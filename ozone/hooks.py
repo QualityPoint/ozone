@@ -25,7 +25,7 @@ app_license = "agpl-3.0"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/ozone/css/ozone.css"
+app_include_css = "/assets/ozone/css/ozone.css"
 # app_include_js = "/assets/ozone/js/ozone.js"
 
 # include js, css files in header of web template
@@ -57,7 +57,7 @@ app_license = "agpl-3.0"
 # ----------
 
 # application home page (will override Website Settings)
-# home_page = "login"
+home_page = "home"
 
 # website user home page (by Role)
 # role_home_page = {
