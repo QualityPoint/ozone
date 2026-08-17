@@ -3,7 +3,7 @@ app_title = "Ozone"
 app_publisher = "QualityPoint"
 app_description = "A waste management app"
 app_email = "erp@qp.sa"
-app_license = "agpl-3.0"
+app_license = "gpl-3.0"
 
 # Apps
 # ------------------
