@@ -1,0 +1,42 @@
+/*
+ * Ozone's theme for the `accessibility` app's toolbar.
+ *
+ * Two jobs only: map the toolbar's --acc-* tokens onto the Wastey template's
+ * palette, and give the sticky header a trigger of its own. The widget's
+ * look lives in /assets/accessibility/css/accessibility.css.
+ */
+
+:root {
+	--acc-accent: var(--thm-base);
+	--acc-ink: var(--thm-black);
+	--acc-text: #646a7a;          /* .topbar-one__infos p */
+	--acc-border: #d4d7de;        /* topbar icon borders */
+	--acc-pill-bg: #f1f3f5;       /* .topbar-one background */
+	--acc-pill-fg: var(--thm-black);
+	--acc-font: var(--thm-font);
+	--acc-radius: 4px;
+	--acc-bar-bg: var(--thm-black);
+	--acc-bar-width: 1140px;      /* bootstrap .container at >= 1200px */
+}
+
+/* The bar sits above the header and scrolls away with it; theme.js clones
+   only <header class="stricky"> for the sticky copy, so that copy gets an
+   icon-only trigger in its logo row. Hidden everywhere else. */
+.acc-toggle--compact {
+	display: none;
+	/* .header-one__logo::before is a positioned white band that paints over
+	   static siblings — same lift the template gives .side-menu__toggler. */
+	position: relative;
+	z-index: 10;
+	margin-inline-start: auto;
+	margin-inline-end: 12px;
+}
+
+.header-one.stricked-menu .header-one__logo {
+	display: flex;
+	align-items: center;
+}
+
+.header-one.stricked-menu .acc-toggle--compact {
+	display: inline-flex;
+}

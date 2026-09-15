@@ -1,0 +1,162 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-09-10 16:17:46.626739",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "brand_tab",
+  "brand_name",
+  "column_break_fjfl",
+  "logo",
+  "favicon",
+  "contact_tab",
+  "email",
+  "whatsapp",
+  "column_break_awco",
+  "contact_phones",
+  "social_links_tab",
+  "facebook",
+  "instagram",
+  "snapchat",
+  "linktree",
+  "column_break_qhgf",
+  "x",
+  "youtube",
+  "tiktok",
+  "linkedin"
+ ],
+ "fields": [
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name"
+  },
+  {
+   "fieldname": "column_break_fjfl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo"
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
+  },
+  {
+   "fieldname": "brand_tab",
+   "fieldtype": "Tab Break",
+   "label": "Brand"
+  },
+  {
+   "fieldname": "contact_tab",
+   "fieldtype": "Tab Break",
+   "label": "Contact"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "column_break_awco",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "contact_phones",
+   "fieldtype": "Table",
+   "label": "Contact Phones",
+   "options": "Website Contact Phone"
+  },
+  {
+   "fieldname": "social_links_tab",
+   "fieldtype": "Tab Break",
+   "label": "Social Links"
+  },
+  {
+   "fieldname": "facebook",
+   "fieldtype": "Data",
+   "label": "Facebook"
+  },
+  {
+   "fieldname": "instagram",
+   "fieldtype": "Data",
+   "label": "Instagram",
+   "options": "URL"
+  },
+  {
+   "fieldname": "snapchat",
+   "fieldtype": "Data",
+   "label": "Snapchat"
+  },
+  {
+   "fieldname": "linktree",
+   "fieldtype": "Data",
+   "label": "Linktree",
+   "options": "URL"
+  },
+  {
+   "fieldname": "column_break_qhgf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "x",
+   "fieldtype": "Data",
+   "label": "X"
+  },
+  {
+   "fieldname": "youtube",
+   "fieldtype": "Data",
+   "label": "YouTube",
+   "options": "URL"
+  },
+  {
+   "fieldname": "tiktok",
+   "fieldtype": "Data",
+   "label": "TikTok"
+  },
+  {
+   "fieldname": "linkedin",
+   "fieldtype": "Data",
+   "label": "LinkedIn",
+   "options": "URL"
+  },
+  {
+   "fieldname": "whatsapp",
+   "fieldtype": "Data",
+   "label": "Whatsapp",
+   "options": "Phone"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-12 11:45:26.521362",
+ "modified_by": "Administrator",
+ "module": "Ozone",
+ "name": "Ozone Website Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

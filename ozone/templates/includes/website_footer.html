@@ -1,0 +1,123 @@
+{#- Site footer, shared by the 28 header-one pages (index-2 / index-3 keep
+    their own). Contact details and social links come from Accessibility
+    Settings via `contact` (see oz_website/utils.py); opening hours are still
+    template copy -- there is no field for them yet. -#}
+{% from "ozone/templates/includes/macros.html" import social_links, tel_link, mail_link %}
+            <footer class="site-footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-3">
+                            <div class="footer-widget">
+                                <a href="/" class="footer-widget__logo">
+                                    <img src="/assets/ozone/website/images/logo-1-2.png" alt="">
+                                </a>
+                                <p>There are many variations passages lorem ipsumd available the majority have suffered
+                                    alterationd some form by injected humour, or randomised words which don't look even
+                                    slightly believable. <a href="/our-story">Read More ...</a></p>
+                                <div class="footer-widget__review">
+                                    <h3>Excellent</h3>
+                                    <div class="footer-widget__review-stars">
+                                        <i class="wastey-icon-52"></i>
+                                        <i class="wastey-icon-52"></i>
+                                        <i class="wastey-icon-52"></i>
+                                        <i class="wastey-icon-52"></i>
+                                        <i class="wastey-icon-52"></i>
+                                    </div><!-- /.footer-widget__review-stars -->
+                                    <p>Based On 2,518 Reviews</p>
+                                    <span class="footer-widget__review-count">
+                                        4.9
+                                    </span>
+                                </div><!-- /.footer-widget__review -->
+                            </div><!-- /.footer-widget -->
+                        </div><!-- /.col-lg-3 -->
+                        <div class="col-xl-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="footer-widget">
+                                        <h3 class="footer-widget__title"><span>Our Services</span></h3>
+                                        <!-- /.footer-widget__title -->
+                                        <ul class="list-unstyled footer-widget__list">
+                                            <li><a href="/ser-d-waste">Recurring Waste Services</a></li>
+                                            <li><a href="/ser-d-dumpster">Dumpster Rentals</a></li>
+                                            <li><a href="/ser-d-ondemand">On Demand Collection</a></li>
+                                            <li><a href="/ser-d-tech">Technology</a></li>
+                                            <li><a href="/ser-d-sustain">Sustainability Programs</a></li>
+                                            <li><a href="/ser-d-zero">Zero Waste</a></li>
+                                        </ul><!-- /.list-unstyled footer-widget__list -->
+                                    </div><!-- /.footer-widget -->
+                                </div><!-- /.col-md-6 -->
+                                <div class="col-md-6">
+                                    <div class="footer-widget">
+                                        <h3 class="footer-widget__title"><span>Useful Links</span></h3>
+                                        <!-- /.footer-widget__title -->
+                                        <ul class="list-unstyled footer-widget__list">
+                                            <li><a href="/our-story">About Company</a></li>
+                                            <li><a href="/case-1">Projects</a></li>
+                                            <li><a href="/team">Team</a></li>
+                                            <li><a href="/blog-listing">News & Updates</a></li>
+                                            <li><a href="/faqs">Help & Support</a></li>
+                                            <li><a href="/contact">Contact Us</a></li>
+                                        </ul><!-- /.list-unstyled footer-widget__list -->
+
+                                    </div><!-- /.footer-widget -->
+                                </div><!-- /.col-md-6 -->
+                            </div><!-- /.row -->
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <form action="#" class="footer-widget__subscribe-form mc-form"
+                                        data-url="https://xyz.us18.list-manage.com/subscribe/post?u=20e91746ef818cd941998c598&amp;id=cc0ee8140e">
+                                        <input type="email" class="formInput" placeholder="Your Email Address">
+                                        <button type="submit">Subscribe Us</button>
+                                        <div class="mc-form__response"></div><!-- /.mc-form__response -->
+                                    </form><!-- /.footer-widget__subscribe-form -->
+                                </div><!-- /.col-lg-12 -->
+                            </div><!-- /.row -->
+
+                        </div><!-- /.col-lg-6 -->
+                        <div class="col-xl-3">
+                            <div class="footer-widget footer-widget__contact">
+                                <h3 class="footer-widget__title"><span>Contact Us</span></h3>
+                                <!-- /.footer-widget__title -->
+                                <ul class="footer-widget__contact-list list-unstyled">
+                                    {% if contact.addressLine %}
+                                    <li>
+                                        <i class="wastey-icon-2"></i>
+                                        {{ contact.addressLine }}
+                                    </li>
+                                    {% endif %}
+                                    {% if contact.whatsapp or contact.email %}
+                                    <li>
+                                        <i class="wastey-icon-4"></i>
+                                        {% if contact.whatsapp %}{{ tel_link(contact.whatsapp) }}{% endif %}
+                                        {% if contact.email %}{{ mail_link(contact.email) }}{% endif %}
+                                    </li>
+                                    {% endif %}
+                                    <li>
+                                        <i class="wastey-icon-3"></i>
+                                        Opening Hrs: <br> Mon-Sat: 9.00am to 7.00pm
+                                    </li>
+                                    {% if contact.socialLinks %}
+                                    <li>
+                                        <i class="wastey-icon-2"></i>
+                                        <span>Connect With Us</span>
+                                        <div class="footer-widget__social">
+                                            {{ social_links(contact.socialLinks) }}
+                                        </div><!-- /.footer-widget__social -->
+                                    </li>
+                                    {% endif %}
+                                </ul><!-- /.footer-widget__contact-list list-unstyled -->
+                            </div><!-- /.footer-widget -->
+                        </div><!-- /.col-lg-3 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+            </footer><!-- /.site-footer -->
+        </section><!-- /.main-footer-wrap -->
+        <div class="site-footer__bottom">
+            <div class="container">
+                <p>Copyright © {{ year }} All Rights Reserved by <a href="/">Wastey.</a></p>
+                <ul class="list-unstyled site-footer__bottom-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms + Conditions</a></li>
+                </ul><!-- /.list-unstyled -->
+            </div><!-- /.container -->
+        </div><!-- /.site-footer__bottom -->

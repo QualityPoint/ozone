@@ -1,0 +1,8 @@
+{#- Icon-only trigger for the accessibility drawer inside the sticky header
+    clone, which theme.js builds from <header> alone -- the accessibility bar
+    above it scrolls away. Shown only there (see accessibility-theme.css).
+    Left empty on purpose: accessibility.js fills any bare
+    [data-accessibility-toggle] with the toolbar's icon (the built-in glyph or
+    the one chosen in Accessibility Settings > Theme) and keeps it in sync
+    with the bar's own toggle. -#}
+<button type="button" class="acc-pill acc-toggle acc-toggle--compact" data-accessibility-toggle aria-haspopup="dialog" aria-expanded="false" aria-controls="acc-panel" aria-label="{{ _('Accessibility Tool') }}"></button>

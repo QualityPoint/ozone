@@ -1,0 +1,29 @@
+{#- Rendering helpers shared by the header, footer and off-canvas panels.
+
+    They delegate to the `accessibility` app's macros, which own the social
+    icon defaults (a row's uploaded icon, else a built-in glyph per platform)
+    and the tel:/mailto: normalisation. The app is optional for ozone, so the
+    import happens inside each macro and only when there is something to
+    render -- `contact` is empty when the app is not installed (see
+    oz_website/utils.py), so the import is never reached without it. -#}
+
+{% macro social_links(links) -%}
+    {%- if links -%}
+        {% from "accessibility/templates/includes/macros.html" import social_links as render %}
+        {{ render(links) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro tel_link(number) -%}
+    {%- if number -%}
+        {% from "accessibility/templates/includes/macros.html" import tel_link as render %}
+        {{ render(number) }}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro mail_link(email) -%}
+    {%- if email -%}
+        {% from "accessibility/templates/includes/macros.html" import mail_link as render %}
+        {{ render(email) }}
+    {%- endif -%}
+{%- endmacro %}

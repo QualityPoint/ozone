@@ -9,17 +9,23 @@ app_license = "gpl-3.0"
 # ------------------
 
 # required_apps = []
+#
+# The `accessibility` app is an optional add-on, not a dependency: when it is
+# installed on the site, the public pages gain its toolbar / language switcher
+# / deaf-friendly contact bar and read the site's contact details from
+# Accessibility Settings. Without it the pages render the same, minus those
+# blocks (see oz_website/utils.py and the `{% if accessibility %}` guards).
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "ozone",
-# 		"logo": "/assets/ozone/logo.png",
-# 		"title": "Ozone",
-# 		"route": "/ozone",
-# 		"has_permission": "ozone.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "ozone",
+		"logo": "/assets/ozone/icons/logo.svg",
+		"title": "Ozone",
+		"route": "/ozone",
+		# "has_permission": "ozone.api.permission.has_app_permission"
+	}
+]
 
 # Includes in <head>
 # ------------------

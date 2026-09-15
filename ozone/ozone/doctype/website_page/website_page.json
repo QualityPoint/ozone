@@ -1,0 +1,131 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:page_name",
+ "creation": "2026-09-10 17:25:17.821477",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_h01p",
+  "page_name",
+  "route",
+  "language",
+  "column_break_ljgf",
+  "is_group",
+  "parent_page",
+  "section_break_ummc",
+  "lft",
+  "old_parent",
+  "column_break_ybnh",
+  "rgt"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_h01p",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Old Parent",
+   "options": "Website Page"
+  },
+  {
+   "fieldname": "parent_page",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Parent Page",
+   "options": "Website Page"
+  },
+  {
+   "fieldname": "column_break_ljgf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_ummc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ybnh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Example: <code>/home</code>",
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route",
+   "options": "URL"
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Language",
+   "options": "Language",
+   "reqd": 1
+  },
+  {
+   "fieldname": "page_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Page Name",
+   "reqd": 1,
+   "unique": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_tree": 1,
+ "links": [],
+ "modified": "2026-09-10 17:31:27.743378",
+ "modified_by": "Administrator",
+ "module": "Ozone",
+ "name": "Website Page",
+ "naming_rule": "By fieldname",
+ "nsm_parent_field": "parent_page",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Website Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

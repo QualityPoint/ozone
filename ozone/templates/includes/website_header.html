@@ -1,0 +1,139 @@
+{#- Topbar + main header, shared by every page that uses the template's
+    "header-one" layout (index-2 / index-3 have their own variants). Extracted
+    so the accessibility tools and any future header edit happen once.
+
+    theme.js clones <header class="stricky"> for the sticky copy, so nothing
+    inside may rely on an id -- the toolbar fills/syncs by data attribute.
+
+    Contact details come from Accessibility Settings via `contact`
+    (oz_website/utils.py); the branch selector and hours are still template
+    copy -- nothing stores them yet. -#}
+{% from "ozone/templates/includes/macros.html" import tel_link, mail_link %}
+        {#- Accessibility bar: contact details + language / deaf-contact /
+            accessibility tools, above the template's own topbar. -#}
+        {% if accessibility %}{% include "accessibility/templates/includes/bar.html" %}{% endif %}
+        <div class="topbar-one">
+            <div class="container">
+                <ul class="list-unstyled topbar-one__infos">
+                    <li class="topbar-one__select-box">
+                        <i class="wastey-icon-1"></i>
+                        <select class="selectpicker">
+                            <option value="branch-1">NewYork</option>
+                            <option value="branch-2">California</option>
+                            <option value="branch-3">Melbourn</option>
+                        </select>
+                    </li>
+                    {% if contact.addressLine %}
+                    <li>
+                        <i class="wastey-icon-2"></i>
+                        <h3>Main Branch</h3>
+                        <p>{{ contact.addressLine }}</p>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <i class="wastey-icon-3"></i>
+                        <h3>Mon - SUN</h3>
+                        <p>9.00am to 8.00pm</p>
+                    </li>
+                    {% if contact.whatsapp or contact.email %}
+                    <li>
+                        <i class="wastey-icon-4"></i>
+                        {% if contact.whatsapp %}<h3>{{ tel_link(contact.whatsapp) }}</h3>{% endif %}
+                        {% if contact.email %}<p>{{ mail_link(contact.email) }}</p>{% endif %}
+                    </li>
+                    {% endif %}
+                </ul><!-- /.list-unstyled topbar-one__infos -->
+                <div class="topbar-one__right">
+                    <a class="sidecontent__toggler side-content__toggler" href="#"><i class="wastey-icon-5"></i></a>
+                </div><!-- /.topbar-one__right -->
+            </div><!-- /.container -->
+        </div><!-- /.topbar-one -->
+        <header class="header-one stricky">
+            <a href="#" class="topbar-one__toggler"><i class="far fa-angle-down"></i></a><!-- /.topbar-one__toggler -->
+            <div class="container">
+                <div class="header-one__logo">
+                    <a href="/">
+                        <img src="/assets/ozone/website/images/logo-1-1.png" alt="">
+                    </a>
+                    {#- Icon-only trigger for the sticky clone, which has no bar above it. -#}
+                    {% if accessibility %}{% include "ozone/templates/includes/accessibility_compact_toggle.html" %}{% endif %}
+                    <span class="side-menu__toggler fa fa-bars"></span>
+                </div><!-- /.header-one__logo -->
+                <nav class="header-one__menu main-nav__main-navigation">
+                    <ul class="header-one__menu-list main-nav__navigation-box">
+                        <li class="dropdown">
+                            <a href="/">Home</a>
+                            <ul>
+                                <li><a href="/">Home Page 01</a></li>
+                                <li><a href="/index-2">Home Page 02</a></li>
+                                <li><a href="/index-3">Home Page 03</a></li>
+                            </ul>
+                        </li><!-- /.dropdown -->
+                        <li class="dropdown">
+                            <a href="#">About</a>
+                            <ul>
+                                <li><a href="/our-story">Our Story</a></li>
+                                <li><a href="/company-values">Company Values</a></li>
+                                <li><a href="/team">Team</a></li>
+                                <li><a href="/career">Career</a></li>
+                            </ul>
+                        </li><!-- /.dropdown -->
+                        <li class="dropdown">
+                            <a href="/services">Services</a>
+                            <ul>
+                                <li><a href="/services">All Services</a></li>
+                                <li><a href="/ser-d-waste">Waste Removal</a></li>
+                                <li><a href="/ser-d-dumpster">Dumpster Rentals</a></li>
+                                <li><a href="/ser-d-ondemand">On-Demand Collection</a></li>
+                                <li><a href="/ser-d-zero">Zero Waste</a></li>
+                                <li><a href="/ser-d-tech">Technology</a></li>
+                            </ul>
+                        </li><!-- /.dropdown -->
+                        <li class="dropdown">
+                            <a href="/industries">Industries</a>
+                            <ul>
+                                <li><a href="/industries">All Industries</a></li>
+                                <li><a href="/ind-d-grocery">Grocery Stores</a></li>
+                                <li><a href="/ind-d-medical">Medical & Hospital</a></li>
+                                <li><a href="/ind-d-hotel">Hotel & Restaurant</a></li>
+                                <li><a href="/ind-d-munci">Municipalities</a></li>
+                                <li><a href="/ind-d-mall">Mall & Theatre</a></li>
+                                <li><a href="/ind-d-stadium">Stadium & Event</a></li>
+                            </ul>
+                        </li><!-- /.dropdown -->
+                        <li class="dropdown">
+                            <a href="#">Pages</a>
+                            <ul>
+                                <li class="dropdown"><a href="/blog-grid">Blog</a>
+                                    <ul>
+                                        <li><a href="/blog-grid">Blog Grid</a></li>
+                                        <li><a href="/blog-listing">Blog Listing</a></li>
+                                        <li><a href="/blog-masonary">Blog Masonry</a></li>
+                                        <li><a href="/blog-details">Single Post</a></li>
+                                    </ul><!-- /.dropdown -->
+                                </li>
+                                <li class="dropdown"><a href="/case-1">Case Studies</a>
+                                    <ul>
+                                        <li><a href="/case-1">Case Studies 01</a></li>
+                                        <li><a href="/case-2">Case Studies 02</a></li>
+                                        <li><a href="/case-details">Case Details</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="/faqs">FAQ’s</a></li>
+                            </ul>
+                        </li><!-- /.dropdown -->
+                        <li>
+                            <a href="/contact">Contact</a>
+                        </li><!-- /.dropdown -->
+                    </ul><!-- /.header-one__menu-list -->
+                </nav><!-- /.header-one__menu -->
+                <div class="header-one__right">
+                    <a href="/contact">
+                        <i class="wastey-icon-9"></i>
+                        Request pickup
+                    </a>
+                </div><!-- /.header-one__right -->
+            </div><!-- /.container -->
+        </header><!-- /.header-one -->
+        {#- Skip-link target: the template has no <main>, so land just past the header. -#}
+        <div id="main-content" tabindex="-1"></div>
