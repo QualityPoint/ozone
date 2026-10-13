@@ -39,3 +39,26 @@ export interface SiteContact {
 	map: string | null
 	socials: { platform: SocialPlatform; url: string }[]
 }
+
+/** The services on the landing page; texts are `services.items.<id>`. */
+export type ServiceId = "collection" | "environmental" | "recycling"
+
+/** The sectors Ozone serves; texts are `industries.items.<id>`. */
+export type IndustryId =
+	| "commercial"
+	| "industrial"
+	| "government"
+	| "residential"
+
+/** One piece of equipment: its photo in assets/images/equipment/<slug>.webp, texts `equipment.items.<slug>`. */
+export interface EquipmentItem {
+	slug: string
+}
+
+/** An impact figure: the number is a fact (here), its label a message (`why.stats.<id>`). */
+export interface Stat {
+	id: string
+	value: number
+	prefix?: string
+	suffix?: string
+}

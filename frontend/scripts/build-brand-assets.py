@@ -3,6 +3,9 @@
 Sources (outside the repo):
   logo.svg   the official logo, vector, 500x235: red (#af2625) and green (#11532a) inks
   logo.png   the same logo, 2084x980 on transparent
+  References/ملف تشغيل أوزون نهائي copy.pdf
+             the operation file: its pages are images of the fleet and containers in Ozone's
+             livery, rendered with poppler's pdftoppm and cropped (PHOTOS below)
 
 The script writes:
 
@@ -13,13 +16,16 @@ The script writes:
   public/apple-touch-icon.png         180 px, on white
   public/icon-192.png, icon-512.png   web app manifest icons, on white
   public/og-image.png                 1200x630 social preview: the logo between the brand stripes
+  src/assets/images/equipment/<slug>.webp   fleet and container photos (listed in src/config/site.ts)
 
 Usage (from frontend/):  python3 scripts/build-brand-assets.py [SOURCE_DIR]
-Requires Pillow.
+Requires Pillow, and pdftoppm (poppler-utils) for the photos.
 """
 
 import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -27,11 +33,28 @@ from PIL import Image, ImageDraw
 FRONTEND = Path(__file__).resolve().parent.parent
 SOURCE = Path(sys.argv[1] if len(sys.argv) > 1 else Path.home() / "Projects/Ozone")
 BRAND_OUT = FRONTEND / "src/assets/brand"
+PHOTOS_OUT = FRONTEND / "src/assets/images/equipment"
 PUBLIC_OUT = FRONTEND / "public"
 
 GREEN = "#11532a"
 RED = "#af2625"
 WHITE = (255, 255, 255, 255)
+
+# The operation file, and each photo's page and crop box at PHOTO_DPI (left, top, right, bottom),
+# around the product only: below the page's header and its red section tag.
+OPERATION_FILE = "References/ملف تشغيل أوزون نهائي copy.pdf"
+PHOTO_DPI = 150
+PHOTO_WIDTH = 1100
+PHOTOS = {
+	"compactor-trucks": (17, (122, 301, 1671, 1013)),
+	"hook-lift-truck": (18, (281, 307, 1557, 1001)),
+	"tipper-truck": (19, (146, 229, 1710, 965)),
+	"skip-loader": (20, (101, 290, 1719, 920)),
+	"indoor-bins": (28, (215, 290, 1632, 1013)),
+	"outdoor-containers": (29, (137, 343, 1485, 1094)),
+	"compactors": (30, (221, 427, 1590, 887)),
+	"debris-containers": (31, (74, 445, 1707, 881)),
+}
 
 # Where the red "O" and its location pin sit in logo.png (measured from its pixels).
 O_BOX = (56, 324, 528, 798)
@@ -101,6 +124,36 @@ def og_image(logo: Image.Image) -> Image.Image:
 	return image.convert("RGB")
 
 
+def write_photos() -> None:
+	"""Each PHOTOS entry: its page rendered at PHOTO_DPI, cropped, scaled to PHOTO_WIDTH, as WebP.
+	The photos keep the documents' off-white background; the site shows them on white cards."""
+	PHOTOS_OUT.mkdir(parents=True, exist_ok=True)
+	with tempfile.TemporaryDirectory() as tmp:
+		for slug, (page, box) in PHOTOS.items():
+			stem = Path(tmp) / slug
+			subprocess.run(
+				[
+					"pdftoppm",
+					"-r",
+					str(PHOTO_DPI),
+					"-png",
+					"-singlefile",
+					"-f",
+					str(page),
+					"-l",
+					str(page),
+					str(SOURCE / OPERATION_FILE),
+					str(stem),
+				],
+				check=True,
+			)
+			photo = Image.open(f"{stem}.png").convert("RGB").crop(box)
+			photo = photo.resize(
+				(PHOTO_WIDTH, round(photo.height * PHOTO_WIDTH / photo.width)), Image.LANCZOS
+			)
+			photo.save(PHOTOS_OUT / f"{slug}.webp", quality=82, method=6)
+
+
 def main() -> None:
 	BRAND_OUT.mkdir(parents=True, exist_ok=True)
 	PUBLIC_OUT.mkdir(parents=True, exist_ok=True)
@@ -115,6 +168,7 @@ def main() -> None:
 	for size in (192, 512):
 		square(mark, size, WHITE, fill=0.76).save(PUBLIC_OUT / f"icon-{size}.png", optimize=True)
 	og_image(logo).save(PUBLIC_OUT / "og-image.png", optimize=True)
+	write_photos()
 	print(f"wrote brand assets from {SOURCE}")
 
 

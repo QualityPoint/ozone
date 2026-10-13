@@ -1,8 +1,11 @@
+import { existsSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 
 import {
 	basePath,
 	defaultLocale,
+	equipment,
 	localeHome,
 	localePath,
 	navItems,
@@ -35,5 +38,20 @@ describe("navItems", () => {
 	it("has unique ids", () => {
 		const ids = navItems.map((item) => item.id)
 		expect(new Set(ids).size).toBe(ids.length)
+	})
+})
+
+describe("equipment", () => {
+	it("has a photo for every item, and unique slugs", () => {
+		const slugs = [...equipment.fleet, ...equipment.containers].map(
+			(item) => item.slug,
+		)
+		for (const slug of slugs) {
+			const photo = fileURLToPath(
+				new URL(`../../assets/images/equipment/${slug}.webp`, import.meta.url),
+			)
+			expect(existsSync(photo), slug).toBe(true)
+		}
+		expect(new Set(slugs).size).toBe(slugs.length)
 	})
 })

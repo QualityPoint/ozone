@@ -26,6 +26,9 @@ as-is. `frontend/src/` follows the standard Vue 3 layout and the
 
 ## Reuse
 
+- **Entrances go through `BaseReveal` (or `useReveal`).** One place decides when something is
+  in view, instead of an IntersectionObserver per section.
+
 - **Before writing a second copy** of markup or logic, extract it: a `Base*` component for
   UI, a composable (`use*`) for stateful logic, a `utils/` function for pure logic. Then
   switch the first copy to it too.
@@ -64,7 +67,8 @@ Tests live next to the code they cover, in `__tests__/*.test.ts`:
 | File | Checks |
 | --- | --- |
 | `router/__tests__/routes.test.ts` | `/` (Arabic) and `/en` resolve with their locale and page; unknown paths redirect to their language's landing page; every page has a layout |
-| `config/__tests__/site.test.ts` | Arabic has no prefix, English is under `/en` and back (`localePath`, `basePath`), language homes, unique nav ids |
+| `config/__tests__/site.test.ts` | Arabic has no prefix, English is under `/en` and back (`localePath`, `basePath`), language homes, unique nav ids, a photo for every equipment slug |
+| `utils/__tests__/format.test.ts` | Thousands separators, Latin digits |
 | `i18n/__tests__/locales.test.ts` | `en` has exactly the same keys and list lengths as `ar`, no empty messages, no `@ { } \|` |
 | `composables/__tests__/useTheme.test.ts` | Theme toggle, storage key, `theme-color` |
 | `composables/__tests__/useSiteContact.test.ts` | Phone formatting, `wa.me` link, filtering of boot data (unknown platforms, non-https links, empty addresses) |

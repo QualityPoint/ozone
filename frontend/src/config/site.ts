@@ -1,9 +1,13 @@
 import meta from "@/i18n/locales/meta.json"
 import {
+	type EquipmentItem,
+	type IndustryId,
 	type LocaleCode,
 	type NavItem,
 	type PageKey,
 	SUPPORTED_LOCALES,
+	type ServiceId,
+	type Stat,
 } from "@/types"
 
 /**
@@ -64,4 +68,46 @@ export const navItems: NavItem[] = [
 	{ id: "services", section: "services" },
 	{ id: "industries", section: "industries" },
 	{ id: "contact", section: "contact" },
+]
+
+export const serviceIds: ServiceId[] = [
+	"collection",
+	"environmental",
+	"recycling",
+]
+
+/**
+ * The fleet and the containers, in the operation file's order. Each slug's photo is
+ * src/assets/images/equipment/<slug>.webp (made by scripts/build-brand-assets.py).
+ */
+export const equipment: Record<"fleet" | "containers", EquipmentItem[]> = {
+	fleet: [
+		{ slug: "compactor-trucks" },
+		{ slug: "hook-lift-truck" },
+		{ slug: "skip-loader" },
+		{ slug: "tipper-truck" },
+	],
+	containers: [
+		{ slug: "indoor-bins" },
+		{ slug: "outdoor-containers" },
+		{ slug: "compactors" },
+		{ slug: "debris-containers" },
+	],
+}
+
+export const industryIds: IndustryId[] = [
+	"commercial",
+	"industrial",
+	"government",
+	"residential",
+]
+
+/**
+ * Impact figures, from Ozone's operation file. Numbers aren't translated (the site uses Latin
+ * digits in both languages, as blinktech does); their labels are `why.stats.<id>`.
+ */
+export const stats: Stat[] = [
+	{ id: "recycled", value: 50000, prefix: "+" },
+	{ id: "clients", value: 200, prefix: "+" },
+	{ id: "target", value: 90, suffix: "%" },
 ]

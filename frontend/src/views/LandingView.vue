@@ -1,23 +1,19 @@
 <template>
-  <!-- Placeholder hero until the landing sections land (step 4 of docs/frontend/README.md). -->
-  <section class="section flex min-h-[70vh] flex-col items-start justify-center gap-6 py-20">
-    <BaseSectionTag>{{ t("brand.name") }}</BaseSectionTag>
-    <h1 class="max-w-3xl text-display font-extrabold text-site-heading sm:text-display-lg">
-      {{ t("hero.title") }}
-    </h1>
-    <p class="max-w-2xl text-body-lg text-site-muted">{{ t("brand.about") }}</p>
-    <BasePill>
-      <BrandTagline />
-    </BasePill>
-  </section>
+  <LandingHero />
+  <LandingAbout />
+  <LandingServices />
+  <LandingEquipment />
+  <LandingIndustries />
+  <LandingWhyUs />
+  <LandingContact />
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from "vue-i18n"
-
-import BasePill from "@/components/base/BasePill.vue"
-import BaseSectionTag from "@/components/base/BaseSectionTag.vue"
-import BrandTagline from "@/components/brand/BrandTagline.vue"
-
-const { t } = useI18n()
+import LandingAbout from "@/components/landing/LandingAbout.vue"
+import LandingContact from "@/components/landing/LandingContact.vue"
+import LandingEquipment from "@/components/landing/LandingEquipment.vue"
+import LandingHero from "@/components/landing/LandingHero.vue"
+import LandingIndustries from "@/components/landing/LandingIndustries.vue"
+import LandingServices from "@/components/landing/LandingServices.vue"
+import LandingWhyUs from "@/components/landing/LandingWhyUs.vue"
 </script>

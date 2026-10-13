@@ -14,7 +14,7 @@ apps/ozone/
 │   ├── tsconfig{,.app,.node}.json
 │   ├── biome.json
 │   ├── scripts/type-check.mjs   # vue-tsc, ignoring errors inside node_modules/frappe-ui
-│   ├── scripts/build-brand-assets.py  # logos, favicons, og-image from ~/Projects/Ozone
+│   ├── scripts/build-brand-assets.py  # logos, favicons, og-image and equipment photos from ~/Projects/Ozone
 │   ├── public/                  # favicons, og-image, site.webmanifest
 │   ├── types/frappe-ui-config.d.ts
 │   └── src/
@@ -25,15 +25,17 @@ apps/ozone/
 │       ├── i18n/                # index.ts (setLocale, setPageTitle), locales/{ar,en}/, locales/meta.json
 │       ├── config/site.ts       # defaultLocale, localePath/basePath, languages, navItems
 │       ├── types/index.ts       # SUPPORTED_LOCALES, LocaleCode, PageKey, NavItem
-│       ├── composables/         # useLocale, useTheme, useSiteContact
+│       ├── composables/         # useLocale, useTheme, useSiteContact, useMessageList, useReveal, useCountUp
+│       ├── utils/format.ts      # formatNumber (Latin digits)
 │       ├── services/http.ts     # getMethod: plain fetch to Frappe methods
 │       ├── layouts/             # PublicLayout.vue: skip link, silver background, header, main, footer
 │       ├── components/brand/    # BrandLogo, BrandTagline, BrandStripe, BrandSilverBackground
-│       ├── components/base/     # BaseSectionTag, BasePill
+│       ├── components/base/     # BaseSectionHeading, BaseSectionTag, BasePill, BaseButton, BaseCard, BaseReveal, BaseStat, BaseCheckList, nativeTag
+│       ├── components/landing/  # Landing* sections, LandingPhoto, LandingHierarchy, equipmentPhotos.ts
 │       ├── components/layout/   # TheHeader, TheFooter, NavLink, LanguageSwitcher, ThemeToggle
 │       ├── components/icons/    # IconSocial, socialIconPaths (Simple Icons, CC0)
-│       ├── views/               # LandingView.vue
-│       └── assets/              # styles/{main,components}.css, brand/ (generated logos)
+│       ├── views/               # LandingView.vue: the sections in order
+│       └── assets/              # styles/{main,components}.css, brand/ (logos), images/equipment/ (photos), all generated
 ├── ozone/
 │   ├── hooks.py                 # home_page = "frontend", /en route rules
 │   ├── locales.py               # shared_json(): reads the SPA's meta.json; SUPPORTED_LOCALES
@@ -47,8 +49,7 @@ apps/ozone/
 └── docs/frontend/               # these docs
 ```
 
-Folders such as `utils/` are added as the steps that need them land,
-following [conventions.md](conventions.md).
+Folders are added as the features that need them land, following [conventions.md](conventions.md).
 
 ## Routing
 

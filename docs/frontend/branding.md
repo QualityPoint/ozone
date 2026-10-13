@@ -58,6 +58,11 @@ Each motif is one component, used wherever it appears:
 | `base/BaseSectionTag` | A section's label: white on a slanted red tag with a darker edge, mirrored in English |
 | `base/BasePill` | Rounded titles: `outline` (green border), `solid` (green), `accent` (small red label) |
 | `brand/BrandTagline` | The logo's slogan "صيانة - نظافة - مقاولات عامة", its items with red dots between |
+| `base/BaseCard` | The documents' white panels with a soft green-tinted ground shadow |
+| `base/BaseStat` | An impact figure over the documents' green underline bar, counting up in view |
+| `base/BaseCheckList` | The "features" page's green check badges |
+| `landing/LandingPhoto` | A product photo on white, as the documents show the fleet and containers. It stays white in dark mode; `mix-blend-multiply` removes the photo's off-white page |
+| `landing/LandingHierarchy` | The waste-sorting file's inverted triangle, brand green to leaf green |
 | `brand/BrandLogo` | The official logo. `auto` shows the official inks in light mode and the white variant in dark mode; `white` on the green footer |
 
 ## Logo and icon files
@@ -76,5 +81,6 @@ cd frontend
 | `src/assets/brand/logo-white.svg` | The same with the green ink white, for dark backgrounds |
 | `public/favicon.ico`, `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` | The logo's red "O" and its location pin, cut from `logo.png` |
 | `public/og-image.png` | The logo between the brand bands, 1200×630 |
+| `src/assets/images/equipment/<slug>.webp` | Fleet and container photos cropped from the operation file's pages (`PHOTOS` in the script) |
 
 Give every logo `<img>` the `brand-art` class, or frappe-ui dims it in dark mode.

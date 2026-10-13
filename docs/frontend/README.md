@@ -24,8 +24,20 @@ layout.
 | 1. Scaffold, build and serving | Done |
 | 2. Brand, layout, Arabic/English, SEO | Done: header, footer, brand motifs, a placeholder hero |
 | 3. Ozone Settings (contact details) | Done: the footer's contact column, the Desk link |
-| 4. Landing sections | Next |
-| 5. Polish | |
+| 4. Landing sections | Done: hero, about, services, equipment, industries, why us, contact |
+| 5. Polish | Next |
+
+## To confirm before publishing
+
+The landing page's content comes from Ozone's operation files (`~/Projects/Ozone/References`). These claims come from a proposal document, so confirm them with Ozone before the site goes public:
+
+| Claim | Where |
+| --- | --- |
+| +50,000 tonnes recycled a year, +200 clients | `stats` in `src/config/site.ts`, `why.stats` |
+| Working to ISO 14001 | `why.pillars` (environmental commitment) |
+| Recycling 90% of collected waste (stated as a goal) | `about.goals`, `stats` |
+
+Also fill in Ozone Settings: the contact section shows no buttons until it is.
 
 ## Docs
 
@@ -36,6 +48,7 @@ layout.
 | [i18n.md](i18n.md) | Arabic and English: addresses, messages, `meta.json`, adding a page |
 | [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
 | [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
+| [how-to.md](how-to.md) | Recipes: texts, list items, services and sectors, figures, equipment photos, nav, contact details, responsive checks |
 | [server.md](server.md) | The Frappe side: hooks, boot data, endpoints, Ozone Settings and its validation, tests |
 | [setup-history.md](setup-history.md) | How the project was scaffolded |
 | [changes-from-starter.md](changes-from-starter.md) | Every edit made on top of the starter template, and why |
