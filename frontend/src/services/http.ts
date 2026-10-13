@@ -3,6 +3,17 @@
  * don't use frappe-ui resources.
  */
 
+/**
+ * The CSRF header Frappe requires on POST requests. The token comes with the page (boot data),
+ * except on the dev server, where the check is turned off.
+ */
+export function csrfHeaders(): Record<string, string> {
+	const token = window.csrf_token
+	return token && token !== "{{ csrf_token }}"
+		? { "X-Frappe-CSRF-Token": token }
+		: {}
+}
+
 /** A failed call: the HTTP status and Frappe's exception class (`exc_type`), when it sent one. */
 export class MethodError extends Error {
 	constructor(

@@ -26,6 +26,15 @@ export const defaultLocale: LocaleCode = SUPPORTED_LOCALES[0]
 export const pagePaths: Record<PageKey, string> = meta.paths
 
 /**
+ * The login pages' base addresses (website_route_rules in ozone/hooks.py). Not public pages:
+ * they aren't in meta.json, so they stay out of the sitemap and aren't indexed.
+ */
+export const authPaths = {
+	login: "/login",
+	forgotPassword: "/forgot-password",
+} as const
+
+/**
  * A page's address in a language: the base path in the default language, under
  * "/<code>" in the others ("/" → "/en", "/x" → "/en/x"). The server applies the same
  * rule (frontend.py: localized_path).

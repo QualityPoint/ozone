@@ -8,9 +8,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AccountLink: typeof import('./src/components/layout/AccountLink.vue')['default']
+    AuthCard: typeof import('./src/components/auth/AuthCard.vue')['default']
     BaseButton: typeof import('./src/components/base/BaseButton.vue')['default']
     BaseCard: typeof import('./src/components/base/BaseCard.vue')['default']
     BaseCheckList: typeof import('./src/components/base/BaseCheckList.vue')['default']
+    BaseInput: typeof import('./src/components/base/BaseInput.vue')['default']
+    BaseNotice: typeof import('./src/components/base/BaseNotice.vue')['default']
     BasePill: typeof import('./src/components/base/BasePill.vue')['default']
     BaseReveal: typeof import('./src/components/base/BaseReveal.vue')['default']
     BaseSectionHeading: typeof import('./src/components/base/BaseSectionHeading.vue')['default']
@@ -20,6 +24,7 @@ declare module 'vue' {
     BrandSilverBackground: typeof import('./src/components/brand/BrandSilverBackground.vue')['default']
     BrandStripe: typeof import('./src/components/brand/BrandStripe.vue')['default']
     BrandTagline: typeof import('./src/components/brand/BrandTagline.vue')['default']
+    BrandTruck: typeof import('./src/components/brand/BrandTruck.vue')['default']
     IconSocial: typeof import('./src/components/icons/IconSocial.vue')['default']
     LandingAbout: typeof import('./src/components/landing/LandingAbout.vue')['default']
     LandingContact: typeof import('./src/components/landing/LandingContact.vue')['default']

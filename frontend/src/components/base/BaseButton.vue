@@ -5,12 +5,16 @@
   -->
   <RouterLink v-if="to" :to="to" :class="classes"><slot /></RouterLink>
   <a v-else-if="href" :href="href" :class="classes"><slot /></a>
-  <button v-else type="button" :class="classes"><slot /></button>
+  <button v-else :type="type" :disabled="disabled || loading" :aria-busy="loading || undefined" :class="classes">
+    <LucideLoaderCircle v-if="loading" class="size-4 motion-safe:animate-spin" aria-hidden="true" />
+    <slot />
+  </button>
 </template>
 
 <script lang="ts" setup>
 import { computed } from "vue"
 import type { RouteLocationRaw } from "vue-router"
+import LucideLoaderCircle from "~icons/lucide/loader-circle"
 
 const props = withDefaults(
 	defineProps<{
@@ -20,8 +24,13 @@ const props = withDefaults(
 		href?: string
 		/** `primary` green, `accent` red, `outline` green border; `light` on the green bands. */
 		variant?: "primary" | "accent" | "outline" | "light"
+		/** A button's type: `submit` in forms. */
+		type?: "button" | "submit"
+		/** A button waiting for its request: a spinner, and disabled. */
+		loading?: boolean
+		disabled?: boolean
 	}>(),
-	{ variant: "primary" },
+	{ variant: "primary", type: "button" },
 )
 
 const variants = {
@@ -34,7 +43,7 @@ const variants = {
 const classes = computed(() => [
 	"inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-caption font-bold transition",
 	"focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-leaf/60",
-	"motion-safe:hover:-translate-y-0.5",
+	"motion-safe:hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-60",
 	variants[props.variant],
 ])
 </script>

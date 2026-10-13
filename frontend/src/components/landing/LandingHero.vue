@@ -15,19 +15,8 @@
         </div>
       </div>
 
-      <!-- The truck, cut out of the operation file, parked on the band below: its wheels touch
-           the band, over a soft contact shadow. -->
-      <div class="relative lg:-me-4 xl:-me-16">
-        <span class="absolute inset-x-[4%] -bottom-1.5 h-5 rounded-[50%] bg-black/25 blur-md" aria-hidden="true" />
-        <img
-          :src="heroTruck"
-          :alt="t('hero.imageAlt')"
-          width="1200"
-          height="529"
-          fetchpriority="high"
-          class="brand-art relative w-full"
-        />
-      </div>
+      <!-- Parked on the band below, reaching into the page margin on large screens. -->
+      <BrandTruck :alt="t('hero.imageAlt')" eager class="lg:-me-4 xl:-me-16" />
     </div>
     <BrandStripe edge="bottom" />
   </section>
@@ -36,12 +25,12 @@
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n"
 
-import heroTruck from "@/assets/images/hero-truck.webp"
 import BaseButton from "@/components/base/BaseButton.vue"
 import BasePill from "@/components/base/BasePill.vue"
 import BaseSectionTag from "@/components/base/BaseSectionTag.vue"
 import BrandStripe from "@/components/brand/BrandStripe.vue"
 import BrandTagline from "@/components/brand/BrandTagline.vue"
+import BrandTruck from "@/components/brand/BrandTruck.vue"
 import { useLocale } from "@/composables/useLocale"
 
 const { t } = useI18n()

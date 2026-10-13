@@ -1,4 +1,5 @@
 import about from "./about"
+import auth from "./auth"
 import common from "./common"
 import contact from "./contact"
 import equipment from "./equipment"
@@ -16,6 +17,7 @@ const ar = {
 	industries,
 	why,
 	contact,
+	auth,
 }
 
 /** Arabic, the default language, is the source of truth: every locale must match this shape. */

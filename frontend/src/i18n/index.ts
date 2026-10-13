@@ -1,7 +1,7 @@
 import { createI18n } from "vue-i18n"
 
 import { defaultLocale } from "@/config/site"
-import type { LocaleCode, PageKey } from "@/types"
+import type { LocaleCode } from "@/types"
 
 import ar, { type MessageSchema } from "./locales/ar"
 import en from "./locales/en"
@@ -17,16 +17,17 @@ export function isRtl(locale: LocaleCode): boolean {
 	return locale === "ar"
 }
 
-/** The public page on screen, whose title the browser tab shows. */
-let currentPage: PageKey = "landing"
+/** The message of the page on screen's title, which the browser tab shows. */
+let currentTitle = "meta.landing.title"
 
 /**
- * Sets the browser tab's title to `page`'s, in the active language (meta.json), as the
- * server does (ozone/www/frontend.py). Called with no arguments, it re-translates.
+ * Sets the browser tab's title to a message in the active language: a public page's
+ * (`meta.<page>.title`, as the server does in ozone/www/frontend.py) or a route's own
+ * (`meta.title`). Called with no arguments, it re-translates.
  */
-export function setPageTitle(page: PageKey = currentPage): void {
-	currentPage = page
-	document.title = i18n.global.t(`meta.${page}.title`)
+export function setPageTitle(title: string = currentTitle): void {
+	currentTitle = title
+	document.title = i18n.global.t(title)
 }
 
 /**

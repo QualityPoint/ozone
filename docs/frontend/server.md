@@ -7,14 +7,15 @@ What the `ozone` Frappe app does for the website. The SPA itself is in
 
 | File | Role |
 | --- | --- |
-| `ozone/hooks.py` | `home_page = "frontend"`, `website_route_rules` for `/en` and `/en/<path>`; `website_redirects` sends Frappe's built-in `/about` and `/contact` pages (which can't be switched off) to `/#about` and `/#contact` with a 301. Frappe caches each path's redirect: run `bench clear-cache` after changing them |
+| `ozone/hooks.py` | `home_page = "frontend"`, `website_route_rules` for `/en`, `/en/<path>`, and `/login` and `/forgot-password`, which replace Frappe's login page ([auth.md](auth.md)); `website_redirects` sends Frappe's built-in `/about` and `/contact` pages (which can't be switched off) to `/#about` and `/#contact` with a 301. Frappe caches each path's redirect: run `bench clear-cache` after changing them |
 | `ozone/www/frontend.py` | Renders the SPA shell: SEO values (`context.seo`) and boot data (`context.boot`). `resolve_page` maps the path to a page and language with the SPA's `meta.json`, which also gives the title and description. Known pages get a canonical and hreflang links; other paths are `noindex`. `no_cache = 1` |
 | `ozone/www/frontend.html` | Build output (git-ignored): the Jinja shell made by `yarn build` |
 | `ozone/www/sitemap.py`, `sitemap.xml` | Replace Frappe's `/sitemap.xml` (the last installed app's www page wins). They list each SPA page from `meta.json` in every language with its hreflang alternates, then Frappe's own links minus the pages that only redirect (`website_redirects`). A page added to `meta.json` is listed without changes here |
 | `ozone/api/` | Every whitelisted method, one module per area (`ozone.api.<area>.<method>`): thin, they call the modules below |
 | `ozone/site_contact.py` | Contact details and social links from Ozone Settings |
+| `ozone/auth.py` | `enabled_providers()`: the Social Login Keys that are enabled and fully configured |
 | `ozone/locales.py` | Shared: `shared_json` reads the SPA's `meta.json`; `SUPPORTED_LOCALES`, `DEFAULT_LOCALE` |
-| `ozone/tests/` | Python tests: `test_frontend.py` (addresses, SEO per language, the `/about` and `/contact` redirects, the sitemap), `test_site_contact.py` (what the site shows) |
+| `ozone/tests/` | Python tests: `test_frontend.py` (addresses, SEO per language, the `/about` and `/contact` redirects, the sitemap), `test_auth.py` (the login endpoints, the `/login` route), `test_site_contact.py` (what the site shows) |
 | `ozone/ozone/doctype/` | `Ozone Settings` (with its validation tests) and its child tables `Localized Address`, `Social Media Link` |
 
 ## Endpoints
@@ -25,6 +26,9 @@ shows anyway.
 | Method | Access | Returns |
 | --- | --- | --- |
 | `ozone.api.site.get_site_contact` (GET) | guest | Same data as `window.site_contact`. Used by the dev server, which has no boot data |
+| `ozone.api.auth.get_session_user` | guest | `{name, user_type}` of the session: `Guest`/`null` when logged out. The login pages' guard asks it, because Frappe's cookies outlive an expired session |
+| `ozone.api.auth.get_login_options` | guest | The sign-in methods enabled in System Settings and the configured social logins ([auth.md](auth.md#only-enabled-options-are-shown)) |
+| `ozone.api.auth.social_login` (GET) | guest | Redirects to a provider's consent screen with a fresh state token; refuses providers that aren't enabled |
 
 ## Boot data
 

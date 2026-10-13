@@ -8,11 +8,13 @@
 import { computed } from "vue"
 import { useRoute } from "vue-router"
 
+import AuthLayout from "@/layouts/AuthLayout.vue"
 import PublicLayout from "@/layouts/PublicLayout.vue"
 import type { LayoutName } from "@/router/routes"
 
 const layouts = {
 	public: PublicLayout,
+	auth: AuthLayout,
 } satisfies Record<LayoutName, unknown>
 
 const route = useRoute()

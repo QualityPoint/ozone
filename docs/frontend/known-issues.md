@@ -17,7 +17,14 @@ source ([README.md](README.md#content-sources)).
 Ozone Settings is empty on ozone.local. Until it's filled in, the footer has no contact
 column and the contact section has no buttons ([server.md](server.md#ozone-settings)).
 
-### 3. The Ozone sidebar's Home row is relabelled on ozone.local (local)
+### 3. No outgoing email (setup)
+
+ozone.local has no outgoing Email Account, yet *Login with email link* is on in System
+Settings. "Email me a login link" and password reset answer "sent", by design the same whether
+or not the account exists, but nothing is delivered. Add an Email Account on each site, or
+turn the email link off ([auth.md](auth.md#only-enabled-options-are-shown)).
+
+### 4. The Ozone sidebar's Home row is relabelled on ozone.local (local)
 
 A site-level sidebar customization, created on 2026-10-13, shows the Home row as "Ozone" with
 a truck icon. It's site data, not app code. Reset the sidebar's customization in the Desk if

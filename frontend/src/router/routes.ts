@@ -1,9 +1,10 @@
-import type { RouteComponent, RouteRecordRaw } from "vue-router"
+import type { RouteComponent, RouteMeta, RouteRecordRaw } from "vue-router"
 
-import { defaultLocale, localePath, pagePaths } from "@/config/site"
+import { forgotHash } from "@/components/auth/authHelpers"
+import { authPaths, defaultLocale, localePath, pagePaths } from "@/config/site"
 import { type LocaleCode, type PageKey, SUPPORTED_LOCALES } from "@/types"
 
-export type LayoutName = "public"
+export type LayoutName = "public" | "auth"
 
 declare module "vue-router" {
 	interface RouteMeta {
@@ -13,6 +14,10 @@ declare module "vue-router" {
 		locale?: LocaleCode
 		/** The public page it is (its title, description and twin addresses in meta.json). */
 		page?: PageKey
+		/** The tab title's message, for pages outside meta.json (the login pages). */
+		title?: string
+		/** Logged-in visitors are sent on (the login pages): see guards.ts. */
+		guestOnly?: boolean
 	}
 }
 
@@ -23,18 +28,36 @@ export function localizedName(name: string, locale: LocaleCode): string {
 		: `${name}${locale[0].toUpperCase()}${locale.slice(1)}`
 }
 
-/** A public page in every language (meta.json `paths`, config/site.ts: localePath), on the public layout. */
+/** A page in every language, at its base path's address in each (config/site.ts: localePath). */
+function inEveryLocale(
+	path: string,
+	name: string,
+	component: () => Promise<RouteComponent>,
+	meta: Omit<RouteMeta, "locale">,
+	extra: Partial<RouteRecordRaw> = {},
+): RouteRecordRaw[] {
+	return SUPPORTED_LOCALES.map(
+		(locale) =>
+			({
+				...extra,
+				path: localePath(path, locale),
+				name: localizedName(name, locale),
+				component,
+				meta: { ...meta, locale },
+			}) as RouteRecordRaw,
+	)
+}
+
+/** A public page (meta.json `paths`) on the public layout. */
 function localizedRoutes(
 	page: PageKey,
 	name: string,
 	component: () => Promise<RouteComponent>,
 ): RouteRecordRaw[] {
-	return SUPPORTED_LOCALES.map((locale) => ({
-		path: localePath(pagePaths[page], locale),
-		name: localizedName(name, locale),
-		component,
-		meta: { layout: "public", locale, page },
-	}))
+	return inEveryLocale(pagePaths[page], name, component, {
+		layout: "public",
+		page,
+	})
 }
 
 /** Unknown addresses go to the landing page of their language. */
@@ -57,6 +80,31 @@ export const routes: RouteRecordRaw[] = [
 		"landing",
 		"Landing",
 		() => import("@/views/LandingView.vue"),
+	),
+	// Replaces Frappe's /login (website_route_rules in ozone/hooks.py).
+	...inEveryLocale(
+		authPaths.login,
+		"Login",
+		() => import("@/views/auth/LoginView.vue"),
+		{ layout: "auth", title: "auth.login.pageTitle", guestOnly: true },
+		{
+			beforeEnter: (to) =>
+				forgotHash(to.hash)
+					? {
+							name: localizedName(
+								"ForgotPassword",
+								to.meta.locale ?? defaultLocale,
+							),
+							query: to.query,
+						}
+					: undefined,
+		},
+	),
+	...inEveryLocale(
+		authPaths.forgotPassword,
+		"ForgotPassword",
+		() => import("@/views/auth/ForgotPasswordView.vue"),
+		{ layout: "auth", title: "auth.forgot.pageTitle", guestOnly: true },
 	),
 	...fallbacks,
 ]

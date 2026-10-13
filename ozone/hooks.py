@@ -62,9 +62,12 @@ home_page = "frontend"
 
 # The website SPA (frontend/): `/` is home_page; each other language's pages live under its
 # prefix. Every top-level SPA path needs a rule here, or a full page load returns Frappe's 404.
+# /login replaces Frappe's own login page (frontend/src/router/routes.ts).
 website_route_rules = [
 	{"from_route": "/en", "to_route": "frontend"},
 	{"from_route": "/en/<path:app_path>", "to_route": "frontend"},
+	{"from_route": "/login", "to_route": "frontend"},
+	{"from_route": "/forgot-password", "to_route": "frontend"},
 ]
 
 # Frappe's own About Us and Contact Us pages (frappe/www/about.py, contact.py) are public and

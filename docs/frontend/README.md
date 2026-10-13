@@ -26,6 +26,7 @@ layout.
 | 3. Ozone Settings (contact details) | Done: the footer's contact column, the Desk link |
 | 4. Landing sections | Done: hero, about, services, equipment, industries, why us, contact |
 | 5. Polish | Done: responsive audit (320–1366 px), font weights, the hero's truck cut-out with no motion, clean-checkout build, CI frontend job |
+| 6. Login | Done: Ozone's own `/login` and `/forgot-password` in both languages, replacing Frappe's ([auth.md](auth.md)) |
 
 ## Content sources
 
@@ -59,9 +60,10 @@ Also fill in Ozone Settings: the contact section shows no buttons until it is.
 | [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
 | [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
 | [how-to.md](how-to.md) | Recipes: texts, list items, services and sectors, figures, equipment photos, nav, contact details, responsive checks |
-| [known-issues.md](known-issues.md) | Open items: content to confirm, empty contact details, a local sidebar customization |
+| [known-issues.md](known-issues.md) | Open items: content to confirm, empty contact details, no outgoing email, a local sidebar customization |
 | [dependencies.md](dependencies.md) | Packages, versions and why each is there; tools outside yarn |
 | [typescript.md](typescript.md) | tsconfig layout, global types, the filtered `type-check` script, where it's enforced |
+| [auth.md](auth.md) | The login pages: what they replace, their look, the Frappe behaviour they match, enabled options |
 | [server.md](server.md) | The Frappe side: hooks, boot data, endpoints, Ozone Settings and its validation, tests |
 | [setup-history.md](setup-history.md) | How the project was scaffolded |
 | [changes-from-starter.md](changes-from-starter.md) | Every edit made on top of the starter template, and why |

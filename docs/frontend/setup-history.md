@@ -49,3 +49,4 @@ The details are in [changes-from-starter.md](changes-from-starter.md).
 | 2026-10-13 | Content corrected against the operation file: Ozone collects, transports and sorts at source, and doesn't recycle. The 25-page technical offer's claims removed (recycling services, 90%, +50,000 t, +200 clients, ISO 14001, consulting); the waste hierarchy replaced by the three sorting streams |
 | 2026-10-13 | Frappe's built-in `/about` and `/contact` pages redirect to the landing page's sections (`website_redirects`) |
 | 2026-10-13 | `/sitemap.xml` lists `/` and `/en` with hreflang alternates, and no longer the redirected `/about` and `/contact` |
+| 2026-10-13 | Step 6: Ozone's own login (`/login`, `/forgot-password`, in both languages) replaces Frappe's: blinktech's structure without sign up, in the website's look; an account link in the header |

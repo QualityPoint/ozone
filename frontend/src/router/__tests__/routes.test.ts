@@ -26,6 +26,24 @@ describe("routes", () => {
 		})
 	})
 
+	it("serves the login pages in each language, on the auth layout, for guests", () => {
+		for (const [path, name, locale] of [
+			["/login", "Login", "ar"],
+			["/en/login", "LoginEn", "en"],
+			["/forgot-password", "ForgotPassword", "ar"],
+			["/en/forgot-password", "ForgotPasswordEn", "en"],
+		]) {
+			const route = router.resolve(path)
+			expect(route.name, path).toBe(name)
+			expect(route.meta, path).toMatchObject({
+				layout: "auth",
+				locale,
+				guestOnly: true,
+			})
+			expect(route.meta.page, path).toBeUndefined() // not a public page: not indexed
+		}
+	})
+
 	it("sends unknown paths to their language's landing page", () => {
 		expect(router.resolve("/no-such-page").matched[0].redirect).toBe("/")
 		expect(router.resolve("/en/no-such-page").matched[0].redirect).toBe("/en")

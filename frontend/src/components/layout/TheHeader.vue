@@ -21,6 +21,8 @@
       </ul>
 
       <div class="flex items-center gap-1 sm:gap-2">
+        <!-- On phones it's in the menu: the row has no room left at 320 px. -->
+        <AccountLink class="max-sm:hidden" />
         <ThemeToggle />
         <LanguageSwitcher />
         <button
@@ -42,6 +44,9 @@
         <li v-for="item in navItems" :key="item.id">
           <NavLink :item="item" class="block rounded-2xl px-4 py-3 font-bold text-site-heading hover:bg-site-hover" />
         </li>
+        <li class="border-t border-site-line pt-1 sm:hidden">
+          <AccountLink labelled />
+        </li>
       </ul>
     </div>
   </header>
@@ -56,6 +61,7 @@ import LucideX from "~icons/lucide/x"
 
 import BrandLogo from "@/components/brand/BrandLogo.vue"
 import BrandStripe from "@/components/brand/BrandStripe.vue"
+import AccountLink from "@/components/layout/AccountLink.vue"
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher.vue"
 import NavLink from "@/components/layout/NavLink.vue"
 import ThemeToggle from "@/components/layout/ThemeToggle.vue"

@@ -65,6 +65,13 @@ section needs that `id` on its `<section>`.
 In the Desk: Ozone → Settings → Ozone Settings ([server.md](server.md#ozone-settings)). The
 footer and the contact section show what's filled in, and hide the rest.
 
+## Change how the team logs in
+
+In the Desk: System Settings (password, email link, username or mobile number, two-factor) and
+Social Login Key (Google and others). The login page shows only what's enabled
+([auth.md](auth.md#only-enabled-options-are-shown)). Email links and resets need an outgoing
+Email Account.
+
 ## Check responsiveness
 
 Open `http://ozone.local:8000` and `/en` at 320, 390 and 414 px wide and on desktop. There

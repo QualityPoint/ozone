@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router"
 
-import { installLocaleGuard } from "./guards"
+import { installAuthGuard, installLocaleGuard } from "./guards"
 import { routes } from "./routes"
 
 const router = createRouter({
@@ -27,5 +27,6 @@ const router = createRouter({
 })
 
 installLocaleGuard(router)
+installAuthGuard(router)
 
 export default router
