@@ -4,17 +4,12 @@ app_publisher = "QualityPoint"
 app_description = "A waste management app"
 app_email = "erp@qp.sa"
 app_license = "gpl-3.0"
+app_home = "/desk/ozone"
 
 # Apps
 # ------------------
 
 # required_apps = []
-#
-# The `accessibility` app is an optional add-on, not a dependency: when it is
-# installed on the site, the public pages gain its toolbar / language switcher
-# / deaf-friendly contact bar and read the site's contact details from
-# Accessibility Settings. Without it the pages render the same, minus those
-# blocks (see oz_website/utils.py and the `{% if accessibility %}` guards).
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
@@ -22,7 +17,7 @@ add_to_apps_screen = [
 		"name": "ozone",
 		"logo": "/assets/ozone/icons/logo.svg",
 		"title": "Ozone",
-		"route": "/ozone",
+		"route": app_home,
 		# "has_permission": "ozone.api.permission.has_app_permission"
 	}
 ]
@@ -57,13 +52,13 @@ app_include_css = "/assets/ozone/css/ozone.css"
 # Svg Icons
 # ------------------
 # include app icons in desk
-# app_include_icons = "ozone/public/icons.svg"
+app_include_icons = ["/assets/ozone/icons/module-icons.svg"]
 
 # Home Pages
 # ----------
 
 # application home page (will override Website Settings)
-home_page = "home"
+# home_page = "home"
 
 # website user home page (by Role)
 # role_home_page = {
