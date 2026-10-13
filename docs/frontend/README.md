@@ -27,6 +27,7 @@ layout.
 | 4. Landing sections | Done: hero, about, services, equipment, industries, why us, contact |
 | 5. Polish | Done: responsive audit (320–1366 px), font weights, the hero's truck cut-out with no motion, clean-checkout build, CI frontend job |
 | 6. Login | Done: Ozone's own `/login` and `/forgot-password` in both languages, replacing Frappe's ([auth.md](auth.md)) |
+| 7. Capabilities page | Done: `/capabilities`, Ozone's operational capabilities and teams from the operation file, in the header ([how-to.md](how-to.md#the-capabilities-pages-sections)) |
 
 ## Content sources
 
@@ -45,7 +46,7 @@ under the authority, by other contractors. Don't describe Ozone as a recycling c
 
 | Item | Where |
 | --- | --- |
-| The operation file is a plan ("Ozone will buy…"): the fleet, camp and tracking are described as the service | `why.pillars`, `why.features`, `equipment` |
+| The operation file is a plan ("Ozone will buy…"): the fleet, camp, tracking and teams are described as the service | `why.pillars`, `why.features`, `equipment`, the whole capabilities page (`capabilities.*`) |
 | Following MWAN's requirements for sorting at source | `why.features` |
 
 Also fill in Ozone Settings: the contact section shows no buttons until it is.
@@ -59,7 +60,7 @@ Also fill in Ozone Settings: the contact section shows no buttons until it is.
 | [i18n.md](i18n.md) | Arabic and English: addresses, messages, `meta.json`, adding a page |
 | [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
 | [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
-| [how-to.md](how-to.md) | Recipes: texts, list items, services and sectors, figures, equipment photos, nav, contact details, responsive checks |
+| [how-to.md](how-to.md) | Recipes: texts, list items, the two pages' sections, services and sectors, figures, equipment photos, nav, contact details, responsive checks |
 | [known-issues.md](known-issues.md) | Open items: content to confirm, empty contact details, no outgoing email, a local sidebar customization |
 | [dependencies.md](dependencies.md) | Packages, versions and why each is there; tools outside yarn |
 | [typescript.md](typescript.md) | tsconfig layout, global types, the filtered `type-check` script, where it's enforced |

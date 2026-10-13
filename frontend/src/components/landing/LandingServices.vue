@@ -9,12 +9,7 @@
             <component :is="ICONS[id]" class="size-7" aria-hidden="true" />
           </span>
           <h3 class="mt-5 text-title font-extrabold text-site-heading">{{ t(`services.items.${id}.title`) }}</h3>
-          <ul class="mt-4 space-y-2.5 text-site-muted">
-            <li v-for="point in list(`services.items.${id}.points`)" :key="point" class="flex gap-2.5">
-              <span class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand-red" aria-hidden="true" />
-              <span>{{ point }}</span>
-            </li>
-          </ul>
+          <BaseDotList :items="list(`services.items.${id}.points`)" class="mt-4 text-site-muted" />
         </BaseCard>
       </BaseReveal>
     </ul>
@@ -29,6 +24,7 @@ import LucideSplit from "~icons/lucide/split"
 import LucideTruck from "~icons/lucide/truck"
 
 import BaseCard from "@/components/base/BaseCard.vue"
+import BaseDotList from "@/components/base/BaseDotList.vue"
 import BaseReveal from "@/components/base/BaseReveal.vue"
 import BaseSectionHeading from "@/components/base/BaseSectionHeading.vue"
 import { useMessageList } from "@/composables/useMessageList"

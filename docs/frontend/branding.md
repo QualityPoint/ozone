@@ -82,8 +82,9 @@ cd frontend
 | `src/assets/brand/logo-white.svg` | The same with the green ink white, for dark backgrounds |
 | `public/favicon.ico`, `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` | The logo's red "O" and its location pin, cut from `logo.png` |
 | `public/og-image.png` | The logo between the brand bands, 1200×630 |
-| `src/assets/images/equipment/<slug>.webp` | Fleet and container photos cropped from the operation file's pages (`PHOTOS` in the script) |
+| `src/assets/images/equipment/<slug>.webp` | Fleet, container, support vehicle and safety gear photos cropped from the operation file's pages (`PHOTOS` in the script) |
 | `src/assets/images/hero-truck.webp` | The green compactor truck, cut out on transparency (`HERO_TRUCK` in the script) |
+| `src/assets/images/office/*.webp`, `equipment/route-*.webp` | Photos embedded in the operation file, taken at their own resolution with `pdfimages` (`EMBEDDED_PHOTOS`): the head office (towers, entrance, reception) and each sorting route's truck, trimmed to the truck |
 
 ### The hero truck's cut-out
 

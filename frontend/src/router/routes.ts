@@ -81,6 +81,11 @@ export const routes: RouteRecordRaw[] = [
 		"Landing",
 		() => import("@/views/LandingView.vue"),
 	),
+	...localizedRoutes(
+		"capabilities",
+		"Capabilities",
+		() => import("@/views/CapabilitiesView.vue"),
+	),
 	// Replaces Frappe's /login (website_route_rules in ozone/hooks.py).
 	...inEveryLocale(
 		authPaths.login,

@@ -7,11 +7,9 @@ export type LocaleCode = (typeof SUPPORTED_LOCALES)[number]
 /** A public page with its own address in each language (keys of `paths` in meta.json). */
 export type PageKey = keyof typeof meta.paths
 
-/** One navbar entry: a section of the landing page. Its label is the `nav.<id>` message. */
-export interface NavItem {
-	id: string
-	section: string
-}
+/** One navbar entry: a section of the landing page, or a page of its own. Its label is the
+ * `nav.<id>` message. */
+export type NavItem = { id: string } & ({ section: string } | { page: PageKey })
 
 /** The Platform options of the Social Media Link doctype (Ozone Settings). */
 export const SOCIAL_PLATFORMS = [

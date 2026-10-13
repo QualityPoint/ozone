@@ -2,7 +2,7 @@ import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { type RouteLocationRaw, useRoute } from "vue-router"
 
-import { basePath, localeHome, localePath } from "@/config/site"
+import { basePath, localeHome, localePath, pagePaths } from "@/config/site"
 import { isRtl } from "@/i18n"
 import { type LocaleCode, type NavItem, SUPPORTED_LOCALES } from "@/types"
 
@@ -34,9 +34,11 @@ export function useLocale() {
 		return { path: home.value, hash: `#${section}` }
 	}
 
-	/** Where a navbar item leads. */
+	/** Where a navbar item leads: its page, or its section of the landing page. */
 	function navTarget(item: NavItem): RouteLocationRaw {
-		return sectionLink(item.section)
+		return "page" in item
+			? { path: localePath(pagePaths[item.page], current.value) }
+			: sectionLink(item.section)
 	}
 
 	return { current, other, rtl, home, twin, sectionLink, navTarget }

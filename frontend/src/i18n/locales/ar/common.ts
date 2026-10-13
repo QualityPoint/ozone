@@ -21,6 +21,7 @@ export default {
 	},
 	nav: {
 		about: "من نحن",
+		capabilities: "قدراتنا",
 		services: "خدماتنا",
 		industries: "القطاعات",
 		contact: "تواصل معنا",

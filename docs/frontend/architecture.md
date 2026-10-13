@@ -30,15 +30,16 @@ apps/ozone/
 │       ├── services/            # http.ts (getMethod, csrfHeaders), auth.ts (login endpoints, [auth.md](auth.md))
 │       ├── layouts/             # PublicLayout.vue (skip link, silver background, header, main, footer), AuthLayout.vue (the login pages)
 │       ├── components/brand/    # BrandLogo, BrandTagline, BrandStripe, BrandSilverBackground, BrandTruck
-│       ├── components/base/     # BaseSectionHeading, BaseSectionTag, BasePill, BaseButton, BaseCard, BaseReveal, BaseStat, BaseCheckList, BaseInput, BaseNotice, nativeTag
-│       ├── components/landing/  # Landing* sections, LandingPhoto, LandingStreams, equipmentPhotos.ts
+│       ├── components/base/     # BaseSectionHeading, BaseSectionTag, BasePill, BaseButton, BaseCard, BaseReveal, BaseStat, BaseCheckList, BaseInput, BaseNotice, BaseDotList, nativeTag
+│       ├── components/landing/  # Landing* sections, LandingPhoto, LandingPhotoCard, LandingStreams, equipmentPhotos.ts
+│       ├── components/capabilities/ # Capabilities* sections of /capabilities
 │       ├── components/layout/   # TheHeader, TheFooter, NavLink, LanguageSwitcher, ThemeToggle, AccountLink
 │       ├── components/auth/     # AuthCard, authHelpers.ts (tested)
 │       ├── components/icons/    # IconSocial, socialIconPaths (Simple Icons, CC0)
-│       ├── views/               # LandingView.vue (the sections in order), auth/LoginView.vue, auth/ForgotPasswordView.vue
+│       ├── views/               # LandingView.vue, CapabilitiesView.vue (their sections in order), auth/LoginView.vue, auth/ForgotPasswordView.vue
 │       └── assets/              # styles/{main,components}.css, brand/ (logos), images/equipment/ (photos), all generated
 ├── ozone/
-│   ├── hooks.py                 # home_page = "frontend", route rules (/en, /login, /forgot-password), redirects
+│   ├── hooks.py                 # home_page = "frontend", route rules (/en, /capabilities, /login, /forgot-password), redirects
 │   ├── locales.py               # shared_json(): reads the SPA's meta.json; SUPPORTED_LOCALES
 │   ├── site_contact.py          # site_contact(): Ozone Settings for the website
 │   ├── auth.py                  # enabled_providers(): the social logins to offer

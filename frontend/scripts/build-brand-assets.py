@@ -18,6 +18,7 @@ The script writes:
   public/og-image.png                 1200x630 social preview: the logo between the brand stripes
   src/assets/images/equipment/<slug>.webp   fleet and container photos (listed in src/config/site.ts)
   src/assets/images/hero-truck.webp   the hero's compactor truck, cut out on transparency
+  src/assets/images/<folder>/<slug>.webp  photos embedded in the operation file (EMBEDDED_PHOTOS)
 
 Usage (from frontend/):  ~/frappe-bench/env/bin/python scripts/build-brand-assets.py [SOURCE_DIR]
 Requires Pillow, OpenCV and NumPy (all in the bench's env), and poppler-utils (pdftoppm and
@@ -59,6 +60,12 @@ PHOTOS = {
 	"outdoor-containers": (29, (137, 343, 1485, 1094)),
 	"compactors": (30, (221, 427, 1590, 887)),
 	"debris-containers": (31, (74, 445, 1707, 881)),
+	# The capabilities page: support vehicles and the crews' safety gear.
+	"supervision-cars": (22, (100, 490, 1530, 1000)),
+	"support-pickups": (23, (110, 380, 1670, 870)),
+	"mobile-workshop": (25, (180, 450, 1460, 1010)),
+	"staff-bus": (26, (310, 405, 1435, 1055)),
+	"safety-gear": (37, (220, 280, 1545, 1110)),
 }
 
 # The hero's truck: the green compactor truck, embedded image 6 on page 17 (`pdfimages -list`),
@@ -67,6 +74,20 @@ PHOTOS = {
 HERO_TRUCK = (17, 6)
 HERO_TRUCK_BODY = (500, 178, 1060, 500)
 HERO_WIDTH = 1200
+
+# Photos embedded in the operation file, at their full resolution: published path under
+# src/assets/images/ → (page, image number from `pdfimages -list`, trim the white page around it).
+EMBEDDED_PHOTOS = {
+	# The capabilities page's opening and methodology: the head office (pages 13 and 14).
+	"office/towers": (13, 10, False),
+	"office/entrance": (13, 8, False),
+	"office/reception": (14, 5, False),
+	# Its daily routes: the compactor truck of each sorting stream (pages 54 to 56).
+	"equipment/route-residuals": (54, 0, True),
+	"equipment/route-organics": (55, 0, True),
+	"equipment/route-recyclables": (56, 0, True),
+}
+EMBEDDED_WIDTH = 1100
 
 # Where the red "O" and its location pin sit in logo.png (measured from its pixels).
 O_BOX = (56, 324, 528, 798)
@@ -229,20 +250,53 @@ def truck_alpha(bgr: np.ndarray) -> np.ndarray:
 	return cv2.GaussianBlur(largest(alpha), (3, 3), 0)
 
 
-def write_hero_truck() -> None:
-	"""The compactor truck from the operation file, cut out, cropped and scaled to HERO_WIDTH."""
-	page, number = HERO_TRUCK
+def embedded_image(page: int, number: int) -> Image.Image:
+	"""An image embedded in the operation file, at its own resolution (`pdfimages -list`)."""
 	with tempfile.TemporaryDirectory() as tmp:
 		subprocess.run(
 			["pdfimages", "-f", str(page), "-l", str(page), "-j", str(SOURCE / OPERATION_FILE), f"{tmp}/img"],
 			check=True,
 		)
-		# An Adobe CMYK JPEG: Pillow reads its inks inverted.
-		photo = ImageChops.invert(Image.open(f"{tmp}/img-{number:03d}.jpg")).convert("RGB")
+		image = Image.open(f"{tmp}/img-{number:03d}.jpg")
+		# Adobe CMYK JPEGs: Pillow reads their inks inverted.
+		return (ImageChops.invert(image) if image.mode == "CMYK" else image).convert("RGB")
+
+
+def scaled(image: Image.Image, width: int) -> Image.Image:
+	"""`image` at most `width` wide."""
+	if image.width <= width:
+		return image
+	return image.resize((width, round(image.height * width / image.width)), Image.LANCZOS)
+
+
+def write_embedded_photos() -> None:
+	"""Each EMBEDDED_PHOTOS entry as WebP, trimmed to its subject on the white page when asked."""
+	for path, (page, number, trim) in EMBEDDED_PHOTOS.items():
+		photo = embedded_image(page, number)
+		if trim:
+			ink = ImageChops.difference(photo, Image.new("RGB", photo.size, WHITE[:3])).convert("L")
+			box = ink.point(lambda v: 255 if v > 24 else 0).getbbox()
+			margin = round(photo.width * 0.02)
+			photo = photo.crop(
+				(
+					max(box[0] - margin, 0),
+					max(box[1] - margin, 0),
+					min(box[2] + margin, photo.width),
+					min(box[3] + margin, photo.height),
+				)
+			)
+		out = IMAGES_OUT / f"{path}.webp"
+		out.parent.mkdir(parents=True, exist_ok=True)
+		scaled(photo, EMBEDDED_WIDTH).save(out, quality=82, method=6)
+
+
+def write_hero_truck() -> None:
+	"""The compactor truck from the operation file, cut out, cropped and scaled to HERO_WIDTH."""
+	photo = embedded_image(*HERO_TRUCK)
 	rgba = photo.convert("RGBA")
 	rgba.putalpha(Image.fromarray(truck_alpha(cv2.cvtColor(np.asarray(photo), cv2.COLOR_RGB2BGR))))
 	truck = rgba.crop(rgba.getchannel("A").point(lambda a: 255 if a > 10 else 0).getbbox())
-	truck = truck.resize((HERO_WIDTH, round(truck.height * HERO_WIDTH / truck.width)), Image.LANCZOS)
+	truck = scaled(truck, HERO_WIDTH)
 	truck.save(IMAGES_OUT / "hero-truck.webp", quality=85, alpha_quality=90, method=6)
 
 
@@ -262,6 +316,7 @@ def main() -> None:
 	og_image(logo).save(PUBLIC_OUT / "og-image.png", optimize=True)
 	write_photos()
 	write_hero_truck()
+	write_embedded_photos()
 	print(f"wrote brand assets from {SOURCE}")
 
 

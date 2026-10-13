@@ -21,6 +21,7 @@ export default {
 	},
 	nav: {
 		about: "About",
+		capabilities: "Capabilities",
 		services: "Services",
 		industries: "Industries",
 		contact: "Contact",

@@ -76,6 +76,7 @@ export const localeHome = Object.fromEntries(
 export const navItems: NavItem[] = [
 	{ id: "about", section: "about" },
 	{ id: "services", section: "services" },
+	{ id: "capabilities", page: "capabilities" },
 	{ id: "industries", section: "industries" },
 	{ id: "contact", section: "contact" },
 ]
@@ -110,6 +111,24 @@ export const equipment: Record<"fleet" | "containers", EquipmentItem[]> = {
 		{ slug: "debris-containers" },
 	],
 }
+
+/** The capabilities page's sections, in order: their ids are the page's anchors (#camp). */
+export const capabilitySections = [
+	"method",
+	"operations",
+	"tracking",
+	"camp",
+	"teams",
+	"quality",
+] as const
+
+/** The teams' vehicles on the capabilities page, in the operation file's order. */
+export const supportFleet: EquipmentItem[] = [
+	{ slug: "supervision-cars" },
+	{ slug: "support-pickups" },
+	{ slug: "mobile-workshop" },
+	{ slug: "staff-bus" },
+]
 
 export const industryIds: IndustryId[] = [
 	"complexes",

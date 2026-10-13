@@ -18,8 +18,32 @@ Recipes for the changes most likely to come up. Each keeps one source per fact: 
 | Contact | `LandingContact` | `#contact` | `contact.*` | Ozone Settings |
 
 Sections are built from shared parts: `BaseSectionHeading` (the red tag, title and intro),
-`BaseCard`, `BaseReveal` (fade up in view), `BaseButton`, `BasePill`, `BaseStat` and
-`BaseCheckList`. A section adds only its own texts and layout.
+`BaseCard`, `BaseReveal` (fade up in view), `BaseButton`, `BasePill`, `BaseStat`,
+`BaseCheckList` (green checks), `BaseDotList` (red dots) and `LandingPhotoCard` (a product
+photo with its name). A section adds only its own texts and layout.
+
+## The capabilities page's sections
+
+`/capabilities` (`src/views/CapabilitiesView.vue`) shows Ozone's capabilities from its
+operation file, for publicity. All its texts are `capabilities.*`, with the operation file's
+pages noted in `ar/capabilities.ts`.
+
+| Section | Component | Anchor | Facts |
+| --- | --- | --- | --- |
+| Opening: the head office in photos, then the page's contents | `CapabilitiesHero` | | `capabilitySections` (the contents' order), `office/towers`, `office/entrance` |
+| Methodology, the head office's reception, ways of working | `CapabilitiesMethod` | `#method` | `office/reception` |
+| The protocol, a route per stream, Ramadan and Hajj | `CapabilitiesOperations` | `#operations` | `wasteStreams` (and `about.streams` names), `route-<stream>` photos |
+| Live tracking and daily reports | `CapabilitiesTracking` | `#tracking` | |
+| The operations camp | `CapabilitiesCamp` | `#camp` | |
+| The organisation, field crews, safety gear, the teams' vehicles | `CapabilitiesTeams` | `#teams` | `supportFleet` (photo slugs), `safety-gear` |
+| Maintenance, safety, follow-up, the risk plan | `CapabilitiesQuality` | `#quality` | |
+| Contact | `LandingContact` (shared) | `#contact` | Ozone Settings |
+
+A section's tag is its name in `capabilities.sections`, which the contents list too. A new
+section needs its id in `capabilitySections`, a name there, and that id on its `<section>`.
+
+The operation file states no achievements (completed projects, figures), so the page has none.
+Add them only from a source Ozone confirms.
 
 ## Change a text
 
@@ -57,8 +81,9 @@ The site test checks that every listed slug has its photo. Photos are shown on w
 
 ## Add a navbar entry
 
-Add `{ id, section }` to `navItems` in `config/site.ts` and `nav.<id>` in both languages. The
-section needs that `id` on its `<section>`.
+Add `{ id, section }` (a section of the landing page) or `{ id, page }` (a page of its own) to
+`navItems` in `config/site.ts`, and `nav.<id>` in both languages. A section needs that `id` on its
+`<section>`. A page entry is marked as the current page while it's open (`aria-current`).
 
 ## Change contact details or social links
 

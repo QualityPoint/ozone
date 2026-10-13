@@ -10,6 +10,7 @@ import {
 	localePath,
 	navItems,
 	pagePaths,
+	supportFleet,
 } from "../site"
 
 describe("page addresses", () => {
@@ -43,9 +44,11 @@ describe("navItems", () => {
 
 describe("equipment", () => {
 	it("has a photo for every item, and unique slugs", () => {
-		const slugs = [...equipment.fleet, ...equipment.containers].map(
-			(item) => item.slug,
-		)
+		const slugs = [
+			...equipment.fleet,
+			...equipment.containers,
+			...supportFleet,
+		].map((item) => item.slug)
 		for (const slug of slugs) {
 			const photo = fileURLToPath(
 				new URL(`../../assets/images/equipment/${slug}.webp`, import.meta.url),

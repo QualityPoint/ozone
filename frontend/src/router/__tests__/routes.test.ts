@@ -26,6 +26,21 @@ describe("routes", () => {
 		})
 	})
 
+	it("serves the capabilities page in each language", () => {
+		for (const [path, name, locale] of [
+			["/capabilities", "Capabilities", "ar"],
+			["/en/capabilities", "CapabilitiesEn", "en"],
+		]) {
+			const route = router.resolve(path)
+			expect(route.name, path).toBe(name)
+			expect(route.meta, path).toMatchObject({
+				layout: "public",
+				locale,
+				page: "capabilities",
+			})
+		}
+	})
+
 	it("serves the login pages in each language, on the auth layout, for guests", () => {
 		for (const [path, name, locale] of [
 			["/login", "Login", "ar"],

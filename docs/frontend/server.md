@@ -7,7 +7,7 @@ What the `ozone` Frappe app does for the website. The SPA itself is in
 
 | File | Role |
 | --- | --- |
-| `ozone/hooks.py` | `home_page = "frontend"`, `website_route_rules` for `/en`, `/en/<path>`, and `/login` and `/forgot-password`, which replace Frappe's login page ([auth.md](auth.md)); `website_redirects` sends Frappe's built-in `/about` and `/contact` pages (which can't be switched off) to `/#about` and `/#contact` with a 301. Frappe caches each path's redirect: run `bench clear-cache` after changing them |
+| `ozone/hooks.py` | `home_page = "frontend"`, `website_route_rules` for `/en`, `/en/<path>`, `/capabilities`, and `/login` and `/forgot-password`, which replace Frappe's login page ([auth.md](auth.md)); `website_redirects` sends Frappe's built-in `/about` and `/contact` pages (which can't be switched off) to `/#about` and `/#contact` with a 301. Frappe caches each path's redirect: run `bench clear-cache` after changing them |
 | `ozone/www/frontend.py` | Renders the SPA shell: SEO values (`context.seo`) and boot data (`context.boot`). `resolve_page` maps the path to a page and language with the SPA's `meta.json`, which also gives the title and description. Known pages get a canonical and hreflang links; other paths are `noindex`. `no_cache = 1` |
 | `ozone/www/frontend.html` | Build output (git-ignored): the Jinja shell made by `yarn build` |
 | `ozone/www/sitemap.py`, `sitemap.xml` | Replace Frappe's `/sitemap.xml` (the last installed app's www page wins). They list each SPA page from `meta.json` in every language with its hreflang alternates, then Frappe's own links minus the pages that only redirect (`website_redirects`). A page added to `meta.json` is listed without changes here |

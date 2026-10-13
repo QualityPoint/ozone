@@ -15,7 +15,7 @@
         <li v-for="item in navItems" :key="item.id">
           <NavLink
             :item="item"
-            class="rounded-full px-4 py-2 text-caption font-bold text-site-heading transition hover:bg-site-hover"
+            class="rounded-full px-4 py-2 text-caption font-bold text-site-heading transition hover:bg-site-hover aria-[current=page]:bg-site-hover aria-[current=page]:text-brand-red"
           />
         </li>
       </ul>
@@ -42,7 +42,7 @@
     <div v-show="menuOpen" id="mobile-menu" class="section pb-6 lg:hidden">
       <ul class="space-y-1">
         <li v-for="item in navItems" :key="item.id">
-          <NavLink :item="item" class="block rounded-2xl px-4 py-3 font-bold text-site-heading hover:bg-site-hover" />
+          <NavLink :item="item" class="block rounded-2xl px-4 py-3 font-bold text-site-heading hover:bg-site-hover aria-[current=page]:bg-site-hover" />
         </li>
         <li class="border-t border-site-line pt-1 sm:hidden">
           <AccountLink labelled />
