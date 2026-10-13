@@ -1,0 +1,20 @@
+{
+  "name": "ozone",
+  "version": "1.0.0",
+  "description": "A waste management app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "(cd frontend && yarn install)",
+    "build": "(cd frontend && yarn build)",
+    "dev": "(cd frontend && yarn dev)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:QualityPoint/ozone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

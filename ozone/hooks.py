@@ -58,7 +58,7 @@ app_include_icons = ["/assets/ozone/icons/module-icons.svg"]
 # ----------
 
 # application home page (will override Website Settings)
-# home_page = "home"
+home_page = "frontend"
 
 # website user home page (by Role)
 # role_home_page = {
@@ -256,4 +256,3 @@ app_include_icons = ["/assets/ozone/icons/module-icons.svg"]
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-
