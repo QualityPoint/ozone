@@ -23,7 +23,7 @@
 
       <BaseReveal :delay="150">
         <BaseCard class="p-6">
-          <LandingHierarchy />
+          <LandingStreams />
         </BaseCard>
       </BaseReveal>
     </div>
@@ -33,19 +33,19 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
-import LucideLeaf from "~icons/lucide/leaf"
+import LucideGauge from "~icons/lucide/gauge"
+import LucideHandshake from "~icons/lucide/handshake"
 import LucideLightbulb from "~icons/lucide/lightbulb"
-import LucideMegaphone from "~icons/lucide/megaphone"
 
 import BaseCard from "@/components/base/BaseCard.vue"
 import BasePill from "@/components/base/BasePill.vue"
 import BaseReveal from "@/components/base/BaseReveal.vue"
 import BaseSectionHeading from "@/components/base/BaseSectionHeading.vue"
 import { useMessageList } from "@/composables/useMessageList"
-import LandingHierarchy from "./LandingHierarchy.vue"
+import LandingStreams from "./LandingStreams.vue"
 
 /** One icon per goal in about.goals, same order. */
-const ICONS = [LucideLeaf, LucideLightbulb, LucideMegaphone]
+const ICONS = [LucideGauge, LucideHandshake, LucideLightbulb]
 
 const { t } = useI18n()
 const { list } = useMessageList()

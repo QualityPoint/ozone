@@ -1,23 +1,23 @@
 export default {
-	title: "Serving every sector",
+	title: "Serving commercial establishments",
 	intro:
-		"Broad experience with commercial and industrial clients: we collect cardboard and waste from shops, factories, households and municipal containers.",
+		"Each establishment gets a way of collection that suits its location and its waste.",
 	items: {
-		commercial: {
-			title: "Commercial",
-			body: "Shops, shopping centres and restaurants.",
+		complexes: {
+			title: "Complexes, hotels and stations",
+			body: "A waste room with a bin for each type, emptied by that type's compactor.",
 		},
-		industrial: {
-			title: "Industrial",
-			body: "Factories, warehouses and workshops.",
+		restaurants: {
+			title: "Restaurants and cafés",
+			body: "Daily collection of organic waste, to prevent odours.",
 		},
-		government: {
-			title: "Government and municipalities",
-			body: "Municipal containers and public facilities.",
+		shops: {
+			title: "Shops and markets",
+			body: "Groceries, fruit, vegetable and meat markets, and electrical shops.",
 		},
-		residential: {
-			title: "Households and neighbourhoods",
-			body: "Sorting at source in homes and neighbourhoods.",
+		streets: {
+			title: "Street-front establishments",
+			body: "Shared containers in side streets, and direct pickup in colour-coded bags on main streets.",
 		},
 	},
 }

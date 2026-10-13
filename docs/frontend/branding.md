@@ -59,10 +59,11 @@ Each motif is one component, used wherever it appears:
 | `base/BasePill` | Rounded titles: `outline` (green border), `solid` (green), `accent` (small red label) |
 | `brand/BrandTagline` | The logo's slogan "صيانة - نظافة - مقاولات عامة", its items with red dots between |
 | `base/BaseCard` | The documents' white panels with a soft green-tinted ground shadow |
-| `base/BaseStat` | An impact figure over the documents' green underline bar, counting up in view |
+| `base/BaseStat` | A key figure over the documents' green underline bar, counting up in view |
 | `base/BaseCheckList` | The "features" page's green check badges |
 | `landing/LandingPhoto` | A product photo on white, as the documents show the fleet and containers. It stays white in dark mode; `mix-blend-multiply` removes the photo's off-white page |
-| `landing/LandingHierarchy` | The waste-sorting file's inverted triangle, brand green to leaf green |
+| `landing/LandingHero`'s truck | The documents' products cut out on white: the compactor truck, cut out on transparency, stands on the bottom band (`BrandStripe edge="bottom"`) as its ground, with a soft contact shadow and no motion. It extends into the page margin on large screens |
+| `landing/LandingStreams` | The operation file's three sorting streams, each in its bins' colour: green (organic), blue (sorted), black (non-recyclable) |
 | `brand/BrandLogo` | The official logo. `auto` shows the official inks in light mode and the white variant in dark mode; `white` on the green footer |
 
 ## Logo and icon files
@@ -72,7 +73,7 @@ Each motif is one component, used wherever it appears:
 
 ```bash
 cd frontend
-~/frappe-bench/env/bin/python scripts/build-brand-assets.py   # needs Pillow
+~/frappe-bench/env/bin/python scripts/build-brand-assets.py   # Pillow, OpenCV; poppler-utils
 ```
 
 | Output | From |
@@ -82,5 +83,24 @@ cd frontend
 | `public/favicon.ico`, `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` | The logo's red "O" and its location pin, cut from `logo.png` |
 | `public/og-image.png` | The logo between the brand bands, 1200×630 |
 | `src/assets/images/equipment/<slug>.webp` | Fleet and container photos cropped from the operation file's pages (`PHOTOS` in the script) |
+| `src/assets/images/hero-truck.webp` | The green compactor truck, cut out on transparency (`HERO_TRUCK` in the script) |
+
+### The hero truck's cut-out
+
+The truck is the full-resolution photo embedded in page 17 (`pdfimages`), not a page render.
+It's an Adobe CMYK JPEG, which Pillow reads with inverted inks, so the script inverts it back.
+`truck_alpha()` then separates it from the white page:
+
+1. **Background:** a flood fill from the photo's corners, stopped by edges (Canny) and by any
+   coloured or grey pixel. Near the wheels only dark or coloured pixels stop it, so the grey
+   ground shadow counts as background.
+2. **The box body** (`HERO_TRUCK_BODY`) is kept whole: its white top edge is too faint against
+   the white page to find.
+3. **Below the axles,** only the tyres (found as circles), the textured tread beside them, and
+   nothing below the ground line are kept: the tyres' contact shadow is as dark as the tyres.
+
+The output is the same on every run. To use another truck, set `HERO_TRUCK` to its page and
+image number (`pdfimages -list -f <page> -l <page> <file>`), measure its body box, and check
+the result over a dark background, where any leftover shadow shows.
 
 Give every logo `<img>` the `brand-art` class, or frappe-ui dims it in dark mode.

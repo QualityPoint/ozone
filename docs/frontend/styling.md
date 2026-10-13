@@ -18,7 +18,6 @@ Tailwind 3.4 with frappe-ui's preset (`tailwind.config.ts`), as in blinktech.
 | Class | Use |
 | --- | --- |
 | `.section` | A page section's container: centred, `max-w-6xl`, side padding |
-| `.float-layer` | With `motion-safe:animate-float`: puts the element on its own GPU layer |
 
 Add a class here only when a second component needs the same utility list. Otherwise keep
 utilities in the template.
@@ -35,8 +34,9 @@ Arabic is the default, so every layout must work in both directions:
 
 ## Motion
 
-`animate-fade-up` and `animate-float` are in the theme. Use them as `motion-safe:animate-…`, so
-they stay off under `prefers-reduced-motion`. Smooth scrolling is also motion-safe
+The hero is still: it's the first thing on screen, so nothing in it moves. Sections below it
+fade up as they scroll into view (`BaseReveal`), and cards and buttons lift on hover. Every
+movement is `motion-safe:`, so it stays off under `prefers-reduced-motion`. Smooth scrolling is also motion-safe
 (`main.css`).
 
 ## Responsive

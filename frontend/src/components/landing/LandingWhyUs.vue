@@ -1,5 +1,5 @@
 <template>
-  <!-- The green band, like the documents' "why us" and impact pages. -->
+  <!-- The green band, like the documents' "why us" pages. -->
   <section id="why" class="relative overflow-hidden bg-brand-green py-20 text-white dark:border-y dark:border-white/10">
     <div class="section">
       <div class="mx-auto max-w-3xl text-center">
@@ -44,9 +44,9 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
-import LucideBadgeCheck from "~icons/lucide/badge-check"
-import LucideLayers from "~icons/lucide/layers"
-import LucideWarehouse from "~icons/lucide/warehouse"
+import LucideMapPin from "~icons/lucide/map-pin"
+import LucideShieldCheck from "~icons/lucide/shield-check"
+import LucideSprayCan from "~icons/lucide/spray-can"
 
 import BaseCheckList from "@/components/base/BaseCheckList.vue"
 import BaseReveal from "@/components/base/BaseReveal.vue"
@@ -56,7 +56,7 @@ import { useMessageList } from "@/composables/useMessageList"
 import { stats } from "@/config/site"
 
 /** One icon per pillar in why.pillars, same order. */
-const ICONS = [LucideLayers, LucideWarehouse, LucideBadgeCheck]
+const ICONS = [LucideMapPin, LucideShieldCheck, LucideSprayCan]
 
 const { t } = useI18n()
 const { list } = useMessageList()

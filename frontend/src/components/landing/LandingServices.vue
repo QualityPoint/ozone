@@ -24,8 +24,8 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
 import { useI18n } from "vue-i18n"
-import LucideClipboardCheck from "~icons/lucide/clipboard-check"
-import LucideRecycle from "~icons/lucide/recycle"
+import LucideConstruction from "~icons/lucide/construction"
+import LucideSplit from "~icons/lucide/split"
 import LucideTruck from "~icons/lucide/truck"
 
 import BaseCard from "@/components/base/BaseCard.vue"
@@ -37,8 +37,8 @@ import type { ServiceId } from "@/types"
 
 const ICONS: Record<ServiceId, Component> = {
 	collection: LucideTruck,
-	environmental: LucideClipboardCheck,
-	recycling: LucideRecycle,
+	sorting: LucideSplit,
+	debris: LucideConstruction,
 }
 
 const { t } = useI18n()

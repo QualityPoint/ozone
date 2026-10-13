@@ -41,21 +41,26 @@ export interface SiteContact {
 }
 
 /** The services on the landing page; texts are `services.items.<id>`. */
-export type ServiceId = "collection" | "environmental" | "recycling"
+export type ServiceId = "collection" | "sorting" | "debris"
 
-/** The sectors Ozone serves; texts are `industries.items.<id>`. */
-export type IndustryId =
-	| "commercial"
-	| "industrial"
-	| "government"
-	| "residential"
+/** The kinds of establishment Ozone serves; texts are `industries.items.<id>`. */
+export type IndustryId = "complexes" | "restaurants" | "shops" | "streets"
+
+/** The waste streams sorted at source; texts are `about.streams.items.<id>`. */
+export type WasteStreamId = "organics" | "recyclables" | "residuals"
+
+/** A waste stream and the colour of its bins, bags and truck. */
+export interface WasteStream {
+	id: WasteStreamId
+	color: string
+}
 
 /** One piece of equipment: its photo in assets/images/equipment/<slug>.webp, texts `equipment.items.<slug>`. */
 export interface EquipmentItem {
 	slug: string
 }
 
-/** An impact figure: the number is a fact (here), its label a message (`why.stats.<id>`). */
+/** A key figure: the number is a fact (here), its label a message (`why.stats.<id>`). */
 export interface Stat {
 	id: string
 	value: number

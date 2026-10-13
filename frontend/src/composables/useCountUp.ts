@@ -2,7 +2,7 @@ import { useTransition } from "@vueuse/core"
 import { type Ref, computed } from "vue"
 
 /**
- * A number that counts up from 0 to `value` once `active` turns true (an impact figure coming
+ * A number that counts up from 0 to `value` once `active` turns true (a key figure coming
  * into view). With reduced motion it shows the value at once.
  */
 export function useCountUp(

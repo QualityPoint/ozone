@@ -1,31 +1,32 @@
 export default {
 	tag: "Why Ozone",
-	title: "Your partner for a greener future",
+	title: "Your partner for a cleaner environment",
 	pillars: [
 		{
-			title: "Complete solutions",
-			body: "We collect, sort, process and recycle every kind of waste.",
+			title: "Live tracking",
+			body: "A tracker in every vehicle updates its position every 30 seconds, with alerts when it leaves its area or speeds.",
 		},
 		{
-			title: "Advanced infrastructure",
-			body: "A modern fleet, smart sorting centres and high-efficiency hydraulic balers.",
+			title: "A service that doesn't stop",
+			body: "Backup equipment on standby, a mobile workshop for breakdowns, and no crew leaves a site before its relief arrives.",
 		},
 		{
-			title: "Environmental commitment",
-			body: "We work to ISO 14001 standards to keep our environmental impact to a minimum.",
+			title: "Clean equipment",
+			body: "Equipment cleaned and sanitised every day to prevent odours, and a daily report to the project manager.",
 		},
 	],
 	featuresTitle: "What sets Ozone apart",
 	features: [
-		"Broad experience with commercial and industrial clients.",
-		"An equipped fleet: collection vehicles, compactor trucks, hook-lift trucks and skip loaders.",
-		"Strategic partnerships with local and international recycling plants.",
-		"Compliance with environmental regulations and the latest standards.",
+		"Long experience operating waste collection and transport, construction debris and cleaning projects.",
+		"A dedicated fleet: compactor trucks, hook-lift trucks, skip loaders, tippers, supervision cars and a mobile workshop.",
+		"A trained supervision team, ready to move at any moment.",
+		"A complete operations camp: maintenance workshop, vehicle and container wash, parking and a spare-parts store.",
+		"Following the National Center for Waste Management (MWAN) requirements for sorting waste at source.",
 	],
-	/** Labels of the impact figures in config/site.ts `stats`. */
+	/** Labels of the figures in config/site.ts `stats`. */
 	stats: {
-		recycled: "tonnes of waste recycled every year",
-		clients: "clients in the commercial and industrial sectors",
-		target: "of the waste we collect, our recycling target",
+		streams: "Sorting streams, each with its own truck",
+		capacity: "Yards: the capacity of each compactor truck",
+		tracking: "Seconds between each vehicle position update",
 	},
 }

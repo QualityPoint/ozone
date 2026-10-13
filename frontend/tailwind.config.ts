@@ -119,22 +119,6 @@ export default {
 				card: "0 1px 2px rgb(17 83 42 / 0.06), 0 12px 32px -12px rgb(17 83 42 / 0.18)",
 				header: "0 8px 24px -16px rgb(17 83 42 / 0.35)",
 			},
-			keyframes: {
-				"fade-up": {
-					from: { opacity: "0", transform: "translateY(16px)" },
-					to: { opacity: "1", transform: "translateY(0)" },
-				},
-				// A slow vertical drift for hero imagery (the individual `translate` property,
-				// so it runs on its own GPU layer; see .float-layer).
-				float: {
-					"0%, 100%": { translate: "0 0" },
-					"50%": { translate: "0 -10px" },
-				},
-			},
-			animation: {
-				"fade-up": "fade-up 0.6s ease-out both",
-				float: "float 8s cubic-bezier(0.37, 0, 0.63, 1) infinite",
-			},
 		},
 	},
 	plugins: [],

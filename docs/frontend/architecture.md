@@ -31,7 +31,7 @@ apps/ozone/
 │       ├── layouts/             # PublicLayout.vue: skip link, silver background, header, main, footer
 │       ├── components/brand/    # BrandLogo, BrandTagline, BrandStripe, BrandSilverBackground
 │       ├── components/base/     # BaseSectionHeading, BaseSectionTag, BasePill, BaseButton, BaseCard, BaseReveal, BaseStat, BaseCheckList, nativeTag
-│       ├── components/landing/  # Landing* sections, LandingPhoto, LandingHierarchy, equipmentPhotos.ts
+│       ├── components/landing/  # Landing* sections, LandingPhoto, LandingStreams, equipmentPhotos.ts
 │       ├── components/layout/   # TheHeader, TheFooter, NavLink, LanguageSwitcher, ThemeToggle
 │       ├── components/icons/    # IconSocial, socialIconPaths (Simple Icons, CC0)
 │       ├── views/               # LandingView.vue: the sections in order

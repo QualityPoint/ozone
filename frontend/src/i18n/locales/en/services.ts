@@ -1,27 +1,29 @@
 export default {
-	title: "Complete waste management solutions",
+	title: "Collecting, transporting and sorting waste",
 	intro:
-		"We collect, sort, process and recycle every kind of waste: paper, cardboard, plastic, metals and organic waste.",
+		"We collect waste from commercial establishments and take it to the approved public landfill, sorted at source by type.",
 	items: {
 		collection: {
 			title: "Waste collection and transport",
 			points: [
-				"Collection of general, commercial and industrial waste.",
-				"Sorting at source: paper, plastic, metals and cardboard.",
+				"Collection from establishments on a daily schedule that fits their needs.",
+				"Transport by compactor truck to the transfer station, then to the approved public landfill.",
+				"An intensified plan during Ramadan and the Hajj season.",
 			],
 		},
-		environmental: {
-			title: "Environmental services",
+		sorting: {
+			title: "Sorting at source",
 			points: [
-				"Environmental consulting for companies.",
-				"Waste management solutions to international standards.",
+				"Colour-coded bins and bags for each type of waste in every establishment.",
+				"A route and a truck for each type: organic, sorted and non-recyclable.",
+				"Raising establishments' awareness of sorting, and following up on it.",
 			],
 		},
-		recycling: {
-			title: "Recycling",
+		debris: {
+			title: "Construction debris transport",
 			points: [
-				"Cardboard and paper processed with advanced hydraulic balers.",
-				"Plastic and metal recycling.",
+				"Dedicated containers for rubble and construction and demolition waste.",
+				"Hook-lift trucks and tippers to lift and move the containers.",
 			],
 		},
 	},

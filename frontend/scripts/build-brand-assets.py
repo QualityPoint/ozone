@@ -17,9 +17,11 @@ The script writes:
   public/icon-192.png, icon-512.png   web app manifest icons, on white
   public/og-image.png                 1200x630 social preview: the logo between the brand stripes
   src/assets/images/equipment/<slug>.webp   fleet and container photos (listed in src/config/site.ts)
+  src/assets/images/hero-truck.webp   the hero's compactor truck, cut out on transparency
 
-Usage (from frontend/):  python3 scripts/build-brand-assets.py [SOURCE_DIR]
-Requires Pillow, and pdftoppm (poppler-utils) for the photos.
+Usage (from frontend/):  ~/frappe-bench/env/bin/python scripts/build-brand-assets.py [SOURCE_DIR]
+Requires Pillow, OpenCV and NumPy (all in the bench's env), and poppler-utils (pdftoppm and
+pdfimages) for the photos.
 """
 
 import re
@@ -28,12 +30,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+import cv2
+import numpy as np
+from PIL import Image, ImageChops, ImageDraw
 
 FRONTEND = Path(__file__).resolve().parent.parent
 SOURCE = Path(sys.argv[1] if len(sys.argv) > 1 else Path.home() / "Projects/Ozone")
 BRAND_OUT = FRONTEND / "src/assets/brand"
-PHOTOS_OUT = FRONTEND / "src/assets/images/equipment"
+IMAGES_OUT = FRONTEND / "src/assets/images"
+PHOTOS_OUT = IMAGES_OUT / "equipment"
 PUBLIC_OUT = FRONTEND / "public"
 
 GREEN = "#11532a"
@@ -55,6 +60,13 @@ PHOTOS = {
 	"compactors": (30, (221, 427, 1590, 887)),
 	"debris-containers": (31, (74, 445, 1707, 881)),
 }
+
+# The hero's truck: the green compactor truck, embedded image 6 on page 17 (`pdfimages -list`),
+# and its box body (left, top, right, bottom) in that image, kept whole: the white top edge of
+# the body is too faint against the white page to find.
+HERO_TRUCK = (17, 6)
+HERO_TRUCK_BODY = (500, 178, 1060, 500)
+HERO_WIDTH = 1200
 
 # Where the red "O" and its location pin sit in logo.png (measured from its pixels).
 O_BOX = (56, 324, 528, 798)
@@ -154,6 +166,86 @@ def write_photos() -> None:
 			photo.save(PHOTOS_OUT / f"{slug}.webp", quality=82, method=6)
 
 
+def ellipse(size: int) -> np.ndarray:
+	return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size))
+
+
+def largest(mask: np.ndarray) -> np.ndarray:
+	"""Only the largest connected part of `mask`."""
+	_, labels, stats, _ = cv2.connectedComponentsWithStats((mask > 127).astype(np.uint8))
+	return np.where(labels == 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA]), mask, 0).astype(np.uint8)
+
+
+def truck_alpha(bgr: np.ndarray) -> np.ndarray:
+	"""The truck's mask on the page's white background, without the ground shadow."""
+	height, width = bgr.shape[:2]
+	gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+	low = bgr.min(axis=2).astype(int)
+	spread = bgr.max(axis=2).astype(int) - low
+
+	# The background is what the page's corners reach without crossing an edge or a coloured
+	# or grey pixel. Around the wheels only dark or coloured pixels stop it, so the grey ground
+	# shadow is background.
+	barrier = cv2.dilate(cv2.Canny(cv2.GaussianBlur(gray, (3, 3), 0), 10, 30), ellipse(3))
+	barrier |= (((low < 215) | (spread > 25)) * 255).astype(np.uint8)
+	rows = np.where(((low < 215) | (spread > 25)).any(axis=1))[0]
+	wheel_band = int(rows[0] + (rows[-1] - rows[0]) * 0.72)
+	dark = (((low < 60) | (spread > 40)) * 255).astype(np.uint8)
+	barrier[wheel_band:] = cv2.dilate(dark, ellipse(3))[wheel_band:]
+	reach = 255 - barrier
+	for seed in ((0, 0), (width - 1, 0), (0, height - 1), (width - 1, height - 1)):
+		if reach[seed[1], seed[0]] == 255:
+			cv2.floodFill(reach, None, seed, 128)
+	alpha = np.where(reach == 128, 0, 255).astype(np.uint8)
+	x0, y0, x1, y1 = HERO_TRUCK_BODY
+	alpha[y0:y1, x0:x1] = 255
+	alpha = largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, ellipse(5)))
+	alpha = cv2.erode(alpha, ellipse(3))  # the dilated edges leave a halo outside the contour
+
+	# Below the axles, the tyres' dark contact shadow passes the rule above. Keep only the
+	# tyres (found as circles), the textured tread beside them, and nothing under the ground.
+	circles = cv2.HoughCircles(
+		cv2.medianBlur(gray, 5),
+		cv2.HOUGH_GRADIENT,
+		dp=1.5,
+		minDist=300,
+		param1=120,
+		param2=40,
+		minRadius=90,
+		maxRadius=160,
+	)[0]
+	wheels = [(round(x), round(y), round(r)) for x, y, r in circles if y > height * 0.6][:2]
+	if len(wheels) != 2:
+		raise SystemExit(f"found {len(wheels)} wheels on the hero truck, expected 2")
+	blur = cv2.blur(gray.astype(np.float32), (9, 9))
+	deviation = np.sqrt(np.maximum(cv2.blur(gray.astype(np.float32) ** 2, (9, 9)) - blur**2, 0))
+	keep = cv2.morphologyEx(((deviation > 8) * 255).astype(np.uint8), cv2.MORPH_OPEN, ellipse(5))
+	axle = min(y for _, y, _ in wheels)
+	keep[axle + min(r for _, _, r in wheels) // 2 :] = 0
+	for x, y, r in wheels:
+		cv2.circle(keep, (x, y), r, 255, -1)
+	alpha[axle:] &= keep[axle:]
+	alpha[max(y + r for _, y, r in wheels) - 6 :] = 0
+	return cv2.GaussianBlur(largest(alpha), (3, 3), 0)
+
+
+def write_hero_truck() -> None:
+	"""The compactor truck from the operation file, cut out, cropped and scaled to HERO_WIDTH."""
+	page, number = HERO_TRUCK
+	with tempfile.TemporaryDirectory() as tmp:
+		subprocess.run(
+			["pdfimages", "-f", str(page), "-l", str(page), "-j", str(SOURCE / OPERATION_FILE), f"{tmp}/img"],
+			check=True,
+		)
+		# An Adobe CMYK JPEG: Pillow reads its inks inverted.
+		photo = ImageChops.invert(Image.open(f"{tmp}/img-{number:03d}.jpg")).convert("RGB")
+	rgba = photo.convert("RGBA")
+	rgba.putalpha(Image.fromarray(truck_alpha(cv2.cvtColor(np.asarray(photo), cv2.COLOR_RGB2BGR))))
+	truck = rgba.crop(rgba.getchannel("A").point(lambda a: 255 if a > 10 else 0).getbbox())
+	truck = truck.resize((HERO_WIDTH, round(truck.height * HERO_WIDTH / truck.width)), Image.LANCZOS)
+	truck.save(IMAGES_OUT / "hero-truck.webp", quality=85, alpha_quality=90, method=6)
+
+
 def main() -> None:
 	BRAND_OUT.mkdir(parents=True, exist_ok=True)
 	PUBLIC_OUT.mkdir(parents=True, exist_ok=True)
@@ -169,6 +261,7 @@ def main() -> None:
 		square(mark, size, WHITE, fill=0.76).save(PUBLIC_OUT / f"icon-{size}.png", optimize=True)
 	og_image(logo).save(PUBLIC_OUT / "og-image.png", optimize=True)
 	write_photos()
+	write_hero_truck()
 	print(f"wrote brand assets from {SOURCE}")
 
 

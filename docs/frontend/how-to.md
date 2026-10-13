@@ -9,8 +9,8 @@ Recipes for the changes most likely to come up. Each keeps one source per fact: 
 
 | Section | Component | Anchor | Texts | Facts |
 | --- | --- | --- | --- | --- |
-| Hero | `LandingHero` | | `hero.*`, `brand.*` | the compactor-trucks photo |
-| About | `LandingAbout` (+ `LandingHierarchy`) | `#about` | `about.*` | |
+| Hero | `LandingHero` | | `hero.*`, `brand.*` | `hero-truck.webp`, a cut-out ([branding.md](branding.md#the-hero-trucks-cut-out)) |
+| About | `LandingAbout` (+ `LandingStreams`) | `#about` | `about.*` | `wasteStreams` |
 | Services | `LandingServices` | `#services` | `services.*` | `serviceIds` |
 | Equipment | `LandingEquipment` | `#equipment` | `equipment.*` | `equipment` (photo slugs) |
 | Industries | `LandingIndustries` | `#industries` | `industries.*` | `industryIds` |
@@ -27,19 +27,19 @@ Edit the message in `src/i18n/locales/ar/<area>.ts` and the same key in `en/<are
 is the source of truth. The locales test fails if the two differ in keys or list lengths, or
 if a message uses `@ { } |`.
 
-## Add an item to a list (a goal, a feature, a hierarchy tier)
+## Add an item to a list (a goal, a feature)
 
 Add it to the array in both languages, in the same position. Lists with icons (`about.goals`,
 `why.pillars`) take one icon per item in the component's `ICONS` array, in the same order.
 
-## Add a service, a sector or an impact figure
+## Add a service, a sector, a waste stream or a key figure
 
-1. Add the id to `ServiceId` / `IndustryId` in `src/types/index.ts`, and to `serviceIds` /
-   `industryIds` in `config/site.ts`. For a figure, add `{ id, value, prefix?, suffix? }` to
-   `stats`.
-2. Add its texts under `services.items.<id>`, `industries.items.<id>` or `why.stats.<id>`, in
-   both languages.
-3. Services and sectors take an icon in the component's `ICONS` record, which TypeScript
+1. Add the id to `ServiceId` / `IndustryId` / `WasteStreamId` in `src/types/index.ts`, and to
+   `serviceIds` / `industryIds` / `wasteStreams` (with its bins' colour) in `config/site.ts`.
+   For a figure, add `{ id, value, prefix?, suffix? }` to `stats`.
+2. Add its texts under `services.items.<id>`, `industries.items.<id>`,
+   `about.streams.items.<id>` or `why.stats.<id>`, in both languages.
+3. Services, sectors and streams take an icon in the component's `ICONS` record, which TypeScript
    requires for every id.
 
 ## Add an equipment photo

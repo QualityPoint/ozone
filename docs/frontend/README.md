@@ -25,17 +25,27 @@ layout.
 | 2. Brand, layout, Arabic/English, SEO | Done: header, footer, brand motifs, a placeholder hero |
 | 3. Ozone Settings (contact details) | Done: the footer's contact column, the Desk link |
 | 4. Landing sections | Done: hero, about, services, equipment, industries, why us, contact |
-| 5. Polish | Next |
+| 5. Polish | Done: responsive audit (320–1366 px), font weights, the hero's truck cut-out with no motion, clean-checkout build, CI frontend job |
+
+## Content sources
+
+The texts come from Ozone's files in `~/Projects/Ozone/References`:
+
+| File | Use |
+| --- | --- |
+| `ملف تشغيل أوزون نهائي` (90 pages, images) | **The source.** Ozone's operation file: the company, its goals and vision, the collection and transport protocol, the three sorting streams, the fleet, containers and camp. Also the photos |
+| `اوزون فصل النفايات` (54 pages) | Sorting at source: the streams, awareness, the kinds of establishment served |
+| `اوزون ملف التشغيل` (25 pages) | **Don't use.** A technical offer for a carton-baler project, not a description of the company |
+
+Ozone collects and transports waste, and sorts it at source in operation. **It doesn't recycle**: recycling is done
+under the authority, by other contractors. Don't describe Ozone as a recycling company.
 
 ## To confirm before publishing
 
-The landing page's content comes from Ozone's operation files (`~/Projects/Ozone/References`). These claims come from a proposal document, so confirm them with Ozone before the site goes public:
-
-| Claim | Where |
+| Item | Where |
 | --- | --- |
-| +50,000 tonnes recycled a year, +200 clients | `stats` in `src/config/site.ts`, `why.stats` |
-| Working to ISO 14001 | `why.pillars` (environmental commitment) |
-| Recycling 90% of collected waste (stated as a goal) | `about.goals`, `stats` |
+| The operation file is a plan ("Ozone will buy…"): the fleet, camp and tracking are described as the service | `why.pillars`, `why.features`, `equipment` |
+| Following MWAN's requirements for sorting at source | `why.features` |
 
 Also fill in Ozone Settings: the contact section shows no buttons until it is.
 
@@ -49,6 +59,9 @@ Also fill in Ozone Settings: the contact section shows no buttons until it is.
 | [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
 | [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
 | [how-to.md](how-to.md) | Recipes: texts, list items, services and sectors, figures, equipment photos, nav, contact details, responsive checks |
+| [known-issues.md](known-issues.md) | Open items: claims to confirm, empty contact details, sitemap, Frappe's own pages |
+| [dependencies.md](dependencies.md) | Packages, versions and why each is there; tools outside yarn |
+| [typescript.md](typescript.md) | tsconfig layout, global types, the filtered `type-check` script, where it's enforced |
 | [server.md](server.md) | The Frappe side: hooks, boot data, endpoints, Ozone Settings and its validation, tests |
 | [setup-history.md](setup-history.md) | How the project was scaffolded |
 | [changes-from-starter.md](changes-from-starter.md) | Every edit made on top of the starter template, and why |

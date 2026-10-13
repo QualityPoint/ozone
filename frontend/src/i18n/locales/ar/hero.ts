@@ -1,7 +1,7 @@
 export default {
-	/** The company's vision, from its operation file. */
-	title: "نحوّل النفايات إلى موارد لبناء مستقبل أخضر لأجيال الغد",
+	/** The slogan on Ozone's trucks, from its operation file. */
+	title: "نخطط لمستقبل مشرق في بيئة نظيفة",
 	primaryCta: "اطلب الخدمة",
 	secondaryCta: "استكشف خدماتنا",
-	imageAlt: "شاحنات أوزون الضاغطة لفرز النفايات",
+	imageAlt: "شاحنة أوزون الضاغطة لنقل النفايات العضوية",
 }

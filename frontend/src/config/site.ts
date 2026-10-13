@@ -8,6 +8,7 @@ import {
 	SUPPORTED_LOCALES,
 	type ServiceId,
 	type Stat,
+	type WasteStream,
 } from "@/types"
 
 /**
@@ -70,10 +71,16 @@ export const navItems: NavItem[] = [
 	{ id: "contact", section: "contact" },
 ]
 
-export const serviceIds: ServiceId[] = [
-	"collection",
-	"environmental",
-	"recycling",
+export const serviceIds: ServiceId[] = ["collection", "sorting", "debris"]
+
+/**
+ * The operation file's three streams, in its order, with the colour of their bins, bags and
+ * trucks (sampled from its photos).
+ */
+export const wasteStreams: WasteStream[] = [
+	{ id: "organics", color: "#2f8a3c" },
+	{ id: "recyclables", color: "#1f4fa3" },
+	{ id: "residuals", color: "#2b2b2b" },
 ]
 
 /**
@@ -96,18 +103,20 @@ export const equipment: Record<"fleet" | "containers", EquipmentItem[]> = {
 }
 
 export const industryIds: IndustryId[] = [
-	"commercial",
-	"industrial",
-	"government",
-	"residential",
+	"complexes",
+	"restaurants",
+	"shops",
+	"streets",
 ]
 
 /**
- * Impact figures, from Ozone's operation file. Numbers aren't translated (the site uses Latin
- * digits in both languages, as blinktech does); their labels are `why.stats.<id>`.
+ * Key figures of the operation plan, from Ozone's operation file: the sorting streams, the
+ * compactor trucks' capacity (yards), the trackers' update interval (seconds). Numbers aren't
+ * translated (the site uses Latin digits in both languages, as blinktech does); their labels
+ * are `why.stats.<id>`.
  */
 export const stats: Stat[] = [
-	{ id: "recycled", value: 50000, prefix: "+" },
-	{ id: "clients", value: 200, prefix: "+" },
-	{ id: "target", value: 90, suffix: "%" },
+	{ id: "streams", value: wasteStreams.length },
+	{ id: "capacity", value: 22 },
+	{ id: "tracking", value: 30 },
 ]

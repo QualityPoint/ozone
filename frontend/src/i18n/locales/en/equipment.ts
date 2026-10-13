@@ -8,7 +8,7 @@ export default {
 	items: {
 		"compactor-trucks": {
 			name: "Sorting compactor trucks",
-			body: "22-yard sorting compactors for collecting sorted waste.",
+			body: "22-yard sorting compactors in each stream's colour: green for organic, blue for sorted and black for non-recyclable waste.",
 		},
 		"hook-lift-truck": {
 			name: "Hook-lift trucks",
@@ -24,15 +24,15 @@ export default {
 		},
 		"indoor-bins": {
 			name: "Indoor sorting bins",
-			body: "For organic waste, dry recyclables and residual waste.",
+			body: "240-litre bins in the streams' colours: organic, sorted and non-recyclable.",
 		},
 		"outdoor-containers": {
 			name: "Outdoor sorting containers",
-			body: "Shared metal containers for neighbourhoods and shopping centres.",
+			body: "Shared containers in side streets, for establishments without a waste room.",
 		},
 		compactors: {
 			name: "Compactors",
-			body: "For compacting waste on site and reducing its volume.",
+			body: "2, 10 and 20-yard compactors for establishments with large volumes, so waste doesn't pile up.",
 		},
 		"debris-containers": {
 			name: "Debris containers",

@@ -1,8 +1,7 @@
 export default {
-	/** The company's vision, from its operation file. */
-	title:
-		"Turning waste into resources to build a greener future for tomorrow's generations",
+	/** The slogan on Ozone's trucks, from its operation file. */
+	title: "Planning a bright future in a clean environment",
 	primaryCta: "Request a service",
 	secondaryCta: "Explore our services",
-	imageAlt: "Ozone's waste sorting compactor trucks",
+	imageAlt: "An Ozone compactor truck for organic waste",
 }

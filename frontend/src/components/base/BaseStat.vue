@@ -1,5 +1,5 @@
 <template>
-  <!-- An impact figure: a large number over the documents' green underline bar, counting up once
+  <!-- A key figure: a large number over the documents' green underline bar, counting up once
        in view. Takes its label translated. -->
   <div ref="root">
     <p class="text-display font-extrabold leading-none" dir="ltr">

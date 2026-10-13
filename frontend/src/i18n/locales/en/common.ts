@@ -11,7 +11,7 @@ export default {
 		/** The logo's slogan, shown as separate items. */
 		tagline: ["Maintenance", "Cleaning", "General Contracting"],
 		about:
-			"A leading company in waste management and recycling, offering sustainable, environmentally friendly solutions for businesses and individuals.",
+			"A Madinah company specialising in collecting and transporting waste and construction debris, and in cleaning. We sort waste at source by type.",
 	},
 	a11y: {
 		skipToContent: "Skip to content",

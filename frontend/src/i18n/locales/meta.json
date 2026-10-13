@@ -8,14 +8,14 @@
 	},
 	"ar": {
 		"landing": {
-			"title": "أوزون للخدمات البيئية — جمع النفايات وإعادة التدوير",
-			"description": "شركة أوزون للخدمات البيئية: جمع ونقل النفايات، وفرزها من المصدر، وإعادة تدوير الكرتون والورق والبلاستيك والمعادن، وحلول بيئية متكاملة لقطاعات الأعمال والأفراد."
+			"title": "أوزون للخدمات البيئية — جمع ونقل النفايات وفرزها من المصدر",
+			"description": "شركة أوزون للخدمات البيئية في المدينة المنورة: جمع النفايات من المنشآت التجارية ونقلها إلى المردم العام المعتمد، وفرزها من المصدر إلى عضوية ومفروزة وغير قابلة لإعادة التدوير، ونقل مخلفات البناء."
 		}
 	},
 	"en": {
 		"landing": {
-			"title": "Ozone Environmental Services — Waste Collection and Recycling",
-			"description": "Ozone Environmental Services: waste collection and transport, sorting at source, recycling of cardboard, paper, plastic and metals, and complete environmental solutions for businesses and individuals."
+			"title": "Ozone Environmental Services — Waste Collection, Transport and Sorting",
+			"description": "Ozone Environmental Services, Madinah: collecting waste from commercial establishments and taking it to the approved public landfill, sorting it at source into organic, sorted and non-recyclable streams, and transporting construction debris."
 		}
 	}
 }

@@ -19,10 +19,10 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
 import { useI18n } from "vue-i18n"
-import LucideFactory from "~icons/lucide/factory"
-import LucideHouse from "~icons/lucide/house"
-import LucideLandmark from "~icons/lucide/landmark"
+import LucideBuilding2 from "~icons/lucide/building-2"
+import LucideSignpost from "~icons/lucide/signpost"
 import LucideStore from "~icons/lucide/store"
+import LucideUtensilsCrossed from "~icons/lucide/utensils-crossed"
 
 import BaseCard from "@/components/base/BaseCard.vue"
 import BaseReveal from "@/components/base/BaseReveal.vue"
@@ -31,10 +31,10 @@ import { industryIds } from "@/config/site"
 import type { IndustryId } from "@/types"
 
 const ICONS: Record<IndustryId, Component> = {
-	commercial: LucideStore,
-	industrial: LucideFactory,
-	government: LucideLandmark,
-	residential: LucideHouse,
+	complexes: LucideBuilding2,
+	restaurants: LucideUtensilsCrossed,
+	shops: LucideStore,
+	streets: LucideSignpost,
 }
 
 const { t } = useI18n()
