@@ -24,15 +24,11 @@ it doesn't list `/` or `/en`. Search engines still find the home page by its lin
 hreflang tags. Listing both would mean overriding Frappe's `www/sitemap.py` in the app,
 with the pages read from `meta.json`. blinktech doesn't do this either.
 
-### 4. Frappe's own `/about` and `/contact` pages are live (low)
+The sitemap does list Frappe's own `/about` and `/contact` (`sitemap = 1` in
+`frappe/www/about.py` and `contact.py`), which redirect to the landing page's sections
+([server.md](server.md)). The same override would drop them.
 
-They're Frappe's built-in www pages (`frappe/www/about.py` and `contact.py`, filled from the
-About Us Settings and Contact Us Settings DocTypes), marked `sitemap = 1`, and unrelated to the
-SPA's `#about` and `#contact` sections. They can't be switched off in settings. If they
-shouldn't be public, redirect them to the landing page with `website_redirects` in
-`hooks.py`.
-
-### 5. The Ozone sidebar's Home row is relabelled on ozone.local (local)
+### 4. The Ozone sidebar's Home row is relabelled on ozone.local (local)
 
 A site-level sidebar customization, created on 2026-10-13, shows the Home row as "Ozone" with
 a truck icon. It's site data, not app code. Reset the sidebar's customization in the Desk if

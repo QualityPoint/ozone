@@ -59,7 +59,7 @@ Also fill in Ozone Settings: the contact section shows no buttons until it is.
 | [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
 | [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
 | [how-to.md](how-to.md) | Recipes: texts, list items, services and sectors, figures, equipment photos, nav, contact details, responsive checks |
-| [known-issues.md](known-issues.md) | Open items: claims to confirm, empty contact details, sitemap, Frappe's own pages |
+| [known-issues.md](known-issues.md) | Open items: content to confirm, empty contact details, the sitemap, a local sidebar customization |
 | [dependencies.md](dependencies.md) | Packages, versions and why each is there; tools outside yarn |
 | [typescript.md](typescript.md) | tsconfig layout, global types, the filtered `type-check` script, where it's enforced |
 | [server.md](server.md) | The Frappe side: hooks, boot data, endpoints, Ozone Settings and its validation, tests |

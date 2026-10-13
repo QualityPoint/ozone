@@ -67,6 +67,13 @@ website_route_rules = [
 	{"from_route": "/en/<path:app_path>", "to_route": "frontend"},
 ]
 
+# Frappe's own About Us and Contact Us pages (frappe/www/about.py, contact.py) are public and
+# can't be switched off: send them to the landing page's sections instead.
+website_redirects = [
+	{"source": "/about", "target": "/#about"},
+	{"source": "/contact", "target": "/#contact"},
+]
+
 # website user home page (by Role)
 # role_home_page = {
 # 	"Role": "home_page"
