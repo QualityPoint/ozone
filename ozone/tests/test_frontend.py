@@ -1,11 +1,14 @@
 """The website SPA's server side (ozone/www/frontend.py): addresses and SEO, which must
 follow the SPA's own rules (frontend/src/config/site.ts) and texts (meta.json)."""
 
+from urllib.parse import urlsplit
+
 import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.website.path_resolver import resolve_redirect
 
 from ozone.locales import shared_json
+from ozone.www import sitemap
 from ozone.www.frontend import localized_path, resolve_page, seo_context
 
 
@@ -50,3 +53,14 @@ class TestFrappePagesRedirect(IntegrationTestCase):
 			with self.assertRaises(frappe.Redirect):
 				resolve_redirect(path)
 			self.assertEqual(frappe.flags.redirect_location, target)
+
+
+class TestSitemap(IntegrationTestCase):
+	def test_lists_the_spa_in_each_language_without_redirected_pages(self):
+		links = {urlsplit(link["loc"]).path: link for link in sitemap.get_context(frappe._dict())["links"]}
+		self.assertIn("/", links)
+		self.assertIn("/en", links)
+		self.assertNotIn("/about", links)
+		self.assertNotIn("/contact", links)
+		hreflangs = {alt["hreflang"] for alt in links["/en"]["alternates"]}
+		self.assertEqual(hreflangs, {"ar", "en", "x-default"})

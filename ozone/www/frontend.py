@@ -56,7 +56,7 @@ def seo_context(path: str) -> dict:
 		"canonical": get_url(path),
 		"robots": None if page else "noindex, nofollow",
 		"og_image": get_url("/assets/ozone/frontend/og-image.png"),
-		"alternates": _alternates(base) if page else [],
+		"alternates": alternates(base) if page else [],
 	}
 
 
@@ -81,7 +81,7 @@ def get_context():
 	return context
 
 
-def _alternates(base: str) -> list[dict]:
+def alternates(base: str) -> list[dict]:
 	"""hreflang links to a public page in every language; x-default is the default language."""
 	links = [{"hreflang": lang, "href": get_url(localized_path(base, lang))} for lang in SUPPORTED_LOCALES]
 	return [*links, {"hreflang": "x-default", "href": get_url(localized_path(base, DEFAULT_LOCALE))}]

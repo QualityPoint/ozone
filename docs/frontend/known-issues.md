@@ -17,18 +17,7 @@ source ([README.md](README.md#content-sources)).
 Ozone Settings is empty on ozone.local. Until it's filled in, the footer has no contact
 column and the contact section has no buttons ([server.md](server.md#ozone-settings)).
 
-### 3. The SPA's pages aren't in the sitemap (low)
-
-Frappe's `/sitemap.xml` lists www pages marked `sitemap = 1` and published DocType pages, so
-it doesn't list `/` or `/en`. Search engines still find the home page by its links and its
-hreflang tags. Listing both would mean overriding Frappe's `www/sitemap.py` in the app,
-with the pages read from `meta.json`. blinktech doesn't do this either.
-
-The sitemap does list Frappe's own `/about` and `/contact` (`sitemap = 1` in
-`frappe/www/about.py` and `contact.py`), which redirect to the landing page's sections
-([server.md](server.md)). The same override would drop them.
-
-### 4. The Ozone sidebar's Home row is relabelled on ozone.local (local)
+### 3. The Ozone sidebar's Home row is relabelled on ozone.local (local)
 
 A site-level sidebar customization, created on 2026-10-13, shows the Home row as "Ozone" with
 a truck icon. It's site data, not app code. Reset the sidebar's customization in the Desk if
