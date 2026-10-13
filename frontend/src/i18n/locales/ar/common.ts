@@ -34,6 +34,12 @@ export default {
 		toLight: "التبديل إلى الوضع الفاتح",
 	},
 	footer: {
+		contact: "تواصل معنا",
+		follow: "تابعنا",
+		/** Accessible name of a social icon link, followed by the platform name. */
+		socialLabel: "أوزون على",
+		whatsapp: "واتساب",
+		map: "موقعنا على الخريطة",
 		explore: "تصفح",
 		rights: "جميع الحقوق محفوظة.",
 	},

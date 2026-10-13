@@ -3,6 +3,7 @@ import frappe.sessions
 from frappe.utils import get_url
 
 from ozone.locales import DEFAULT_LOCALE, SUPPORTED_LOCALES, shared_json
+from ozone.site_contact import site_contact
 
 no_cache = 1
 
@@ -74,6 +75,8 @@ def get_context():
 	context.boot = {
 		"csrf_token": csrf_token,
 		"site_name": frappe.local.site,
+		# Footer and contact section (Ozone Settings).
+		"site_contact": site_contact(),
 	}
 	return context
 

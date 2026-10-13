@@ -59,6 +59,14 @@
 			10% { transform: scale(0.3); }
 			25% { transform: scale(1.15); }
 		}
+		/* Settings: the gear turns. */
+		.ozone-gear {
+			transform-box: view-box;
+			transform-origin: 12px 12px;
+			animation: ozone-turn 4s linear infinite;
+			animation-play-state: var(--icon-motion, paused);
+		}
+		@keyframes ozone-turn { to { transform: rotate(360deg); } }
 	</style>
 
 	<!-- Home: a house with a door. -->
@@ -76,5 +84,8 @@
 		<rect x="2.5" y="3.5" width="19" height="17" rx="2.2" style="fill: var(--duotone-light, var(--ozone-body))" /><path d="M2.5 8.2V5.7a2.2 2.2 0 0 1 2.2-2.2h14.6a2.2 2.2 0 0 1 2.2 2.2v2.5z" style="fill: var(--duotone-dark, var(--ozone-detail))" /><g style="fill: var(--duotone-dark, var(--ozone-detail))"><rect class="ozone-pop" x="5" y="10.4" width="6.4" height="7.6" rx="1" /><rect class="ozone-pop" x="12.8" y="10.4" width="6.2" height="3.2" rx="0.8" /><rect class="ozone-pop" x="12.8" y="14.8" width="6.2" height="3.2" rx="0.8" /></g>
 	</symbol>
 
-
+	<!-- Settings: a gear. -->
+	<symbol viewBox="0 0 24 24" id="icon-ozone-settings-duotone" stroke="none" style="overflow: visible">
+		<g class="ozone-gear"><g style="fill: var(--duotone-light, var(--ozone-body))"><circle cx="12" cy="12" r="6.6" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(45 12 12)" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(90 12 12)" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(135 12 12)" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(180 12 12)" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(225 12 12)" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(270 12 12)" /><rect x="10.4" y="2.4" width="3.2" height="3.6" rx="0.5" transform="rotate(315 12 12)" /></g></g><circle cx="12" cy="12" r="2.8" style="fill: var(--duotone-dark, var(--ozone-detail))" />
+	</symbol>
 </svg>

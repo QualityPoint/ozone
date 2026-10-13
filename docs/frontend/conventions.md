@@ -20,7 +20,7 @@ as-is. `frontend/src/` follows the standard Vue 3 layout and the
 | `utils/` | Pure functions with no Vue state, unit-tested | Anything that reads the locale or a store (pass it in) |
 | `router/` | `routes.ts` (table and `RouteMeta` types), `index.ts` | |
 | `i18n/` | vue-i18n setup and `locales/{ar,en}/` messages | Emails, URLs, phone numbers |
-| `config/` | Static site constants: name, nav items, page paths | Contact details (they come from Ozone Settings) |
+| `config/` | Static site constants: name, nav items, page paths | Contact details (they come from Ozone Settings, [server.md](server.md#ozone-settings)) |
 | `types/` | Shared TS types | |
 | `assets/` | `styles/` and generated images | Files that need a fixed URL (use `public/`) |
 
@@ -67,7 +67,12 @@ Tests live next to the code they cover, in `__tests__/*.test.ts`:
 | `config/__tests__/site.test.ts` | Arabic has no prefix, English is under `/en` and back (`localePath`, `basePath`), language homes, unique nav ids |
 | `i18n/__tests__/locales.test.ts` | `en` has exactly the same keys and list lengths as `ar`, no empty messages, no `@ { } \|` |
 | `composables/__tests__/useTheme.test.ts` | Theme toggle, storage key, `theme-color` |
-| `ozone/tests/test_frontend.py` (server) | `localized_path`, `resolve_page`, SEO per language, `noindex` for unknown pages. Run with `bench --site ozone.local run-tests --module ozone.tests.test_frontend` |
+| `composables/__tests__/useSiteContact.test.ts` | Phone formatting, `wa.me` link, filtering of boot data (unknown platforms, non-https links, empty addresses) |
+| `ozone/tests/test_frontend.py` (server) | `localized_path`, `resolve_page`, SEO per language, `noindex` for unknown pages |
+| `ozone/tests/test_site_contact.py` (server) | Filled details shown, empty ones `None`, only published socials |
+| `ozone/ozone/doctype/ozone_settings/test_ozone_settings.py` (server) | https-only links, one row per platform, one address per language, trimmed links |
+
+Run the server's with `bench --site ozone.local run-tests --app ozone`.
 
 `vitest.config.ts` is standalone and uses the Node environment, so tests resolve routes rather
 than load `.vue` views.

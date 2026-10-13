@@ -14,6 +14,7 @@ layout.
 | Served by | Frappe: `home_page = "frontend"` and `/en` route rules render `ozone/www/frontend.html`, with boot data and server-side SEO from `www/frontend.py` ([architecture.md](architecture.md#production)) |
 | Languages | Arabic (default, `/`, RTL) and English (`/en`) ([i18n.md](i18n.md)) |
 | Themes | Light and dark, following the system until the visitor picks one ([branding.md](branding.md#light-and-dark)) |
+| Editable in the Desk | Phone, email, WhatsApp, address, map link and social links: **Ozone Settings** ([server.md](server.md#ozone-settings)) |
 | Local site | `ozone.local` on `:8000` (production build), `:8080` with `yarn dev` |
 
 ## Status
@@ -22,8 +23,8 @@ layout.
 | --- | --- |
 | 1. Scaffold, build and serving | Done |
 | 2. Brand, layout, Arabic/English, SEO | Done: header, footer, brand motifs, a placeholder hero |
-| 3. Ozone Settings (contact details) | Next |
-| 4. Landing sections | |
+| 3. Ozone Settings (contact details) | Done: the footer's contact column, the Desk link |
+| 4. Landing sections | Next |
 | 5. Polish | |
 
 ## Docs
@@ -35,6 +36,7 @@ layout.
 | [i18n.md](i18n.md) | Arabic and English: addresses, messages, `meta.json`, adding a page |
 | [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
 | [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
+| [server.md](server.md) | The Frappe side: hooks, boot data, endpoints, Ozone Settings and its validation, tests |
 | [setup-history.md](setup-history.md) | How the project was scaffolded |
 | [changes-from-starter.md](changes-from-starter.md) | Every edit made on top of the starter template, and why |
 

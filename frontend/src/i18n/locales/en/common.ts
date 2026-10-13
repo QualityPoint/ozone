@@ -34,6 +34,12 @@ export default {
 		toLight: "Switch to light mode",
 	},
 	footer: {
+		contact: "Contact",
+		follow: "Follow us",
+		/** Accessible name of a social icon link, followed by the platform name. */
+		socialLabel: "Ozone on",
+		whatsapp: "WhatsApp",
+		map: "Find us on the map",
 		explore: "Explore",
 		rights: "All rights reserved.",
 	},

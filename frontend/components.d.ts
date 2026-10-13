@@ -14,6 +14,7 @@ declare module 'vue' {
     BrandSilverBackground: typeof import('./src/components/brand/BrandSilverBackground.vue')['default']
     BrandStripe: typeof import('./src/components/brand/BrandStripe.vue')['default']
     BrandTagline: typeof import('./src/components/brand/BrandTagline.vue')['default']
+    IconSocial: typeof import('./src/components/icons/IconSocial.vue')['default']
     LanguageSwitcher: typeof import('./src/components/layout/LanguageSwitcher.vue')['default']
     NavLink: typeof import('./src/components/layout/NavLink.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
