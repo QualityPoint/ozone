@@ -10,18 +10,19 @@ layout.
 
 | | |
 | --- | --- |
-| Stack | Vue 3.5, TypeScript, vue-router 4, frappe-ui 0.1.278, Tailwind 3.4, Vite 5 |
-| Served by | Frappe: `home_page = "frontend"` renders `ozone/www/frontend.html` with the boot data from `www/frontend.py` ([architecture.md](architecture.md#production)) |
-| Languages | Arabic (default, `/`) and English (`/en`), from the next step on |
+| Stack | Vue 3.5, TypeScript, vue-router 4, vue-i18n 11, frappe-ui 0.1.278, Tailwind 3.4, Vite 5 |
+| Served by | Frappe: `home_page = "frontend"` and `/en` route rules render `ozone/www/frontend.html`, with boot data and server-side SEO from `www/frontend.py` ([architecture.md](architecture.md#production)) |
+| Languages | Arabic (default, `/`, RTL) and English (`/en`) ([i18n.md](i18n.md)) |
+| Themes | Light and dark, following the system until the visitor picks one ([branding.md](branding.md#light-and-dark)) |
 | Local site | `ozone.local` on `:8000` (production build), `:8080` with `yarn dev` |
 
 ## Status
 
 | Step | State |
 | --- | --- |
-| 1. Scaffold, build and serving | Done: placeholder landing page at `/` |
-| 2. Brand, layout, Arabic/English, SEO | Next |
-| 3. Ozone Settings (contact details) | |
+| 1. Scaffold, build and serving | Done |
+| 2. Brand, layout, Arabic/English, SEO | Done: header, footer, brand motifs, a placeholder hero |
+| 3. Ozone Settings (contact details) | Next |
 | 4. Landing sections | |
 | 5. Polish | |
 
@@ -31,6 +32,9 @@ layout.
 | --- | --- |
 | [architecture.md](architecture.md) | Folder layout, routing, dev vs production serving |
 | [conventions.md](conventions.md) | Where new code goes, naming, routes, tests, the checks to run |
+| [i18n.md](i18n.md) | Arabic and English: addresses, messages, `meta.json`, adding a page |
+| [branding.md](branding.md) | Palette, light and dark, fonts, the documents' motifs, logo and icon files |
+| [styling.md](styling.md) | Tailwind and the frappe-ui preset, shared classes, right to left, motion |
 | [setup-history.md](setup-history.md) | How the project was scaffolded |
 | [changes-from-starter.md](changes-from-starter.md) | Every edit made on top of the starter template, and why |
 
@@ -43,3 +47,4 @@ layout.
 | `yarn type-check` | vue-tsc on project files only |
 | `yarn test:run` | Vitest unit tests |
 | `yarn lint` | Biome check and autofix |
+| `~/frappe-bench/env/bin/python scripts/build-brand-assets.py` | Regenerate logos, favicons and the social image from `~/Projects/Ozone` ([branding.md](branding.md#logo-and-icon-files)) |

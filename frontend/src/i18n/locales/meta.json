@@ -1,0 +1,21 @@
+{
+	"paths": {
+		"landing": "/"
+	},
+	"site": {
+		"ar": "شركة أوزون للخدمات البيئية",
+		"en": "Ozone Environmental Services"
+	},
+	"ar": {
+		"landing": {
+			"title": "أوزون للخدمات البيئية — جمع النفايات وإعادة التدوير",
+			"description": "شركة أوزون للخدمات البيئية: جمع ونقل النفايات، وفرزها من المصدر، وإعادة تدوير الكرتون والورق والبلاستيك والمعادن، وحلول بيئية متكاملة لقطاعات الأعمال والأفراد."
+		}
+	},
+	"en": {
+		"landing": {
+			"title": "Ozone Environmental Services — Waste Collection and Recycling",
+			"description": "Ozone Environmental Services: waste collection and transport, sorting at source, recycling of cardboard, paper, plastic and metals, and complete environmental solutions for businesses and individuals."
+		}
+	}
+}

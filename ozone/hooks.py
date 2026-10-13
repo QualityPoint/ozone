@@ -60,6 +60,13 @@ app_include_icons = ["/assets/ozone/icons/module-icons.svg"]
 # application home page (will override Website Settings)
 home_page = "frontend"
 
+# The website SPA (frontend/): `/` is home_page; each other language's pages live under its
+# prefix. Every top-level SPA path needs a rule here, or a full page load returns Frappe's 404.
+website_route_rules = [
+	{"from_route": "/en", "to_route": "frontend"},
+	{"from_route": "/en/<path:app_path>", "to_route": "frontend"},
+]
+
 # website user home page (by Role)
 # role_home_page = {
 # 	"Role": "home_page"

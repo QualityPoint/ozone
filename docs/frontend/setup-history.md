@@ -42,3 +42,4 @@ The details are in [changes-from-starter.md](changes-from-starter.md).
 | Date | Milestone |
 | --- | --- |
 | 2026-10-13 | Step 1: scaffold, build and serving. A placeholder landing page at `/` on ozone.local |
+| 2026-10-13 | Step 2: brand palette and the documents' motifs, header and footer, Arabic at `/` and English at `/en`, server-side SEO, light and dark themes, favicons and social image |

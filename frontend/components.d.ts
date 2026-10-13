@@ -8,7 +8,18 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BasePill: typeof import('./src/components/base/BasePill.vue')['default']
+    BaseSectionTag: typeof import('./src/components/base/BaseSectionTag.vue')['default']
+    BrandLogo: typeof import('./src/components/brand/BrandLogo.vue')['default']
+    BrandSilverBackground: typeof import('./src/components/brand/BrandSilverBackground.vue')['default']
+    BrandStripe: typeof import('./src/components/brand/BrandStripe.vue')['default']
+    BrandTagline: typeof import('./src/components/brand/BrandTagline.vue')['default']
+    LanguageSwitcher: typeof import('./src/components/layout/LanguageSwitcher.vue')['default']
+    NavLink: typeof import('./src/components/layout/NavLink.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TheFooter: typeof import('./src/components/layout/TheFooter.vue')['default']
+    TheHeader: typeof import('./src/components/layout/TheHeader.vue')['default']
+    ThemeToggle: typeof import('./src/components/layout/ThemeToggle.vue')['default']
   }
 }

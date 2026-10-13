@@ -3,7 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>أوزون للخدمات البيئية</title>
+    <meta name="theme-color" content="#11532a" />
+    <script>
+      // Apply the saved or system theme before first paint, so dark-mode visitors
+      // don't see a white flash. Same key and values as useTheme() (src/composables).
+      try {
+        var saved = localStorage.getItem("ozone-theme")
+        var dark = saved === "dark" || (saved !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light")
+      } catch (e) {}
+    </script>
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- seo:start — production replaces this block with Jinja from www/frontend.py (see vite.config.ts) -->
+    <title>أوزون للخدمات البيئية — جمع النفايات وإعادة التدوير</title>
+    <!-- seo:end -->
   </head>
   <body>
     <div id="app"></div>

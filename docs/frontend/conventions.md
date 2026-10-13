@@ -44,9 +44,15 @@ as-is. `frontend/src/` follows the standard Vue 3 layout and the
   - the feature name for feature components (`LandingHero`).
 - Import with the `@/` alias, not `../../`.
 - SFCs use `<script setup lang="ts">`.
+- On public pages, colour text and surfaces with the `site-*` tokens, not `bg-white` or
+  `text-brand-green`, so dark mode works with no extra classes ([branding.md](branding.md#light-and-dark)).
+- Give every logo `<img>` the `brand-art` class.
+- Use logical utilities (`ps-`, `start-`, `text-start`): Arabic is the default ([styling.md](styling.md#right-to-left)).
 
 ## Routes
 
+- Public pages come in pairs: add both with `localizedRoutes(page, name, component)` ([i18n.md](i18n.md#adding-a-page-in-both-languages)).
+- Link inside the site with `useLocale()`: `sectionLink("about")`, `twin(code)`. Never a bare `href="#id"`.
 - Every route sets `meta.layout`.
 - A new top-level path needs a `website_route_rules` entry in `ozone/hooks.py`, or Frappe
   returns 404 on a full page load.
@@ -57,7 +63,11 @@ Tests live next to the code they cover, in `__tests__/*.test.ts`:
 
 | File | Checks |
 | --- | --- |
-| `router/__tests__/routes.test.ts` | `/` is the landing page, unknown paths redirect to it, every page has a layout |
+| `router/__tests__/routes.test.ts` | `/` (Arabic) and `/en` resolve with their locale and page; unknown paths redirect to their language's landing page; every page has a layout |
+| `config/__tests__/site.test.ts` | Arabic has no prefix, English is under `/en` and back (`localePath`, `basePath`), language homes, unique nav ids |
+| `i18n/__tests__/locales.test.ts` | `en` has exactly the same keys and list lengths as `ar`, no empty messages, no `@ { } \|` |
+| `composables/__tests__/useTheme.test.ts` | Theme toggle, storage key, `theme-color` |
+| `ozone/tests/test_frontend.py` (server) | `localized_path`, `resolve_page`, SEO per language, `noindex` for unknown pages. Run with `bench --site ozone.local run-tests --module ozone.tests.test_frontend` |
 
 `vitest.config.ts` is standalone and uses the Node environment, so tests resolve routes rather
 than load `.vue` views.
@@ -70,4 +80,5 @@ Run in `frontend/`:
 yarn type-check && npx biome check . && yarn test:run && yarn build
 ```
 
-Then open `http://ozone.local:8000`, where the build is served directly.
+Then open `http://ozone.local:8000` and `/en`, where the build is served directly, at phone
+width and on desktop, in light and dark mode.

@@ -6,15 +6,29 @@ import { routes } from "../routes"
 const router = createRouter({ history: createMemoryHistory(), routes })
 
 describe("routes", () => {
-	it("serves the landing page at /", () => {
+	it("serves the Arabic landing page at /", () => {
 		const route = router.resolve("/")
 		expect(route.name).toBe("Landing")
-		expect(route.meta).toMatchObject({ layout: "public" })
+		expect(route.meta).toMatchObject({
+			layout: "public",
+			locale: "ar",
+			page: "landing",
+		})
 	})
 
-	it("sends unknown paths to the landing page", () => {
-		const [record] = router.resolve("/no-such-page").matched
-		expect(record.redirect).toBe("/")
+	it("serves the English landing page at /en", () => {
+		const route = router.resolve("/en")
+		expect(route.name).toBe("LandingEn")
+		expect(route.meta).toMatchObject({
+			layout: "public",
+			locale: "en",
+			page: "landing",
+		})
+	})
+
+	it("sends unknown paths to their language's landing page", () => {
+		expect(router.resolve("/no-such-page").matched[0].redirect).toBe("/")
+		expect(router.resolve("/en/no-such-page").matched[0].redirect).toBe("/en")
 	})
 
 	it("gives every page a layout", () => {

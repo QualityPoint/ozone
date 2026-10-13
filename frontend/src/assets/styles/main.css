@@ -1,2 +1,77 @@
+/* Self-hosted brand fonts: Almarai (Arabic, the default language), Montserrat (Latin). */
+@import "@fontsource/almarai/arabic-300.css";
+@import "@fontsource/almarai/arabic-400.css";
+@import "@fontsource/almarai/arabic-700.css";
+@import "@fontsource/almarai/arabic-800.css";
+@import "@fontsource/montserrat/latin-400.css";
+@import "@fontsource/montserrat/latin-500.css";
+@import "@fontsource/montserrat/latin-600.css";
+@import "@fontsource/montserrat/latin-700.css";
+@import "@fontsource/montserrat/latin-800.css";
+
 /* frappe-ui styles; this file contains the @tailwind base/components/utilities directives. */
 @import "frappe-ui/style.css";
+@import "./components.css";
+
+/*
+ * Theme tokens (RGB channels) behind the `site-*` Tailwind colours.
+ * Light follows Ozone's documents: white pages, silver geometry, green headings.
+ * Dark is a deep green with the same accents. Dark mode is `data-theme="dark"` on <html>,
+ * set by useTheme() and, before the app loads, by the inline script in index.html.
+ */
+:root {
+	--site-bg: 255 255 255;
+	--site-tint: 246 248 247; /* the documents' off-white wash */
+	--site-heading: 17 83 42; /* brand-green */
+	--site-text: 35 31 32; /* brand-ink */
+	--site-muted: 92 99 95;
+	--site-hover: 232 240 234;
+	--site-line: 216 222 218; /* brand-silver */
+	--site-silver: 216 222 218; /* the background geometry */
+	color-scheme: light;
+}
+
+[data-theme="dark"] {
+	--site-bg: 7 22 13;
+	--site-tint: 11 32 19;
+	--site-heading: 255 255 255;
+	--site-text: 221 232 224;
+	--site-muted: 158 178 165;
+	--site-hover: 20 52 32;
+	--site-line: 34 64 45;
+	--site-silver: 24 50 34;
+	color-scheme: dark;
+}
+
+/*
+ * Unlayered on purpose so it overrides frappe-ui's base `html { font-family: InterVar, … }`.
+ * Arabic pages put Almarai first so Latin words inside Arabic text match it.
+ */
+html {
+	@apply font-sans;
+	font-variation-settings: normal;
+	scroll-padding-top: 6rem;
+}
+
+html:lang(ar) {
+	@apply font-arabic;
+}
+
+/*
+ * frappe-ui dims every <img> in dark mode ([data-theme=dark] img { filter: brightness(.8)… })
+ * to soften photos. Brand art (logos) must keep its colours, so it opts out with
+ * class="brand-art". This selector is more specific than frappe-ui's.
+ */
+[data-theme="dark"] img.brand-art {
+	filter: none;
+}
+
+body {
+	@apply bg-site-bg text-body text-site-text antialiased;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
