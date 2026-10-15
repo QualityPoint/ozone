@@ -1,0 +1,104 @@
+<template>
+  <!-- Contracts (ozone/portal/contracts.py): each quotation the producer accepted that Ozone's team has
+       submitted, with the Service Contract that follows it ("being prepared" until the team issues it),
+       and any other contract of the producer's Customer. Read only; a quotation's details open below it. -->
+  <section>
+    <DashboardHeading :title="t('dashboard.nav.contracts')" :intro="t('dashboard.contracts.intro')" />
+    <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
+    <p v-else-if="!entries" class="mt-8 text-site-muted">{{ t("dashboard.requests.loading") }}</p>
+    <p v-else-if="!entries.length" class="mt-8 text-site-muted">
+      {{ t("dashboard.contracts.none") }}
+      <RouterLink :to="quotationsLink" class="font-bold text-brand-green underline dark:text-brand-leaf">{{ t("dashboard.nav.quotations") }}</RouterLink>
+    </p>
+
+    <ul v-else class="mt-8 space-y-3">
+      <li v-for="entry in entries" :key="entry.quotation ?? entry.contract?.name">
+        <BaseCard class="p-5">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="flex min-w-0 gap-4">
+              <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-site-hover text-brand-green dark:text-brand-leaf">
+                <LucideHandshake class="size-5" aria-hidden="true" />
+              </span>
+              <div class="min-w-0">
+                <p class="font-extrabold text-site-heading">{{ entry.service_title || entry.contract?.name }}</p>
+                <p class="mt-0.5 text-caption text-site-muted">
+                  <template v-if="entry.facility_title">{{ entry.facility_title }} · </template>
+                  <span dir="ltr">{{ entry.contract?.name ?? entry.quotation }}</span>
+                </p>
+                <p v-if="entry.start_date" class="mt-1 text-caption text-site-muted">
+                  {{ formatDate(entry.start_date) }}<template v-if="entry.end_date"> – {{ formatDate(entry.end_date) }}</template>
+                </p>
+              </div>
+            </div>
+            <div class="text-end">
+              <span
+                :class="[
+                  'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-bold',
+                  entry.contract ? 'bg-brand-green text-white' : 'bg-site-hover text-site-heading',
+                ]"
+              >
+                <LucideHourglass v-if="!entry.contract" class="size-3.5" aria-hidden="true" />
+                {{ entry.contract?.status_label ?? t("dashboard.contracts.preparing") }}
+              </span>
+              <p v-if="entry.amount" class="mt-2 font-extrabold text-site-heading">{{ formatMoney(entry.amount, entry.currency, locale) }}</p>
+            </div>
+          </div>
+
+          <!-- The accepted quotation it follows -->
+          <template v-if="entry.quotation">
+            <button
+              type="button"
+              class="mt-4 inline-flex items-center gap-1.5 rounded-full border-2 border-site-line px-4 py-1.5 text-label font-bold text-site-heading transition hover:bg-site-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-leaf"
+              :aria-expanded="Boolean(open[entry.quotation])"
+              @click="open[entry.quotation] = !open[entry.quotation]"
+            >
+              <LucideReceipt class="size-3.5" aria-hidden="true" />
+              {{ t("dashboard.contracts.details") }}
+              <span dir="ltr">{{ entry.quotation }}</span>
+            </button>
+            <QuotationPanel v-if="open[entry.quotation]" :name="entry.quotation" />
+          </template>
+        </BaseCard>
+      </li>
+    </ul>
+  </section>
+</template>
+
+<script lang="ts" setup>
+import { computed, onMounted, reactive, ref } from "vue"
+import { useI18n } from "vue-i18n"
+import LucideHandshake from "~icons/lucide/handshake"
+import LucideHourglass from "~icons/lucide/hourglass"
+import LucideReceipt from "~icons/lucide/receipt"
+
+import BaseCard from "@/components/base/BaseCard.vue"
+import BaseNotice from "@/components/base/BaseNotice.vue"
+import DashboardHeading from "@/components/dashboard/DashboardHeading.vue"
+import QuotationPanel from "@/components/dashboard/QuotationPanel.vue"
+import { dashboardPath, localePath } from "@/config/site"
+import { type ContractEntry, getContracts } from "@/services/portal"
+import type { LocaleCode } from "@/types"
+import { formatMoney } from "@/utils/format"
+
+const { t, locale } = useI18n()
+const entries = ref<ContractEntry[] | null>(null)
+const failed = ref(false)
+const open = reactive<Record<string, boolean>>({})
+const quotationsLink = computed(() =>
+	localePath(`${dashboardPath}/quotations`, locale.value as LocaleCode),
+)
+
+onMounted(async () => {
+	try {
+		entries.value = await getContracts()
+	} catch {
+		failed.value = true
+	}
+})
+
+function formatDate(value: string): string {
+	return new Intl.DateTimeFormat(locale.value, { dateStyle: "medium" }).format(
+		new Date(`${value}T00:00:00`),
+	)
+}
+</script>

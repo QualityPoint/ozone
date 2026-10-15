@@ -1,0 +1,343 @@
+{#- The Madinah Regional Municipality's contract for transporting non-hazardous waste, filled from a Service
+    Quotation (ozone/contract_print.py: waste_transport_contract). Three pages as the official form: the contract
+    data, the parties and the container plan; the technical terms; and, for a collection room, its annex.
+    Tables only (wkhtmltopdf), right to left, A4. -#}
+{%- set c = waste_transport_contract(doc) -%}
+{%- set pages = 3 if c.collection_room else 2 -%}
+
+{%- macro v(value) -%}
+	{%- if value %}<b>{{ value }}</b>{% else %}<span class="wt-blank"></span>{% endif -%}
+{%- endmacro -%}
+
+{%- macro box(checked) -%}
+	<span class="wt-box">{{ "☑" if checked else "☐" }}</span>
+{%- endmacro -%}
+
+{%- macro money(value) -%}
+	{{ "{:,.2f}".format(value or 0) }}
+{%- endmacro -%}
+
+{%- macro header() -%}
+<table class="wt-header">
+	<tr>
+		<td class="wt-amanah">
+			<img src="{{ c.logo }}" alt="أمانة منطقة المدينة المنورة">
+			<div class="wt-agency">وكالة الجودة والإمتثال ▫ الإدارة العامة للبيئة</div>
+		</td>
+		<td class="wt-company-logo">
+			<div class="wt-logo-ring">
+				{%- if c.company_logo %}<img src="{{ c.company_logo }}" alt="{{ c.second.name }}">{% else %}شعار الشركة{% endif -%}
+			</div>
+		</td>
+	</tr>
+</table>
+{%- endmacro -%}
+
+{%- macro footer(page) -%}
+<table class="wt-footer">
+	<tr>
+		<td>
+			<b class="wt-red">بيانات المستثمر</b>
+			(<b>العنوان</b>: {{ c.second.address }})
+			<b>سجل تجاري</b>: {{ c.second.commercial_registration }}
+			<b>الرقم الضريبي</b>: {{ c.second.tax_id }}
+			<b>الايميل الالكتروني</b>: <span dir="ltr">{{ c.second.email }}</span>
+			<b>رقم التواصل</b>: <span dir="ltr">{{ c.second.phone }}</span>
+		</td>
+		<td class="wt-page">الصفحة {{ page }} من {{ pages }}</td>
+	</tr>
+</table>
+{%- endmacro -%}
+
+{%- macro signatures(supervised=False) -%}
+<table class="wt-grid wt-signatures">
+	<tr class="wt-head">
+		<td>الطرف الأول ( المستفيد ) المنتج للنفايات :</td>
+		<td>الطرف الثاني ( مقدم الخدمة ) :</td>
+	</tr>
+	<tr><td>الاسم : {{ v(c.first.name) }}</td><td>الاسم : {{ v(c.second.name) }}</td></tr>
+	<tr><td>التاريخ :</td><td>التاريخ :</td></tr>
+	<tr><td>التوقيع :</td><td>التوقيع :</td></tr>
+	<tr class="wt-seal"><td>الختم</td><td>الختم</td></tr>
+</table>
+{%- if supervised %}
+<table class="wt-grid wt-signatures">
+	<tr class="wt-head"><td colspan="2">تم ابرام هذا العقد تحت إشراف أمانة منطقة المدينة المنـــــورة : وكالة الجودة والإمتثال</td></tr>
+	<tr><td>الاسم :</td><td>التاريخ :</td></tr>
+	<tr class="wt-seal"><td>التوقيع :</td><td>الختم :</td></tr>
+</table>
+{%- endif %}
+{%- endmacro -%}
+
+{%- macro contract_data(compact=False) -%}
+<table class="wt-grid">
+	<tr class="wt-head"><td colspan="2">بيانات العقد :</td></tr>
+	<tr>
+		<td>رقم العقد : <span dir="ltr">{{ v(c.number) }}</span></td>
+		<td>تاريخ سريان العقد : {{ v(c.start_date) }}</td>
+	</tr>
+	<tr>
+		<td>نوع النشاط : {{ v(c.activity) }}</td>
+		<td>مدة العقد وتاريخ الانتهاء : مدة ( {{ v(c.duration) }} ) تاريخ الانتهاء : {{ v(c.end_date) }}</td>
+	</tr>
+	<tr>
+		<td>رقم الرخصة وتاريخ الانتهاء : {{ v(c.license_no) }}</td>
+		<td>مساحة المحل : {{ v(c.area) }}</td>
+	</tr>
+	<tr>
+		<td>نوع الرخصة : {{ box(c.license_renewal) }} تجديد رخصة &nbsp; {{ box(c.license_new) }} إصدار رخصة</td>
+		<td>نطاق البلدية : {{ v(c.municipality) }}</td>
+	</tr>
+	<tr><td colspan="2" class="wt-center wt-red"><b>( التصنيف للنفايات حسب الفرز من المصدر - المنتج )</b></td></tr>
+	{%- for waste in c.wastes %}
+	<tr>
+		<td colspan="2">
+			{{ box(waste["items"]) }} <span class="wt-tag wt-{{ waste.colour }}">{{ waste.label }}</span>
+			(
+			{%- for item in waste["items"] %} {{ box(True) }} {{ item }}{% endfor %}
+			)
+		</td>
+	</tr>
+	{%- endfor %}
+	<tr class="wt-yellow">
+		<td colspan="2" class="wt-center">
+			<b>تم ابرام هذا العقد يوم {{ c.concluded.weekday }} بتاريخ {{ c.concluded.gregorian }} م الموافق {{ c.concluded.hijri }} هـ بين كل من:</b>
+		</td>
+	</tr>
+</table>
+{%- endmacro -%}
+
+<style>
+	.wt { direction: rtl; text-align: right; font-family: "Almarai", "Noto Naskh Arabic", "DejaVu Sans", Tahoma, sans-serif; font-size: 7.6pt; color: #111; line-height: 1.32; }
+	.wt-page-break { page-break-after: always; }
+	.wt table { width: 100%; border-collapse: collapse; }
+	.wt-header td { vertical-align: top; border: 0; }
+	.wt-amanah img { height: 62px; }
+	.wt-agency { font-size: 7.5pt; font-weight: bold; margin-top: 2px; }
+	.wt-company-logo { text-align: left; }
+	.wt-logo-ring { display: inline-block; width: 88px; height: 52px; border: 1.5px solid #1f3b70; border-radius: 50%; text-align: center; line-height: 52px; font-size: 7.5pt; overflow: hidden; }
+	.wt-logo-ring img { max-width: 80px; max-height: 50px; vertical-align: middle; }
+	.wt-rule { border-top: 2px solid #4f8f3a; margin: 2px 0 3px; }
+	.wt-title { text-align: center; font-size: 11pt; font-weight: bold; color: #c00000; text-decoration: underline; margin: 2px 0 4px; }
+	.wt-grid td { border: 1px solid #555; padding: 1px 4px; vertical-align: top; }
+	.wt-head td { background: #a9d08e; font-weight: bold; font-size: 8.4pt; }
+	.wt-yellow td { background: #ffff00; }
+	.wt-center { text-align: center; }
+	.wt-red { color: #c00000; }
+	.wt-blank { display: inline-block; min-width: 90px; border-bottom: 1px dotted #777; }
+	.wt-box { font-size: 10pt; }
+	.wt-tag { padding: 0 3px; font-weight: bold; }
+	.wt-organic { background: #00b050; color: #000; }
+	.wt-recyclable { background: #2e75b6; color: #fff; }
+	.wt-residual { background: #000; color: #fff; }
+	.wt-plan th { border: 1px solid #555; background: #a9d08e; color: #111 !important; padding: 1px 3px; font-size: 7.4pt; font-weight: bold; }
+	.wt-plan td { border: 1px solid #555; padding: 1px 3px; text-align: center; font-size: 7.4pt; }
+	.wt-plan .wt-total td { background: #f2f2f2; font-weight: bold; }
+	.wt-articles { margin: 2px 0; padding: 2px 5px; border: 1px solid #555; font-size: 7.3pt; }
+	.wt-signatures { margin-top: 3px; }
+	.wt-seal td { height: 20px; vertical-align: bottom; }
+	.wt-notes { font-size: 7pt; color: #c00000; margin-top: 2px; }
+	.wt-section { font-size: 9.5pt; font-weight: bold; color: #c00000; text-decoration: underline; text-align: center; margin: 3px 0 2px; }
+	.wt-terms ol, .wt-terms ul { margin: 0 18px 0 0; padding: 0; }
+	.wt-terms { font-size: 7.3pt; }
+	.wt-terms li { margin-bottom: 0; padding-right: 3px; text-align: justify; }
+	.wt-photos td { border: 1px solid #555; height: 220px; width: 50%; }
+	.wt-photo-label td { border: 0; text-align: center; padding-top: 3px; }
+	.wt-photo-label span { border: 1px solid #555; padding: 2px 14px; }
+	.wt-footer { margin-top: 4px; border-top: 2px solid #4f8f3a; font-size: 7pt; }
+	.wt-footer td { padding-top: 3px; border: 0; }
+	.wt-page { text-align: left; white-space: nowrap; color: #c00000; }
+</style>
+
+<div class="wt">
+
+<!-- ============================ Page 1: the contract ============================ -->
+<div class="wt-page-break">
+	{{ header() }}
+	<div class="wt-rule"></div>
+	<div class="wt-title">عقد نقل النفايات غير الخطرة</div>
+
+	{{ contract_data() }}
+
+	<table class="wt-grid">
+		<tr class="wt-head"><td colspan="2">الطرف الأول ( المستفيد ) المنتج للنفايات :</td></tr>
+		<tr><td>الاسم : {{ v(c.first.name) }}</td><td>الموقع / الشارع : {{ v(c.first.address) }}</td></tr>
+		<tr>
+			<td>رقم السجل التجاري : <span dir="ltr">{{ v(c.first.commercial_registration) }}</span> &nbsp; رقم الهوية : <span dir="ltr">{{ v(c.first.national_id) }}</span></td>
+			<td>أرقام التواصل : <span dir="ltr">{{ v(c.first.phone) }}</span></td>
+		</tr>
+		<tr><td>الرقم الضريبي : <span dir="ltr">{{ v(c.first.tax_id) }}</span></td><td>البريد الإلكتروني : <span dir="ltr">{{ v(c.first.email) }}</span></td></tr>
+
+		<tr class="wt-head"><td colspan="2">الطرف الثاني ( مقدم الخدمة ) الناقل :</td></tr>
+		<tr><td colspan="2">إسم مالك الشركة / المؤسسة : {{ v(c.second.name) }}</td></tr>
+		<tr>
+			<td>رقم رخصة المركز الوطني لإدارة النفايات ( موان ): <span dir="ltr">{{ v(c.second.mwan[0]) }}</span></td>
+			<td>تاريخ انتهاء رخصة المركز الوطني : {{ v(c.second.mwan[1]) }}</td>
+		</tr>
+		<tr>
+			<td>رقم رخصة بلدي : <span dir="ltr">{{ v(c.second.municipal[0]) }}</span></td>
+			<td>تاريخ انتهاء الرخصة : {{ v(c.second.municipal[1]) }}</td>
+		</tr>
+		<tr>
+			<td>رقم شهادة تأهيل أمانة منطقة المدينة المنورة : <span dir="ltr">{{ v(c.second.qualification[0]) }}</span></td>
+			<td>تاريخ إنتهاء التأهيل : {{ v(c.second.qualification[1]) }}</td>
+		</tr>
+	</table>
+
+	<p style="margin: 3px 0;">
+		<b>تمهــــــيد:</b> حيث أن الطرف الثاني مصرح من قبل المركز الوطني لإدارة النفايات بنشاط نقل وجمع النفايات غير الخطرة ويرغب الطرف الأول بالتعاقد معه لتقديم خدمة نقل و جمع النفايات الناتجة من موقعه إلى مردم النفايات التابع للأمانة ضمن حدود إشرافها " وفق الشروط والإلتزامات المعتمدة بين الطرفين :
+	</p>
+
+	<!-- The container plan: the quotation's lines -->
+	<table class="wt-plan">
+		<tr>
+			<th style="width: 4%">م</th>
+			<th>حجم الحاوية</th>
+			<th style="width: 6%">العدد</th>
+			<th style="width: 10%">رقم الحاوية</th>
+			<th style="width: 17%">إحداثيات الموقع</th>
+			<th>التردد</th>
+			<th style="width: 15%">الأجر غير شامل ضريبة القيمة المضافة</th>
+			<th style="width: 11%">مساحة المنشأة</th>
+		</tr>
+		{%- for row in c.rows %}
+		<tr>
+			<td>{{ loop.index }}</td>
+			<td>{{ row.container }}</td>
+			<td>{{ row.count }}</td>
+			<td></td>
+			<td dir="ltr">{{ row.coordinates }}</td>
+			<td>{{ row.frequency }}</td>
+			<td>{{ money(row.amount) }}</td>
+			<td>{{ row.area }}</td>
+		</tr>
+		{%- endfor %}
+		<tr class="wt-total">
+			<td colspan="5" style="text-align: right;">آلية الجمع : {{ c.mechanism }}</td>
+			<td>الإجمالي غير شامل الضريبة</td>
+			<td>{{ money(c.net_total) }}</td>
+			<td>{{ c.currency }}</td>
+		</tr>
+		<tr class="wt-total">
+			<td colspan="5" rowspan="2" style="text-align: right; font-weight: normal;">{{ c.in_words }}</td>
+			<td>ضريبة القيمة المضافة</td>
+			<td>{{ money(c.taxes) }}</td>
+			<td>{{ c.currency }}</td>
+		</tr>
+		<tr class="wt-total">
+			<td>الإجمالي شامل الضريبة</td>
+			<td>{{ money(c.grand_total) }}</td>
+			<td>{{ c.currency }}</td>
+		</tr>
+	</table>
+
+	<div class="wt-articles">
+		<div>المادة ( 39 ) من اللائحة التنفيذية لنظام إدارة النفايات : تنتقل النفايات إلى ملكية الدولة عند وضعها في الحاويات أو الأماكن المخصصة لذلك .</div>
+		<div>المادة ( 41 ) من اللائحة اللتنفذية لنظام إدارة النفايات : يلتزم منتج النفاية بتحمل مسؤلية ما ينتجه من نفايات حتى يتم نقلها من قبل مقدم الخدمة.</div>
+		<div>المادة ( 44 ) من اللائحة التنفيذية لنظام إدارة النفايات : يلتزم منتج النفايات البلدية الصلبة بوضع المخلفات في الحاويات المخصصة لذلك أو بنقلها إلى مقدم الخدمة.</div>
+		<div>المادة ( 68 ) من اللائحة التنفيذية لنظام إدارة النفايات : يلتزم منتج النفاية بفصل النفايات الخطرة عن النفايات غير الخطرة في مصادرها.</div>
+	</div>
+	<div>
+		العقد رقم ( <b dir="ltr">{{ c.number }}</b> ) يتبع للعقد رقم ( {{ v(c.follows) }} ) تاريخ {{ c.concluded.hijri }} هـ.
+	</div>
+
+	{{ signatures(supervised=True) }}
+
+	<div class="wt-notes">
+		<b>❖ ملاحظــــــــــــــات هامة :</b>
+		<div>1- لا يحق لأي طرف بالعقد إلغاؤه أو التعديل على أي بند دون أخذ الموافقة الخطية رسمياُ من قبل الجهة المشرفة بإدارة النظافة مع تقديم الأسباب والمبررات حفاظاً على النظافة العامة.</div>
+		<div>2- تعتبر الشروط والمواصفات جزء لا يتجزأ من العقد وهي إلزامية لجميع الأطراف.</div>
+	</div>
+
+	{{ footer(1) }}
+</div>
+
+<!-- ============================ Page 2: the terms ============================ -->
+<div class="wt-terms {% if c.collection_room %}wt-page-break{% endif %}">
+	{{ header() }}
+	<div class="wt-rule"></div>
+	<div class="wt-section">الشروط والمواصفات الفنية</div>
+	<p style="margin: 2px 0;">حيث أن الطرف الثاني مرخص من قبل المركز الوطني لإدارة النفايات ( موان ) ومرتبط بنشاط محل العقد ويرغب الطرف الأول بالتعاقد مع الطرف الثاني لنقل المخلفات الناتجة من المنشـآت والمحلات التجارية إلى مردم النفايات التابع للأمانة أو أي مكان تحدده الأمانة ضمن حدود اشرافها فقد تم الاتفاق على ما يلي :</p>
+	<ol>
+		<li>يعتبر كل ما ذكر ادناه جزءاً من هذا العقد.</li>
+		<li>مدة العقد ({{ c.duration or "12 شهراً ميلادياً" }}) (شريطة سريان صلاحية رخصة (موان) للمقاول) من تاريخ التوقيع والاعتماد.</li>
+	</ol>
+
+	<div class="wt-section">التزامات الطرف الأول (المستفيد – المنتج)</div>
+	<ol>
+		<li>يلتزم الطرف الأول بدفع مستحقات الطرف الثاني حسب الفاتورة المقدمة من الطرف الثاني مع اضافة مبلغ القيمة المضافة.</li>
+		<li>يتعهد الطرف الأول بعدم إعاقة عمل الطرف الثاني وتمكينه من الوصول إلى الحاويات وإزالة معوقات عمل الطرف الثاني.</li>
+		<li>يلتزم الطرف الأول بإخطار الطرف الثاني بأي زيادة مفاجئة في كميات النفايات، وكذلك بطلب استبدال الحاوية وفقًا للضوابط الفنية الصادرة من المركز الوطني لإدارة النفايات.</li>
+		<li>يلتزم الطرف الأول بتوفير مساحة وموقع مناسبين لوضع الحاوية، وذلك بعد إشعار الأمانة، ويتحمل كامل المسؤولية عن أي تلف أو سوء استخدام أو نقل غير مصرح به للحاوية أو أي حادث قد ينجم نتيجة لموقعها، على أن يتم إشعار الطرف الثاني خطيًا مسبقًا بأي تغيير يطرأ على موقع الحاوية.</li>
+		<li>يلتزم الطرف الأول باختيار حاوية ذات حجم مناسب يتوافق مع كمية النفايات الناتجة عن نشاطه وفقًا للاتفاق المبرم بين الطرفين، وفي حالة مخالفة ذلك سيتم تطبيق لائحة الجزاءات عن المخالفات البلدية الصادرة بقرار مجلس الوزراء رقم (92) وتاريخ 5/2/1444هـ.</li>
+		<li>يلتزم الطرف الأول باستخدام حاويات الطرف الثاني للتخلص من النفايات الناتجة عن نشاطه التجاري فقط، وفقًا للكميات والأنواع المحددة في خطة النقل الموضحة بهذا العقد. مع الالتزام التام بفرز النفايات في أكياس ملونة حسب الألوان المحددة (أسود، أزرق، أخضر). ويتحمل الطرف الأول جميع التكاليف التشغيلية الناجمة عن أي مخالفة، مع حق الطرف الثاني في اتخاذ الإجراءات اللازمة لضمان الالتزام.</li>
+		<li>يلتزم الطرف الأول، كجزء من الخدمات المقدمة بموجب هذا العقد، بوضع النفايات داخل الحاويات المخصصة فقط، وعدم إلقائها خارجها، مع بقاء المسؤولية الكاملة على منتج النفايات، ويتحمل الطرف الأول كافة المخالفات والجزاءات الناتجة عن هذا السلوك، سواءً الصادرة من الجهات المختصة أو من الطرف الثاني.</li>
+		<li>إنفاذاً للمادة (177) وتنفيذاً لأحكام المادة (الثانية عشرة) من النظام في حال تعاقد المجمعات السكنية والتجارية والجهات الإدارية الحكومية مع مقدم خدمات إدارة النفايات، يكون الطرف الأول مسؤولاً عن فحص وثائق مقدم الخدمة وتصريحه أو ترخيصه بممارسة النشاط محل العقد.</li>
+		<li>يتحمل العميل المسؤولية الكاملة عن صحة المستندات المقدمة لغرض إبرام عقد نقل النفايات، وكذلك عن دقة البيانات المتعلقة بطبيعة النفايات المنقولة، ويُعد مسؤولًا قانونيًا ونظاميًا عن أي تبعات ناتجة عن تقديم مستندات أو بيانات غير صحيحة أو مضللة.</li>
+		<li>يعد توقيع الطرف الأول أو من ينوب عنه أو ختمه لهذا العقد بمثابة إقراراً باستلام الحاويات بأعدادها الموضحة بهذا العقد وإقراراً بأنه تم مباشرة العمل من قبل الطرف الثاني وذلك اعتبارا من تاريخ سريان هذا العقد.</li>
+	</ol>
+
+	<div class="wt-section">التزامات الطرف الثاني (مقدم الخدمة - الناقل)</div>
+	<ol>
+		<li>يلتزم الطرف الثاني بتنفيذ عمليات نقل النفايات من مواقع الطرف الأول إلى المردم العام للنفايات بمنطقة المدينة المنورة وفقًا للخطة التشغيلية المرفقة والمبينة ضمن هذا العقد، والتي تُعد جزءًا لا يتجزأ منه، وبما يتوافق مع الضوابط والاشتراطات الفنية المعتمدة من الجهات المختصة.</li>
+		<li>يتعهد الطرف الثاني بعدم الاستفادة من نقل المخلفات التجارية بأي شكل كان ويلتزم بما نصت عليه الأنظمة والتعليمات بهذا الخصوص، إلا بعد الحصول على الموافقة الخطية من الجهة المختصة.</li>
+		<li>يتعهد الطرف الثاني بتطبيق كافة اللوائح والأنظمة والتعليمات الصادرة من المركز الوطني لإدارة النفايات والخاصة بهذا المجال.</li>
+		<li>يلتزم الطرف الثاني بآلية الجمع من المصدر للمحاور والطرق الرئيسية المعتمدة من قبل الأمانة وفق الخطة الاستراتيجية لتحسين المشهد الحضري.</li>
+		<li>يلتزم الطرف الثاني بصيانة ودهان وغسيل وتطهير الحاويات نهاية كل 30 يوم أو حسب توجيه الجهة المشرفة.</li>
+		<li>يلتزم الطرف الثاني بنقل النفايات وتفريغ الحاويات خلال أربع ساعات من الموعد المجدول للرفع أو ست ساعات من موعد إخطاره بضرورة الرفع من قبل مراقبي الجهة المشرفة بالأمانة أو البلديات الفرعية وفي حال مخالة ذلك يتم اجراء اللازم حسب الأنظمة ويراعي الظروف الخارجة عن الإرادة (المواسم، الأعطال المفاجئة، تقلبات الطقس، الكثافة المرورية) مع التزامه بخطة الطوارئ.</li>
+		<li>يلتزم مقدم الخدمة أن يحافظ خلال كامل مدة العقد على جميع التراخيص والتصاريح اللازمة لتحقيق التزاماته التعاقدية بما في ذلك الرخصة ذات الصلة.</li>
+		<li>يلتزم الطرف الثاني بوضع الحاويات في المواقع المحددة من قبل الطرف الأول، ويلتزم الأول بتحمل كامل المسؤولية عن أي مخالفة تنتج عن تغيير الموقع دون إذن خطي مسبق من الطرف الأول.</li>
+		<li>يلتزم الطرف الثاني بمراقبة حجم الحاويات وتغييره عند عدم ملاءمته، مع تحميل الطرف الأول التكاليف الإضافية ان وجدت، وذلك للحفاظ على البيئة والمظهر الحضاري بشكل مرضى ومشرف. وفي حال التكرار، يُعدل العقد مع إشعار الأمانة.</li>
+	</ol>
+
+	<div class="wt-section">الشــــروط العــــامــــــــــــة:-</div>
+	<ul>
+		<li>في حال مخالفة أي طرف للأنظمة والتعليمات سيتم تطبيق ما جاء بحقه بناءً على المادة الثالثة من لائحة الجزاءات عن المخالفات البلدية الصادرة بقرار مجلس الوزراء رقم (92) وتاريخ 5/2/1444هـ. وكذلك تطبيق العقوبات المنصوص عليها بجدول تصنيف المخالفات لنظام النفايات وفق خطابنا التعميمي رقم 4500428306 وتاريخ 1/5/1445هـ.</li>
+		<li>يجدد هذا العقد تلقائياً ويعتمد من قبل وكالة الجودة والامتثال - الإدارة العامة للبيئة.</li>
+		<li>في حالة عدم رغبة أي طرف بالتجديد، فيتم إشعار الطرف الآخر والأمانة خطياً بعدم رغبته في التجديد خلال 90 يوماً قبل تاريخ الانتهاء الرسمي للعقد.</li>
+		<li>أي خلاف ينشأ بين طرفي هذا العقد، يتم تطبيق جميع الأنظمة والقوانين المعمول بها داخل المملكة العربية السعودية وفي حالة حدوث نزاع يتم الالتجاء لجهة الاختصاص للفصل بالمدينة المنورة، ويتعهد الطرفان بعدم الإخلال بخطة التنفيذ حتى صدور الحكم من جهة الاختصاص.</li>
+	</ul>
+
+	{{ signatures() }}
+	<div style="margin-top: 4px;">ملاحظات اخري إن وجد : <span class="wt-blank" style="min-width: 70%;"></span></div>
+	{%- if c.collection_room %}
+	<div class="wt-center wt-red" style="margin-top: 4px;"><b>ملحق عقد لاعتماد غرفة جمع النفايات غير الخطرة وهو مكمل وجزء لا يتجزاء من العقد الأصلي بالنسبة لكامل البنود المذكوره.</b></div>
+	{%- endif %}
+
+	{{ footer(2) }}
+</div>
+
+{%- if c.collection_room %}
+<!-- ============================ Page 3: the collection room annex ============================ -->
+<div>
+	{{ header() }}
+	<div class="wt-rule"></div>
+	{{ contract_data() }}
+
+	<table class="wt-photos" style="margin-top: 8px;">
+		<tr><td></td><td style="border-right: 0;"></td></tr>
+	</table>
+	<table class="wt-photo-label">
+		<tr><td><span>الغرفة من الداخل</span></td><td><span>الغرفة من الخارج</span></td></tr>
+	</table>
+
+	<div class="wt-red" style="margin-top: 6px;"><b>اشتراطات غرفة تجميع النفايات:</b></div>
+	<ol class="wt-terms">
+		<li>مجهزة بإضاءة كافية، ومكيفة من الداخل، ومغلقة بإحكام.</li>
+		<li>يوجد بها مجرى لتصريف السوائل.</li>
+		<li>تقع مسئولية غسيل ونظافة الغرفة على الطرف الأول.</li>
+		<li>تحتوي الغرفة على حساسات استشعار الحريق ومزودة بنظام الرش الآلي للاطفاء .</li>
+		<li>يوجد بها أدوات تنظيف ومصدر مياه.</li>
+		<li>الحد الأدنى لمقاسات الغرفة: (3م طول) (3م عرض) (3م ارتفاع) أو حسب الموقع وكمية النفايات المنتجة.</li>
+		<li>مدة العقد ( {{ c.duration or "12 شهر" }} ) ميلادي ولا يحق لأي طرف بالعقد إلغاؤه أو التعديل على أي بند دون أخذ المواففة الرسمية من قبل الجهة المشرفة .</li>
+		<li>لا يحق لاي طرف بالعقد إلغاؤه أو التعديل على أي بند دون أخذ الموافقة الرسمية من الجهة المشرفة بالإدارة العامة للبيئة .</li>
+		<li>في حالة تم اغلاق أو الغاء غرفة النفايات فيعتبر العقد لاغياً نظاماً ويلزم اشعار الجهة لمشرفة بذلك لتطبيق المادة رقم (84) من جدول مخالفات المركز الوطني لإدارة النفايات وقيمة المخالفة (10000) ريال للحد الادنى .</li>
+		<li>يلتزم الطرف منتج النفايات بتسهيل عملية الوصول الى غرفة النفايات من قبل الطرف الناقل وتذليل الصعوبات ان وجدت.</li>
+	</ol>
+
+	{{ signatures() }}
+	{{ footer(3) }}
+</div>
+{%- endif %}
+
+</div>

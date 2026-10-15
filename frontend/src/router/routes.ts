@@ -1,10 +1,16 @@
 import type { RouteComponent, RouteMeta, RouteRecordRaw } from "vue-router"
 
-import { forgotHash } from "@/components/auth/authHelpers"
-import { authPaths, defaultLocale, localePath, pagePaths } from "@/config/site"
+import { loginHashPage } from "@/components/auth/authHelpers"
+import {
+	authPaths,
+	dashboardPath,
+	defaultLocale,
+	localePath,
+	pagePaths,
+} from "@/config/site"
 import { type LocaleCode, type PageKey, SUPPORTED_LOCALES } from "@/types"
 
-export type LayoutName = "public" | "auth"
+export type LayoutName = "public" | "auth" | "dashboard"
 
 declare module "vue-router" {
 	interface RouteMeta {
@@ -14,10 +20,14 @@ declare module "vue-router" {
 		locale?: LocaleCode
 		/** The public page it is (its title, description and twin addresses in meta.json). */
 		page?: PageKey
-		/** The tab title's message, for pages outside meta.json (the login pages). */
+		/** The tab title's message, for pages outside meta.json (login, dashboard). */
 		title?: string
 		/** Logged-in visitors are sent on (the login pages): see guards.ts. */
 		guestOnly?: boolean
+		/** Guests are sent to the login page, then back. */
+		requiresAuth?: boolean
+		/** Producers only: staff go to the Desk, unlinked accounts to DashboardNotLinked. */
+		producerOnly?: boolean
 	}
 }
 
@@ -60,6 +70,39 @@ function localizedRoutes(
 	})
 }
 
+/** A login page (sign-in, sign-up, password reset) on the auth layout, for guests only. */
+function authRoutes(
+	path: string,
+	name: string,
+	component: () => Promise<RouteComponent>,
+	title: string,
+	extra: Partial<RouteRecordRaw> = {},
+): RouteRecordRaw[] {
+	return inEveryLocale(
+		path,
+		name,
+		component,
+		{ layout: "auth", title, guestOnly: true },
+		extra,
+	)
+}
+
+/** A page of the producer dashboard (docs/producer_dashboard/routing.md). */
+function dashboardRoutes(
+	path: string,
+	name: string,
+	component: () => Promise<RouteComponent>,
+	title: string,
+	producerOnly = true,
+): RouteRecordRaw[] {
+	return inEveryLocale(`${dashboardPath}${path}`, name, component, {
+		layout: "dashboard",
+		title,
+		requiresAuth: true,
+		producerOnly,
+	})
+}
+
 /** Unknown addresses go to the landing page of their language. */
 const fallbacks: RouteRecordRaw[] = SUPPORTED_LOCALES.filter(
 	(locale) => locale !== defaultLocale,
@@ -86,30 +129,86 @@ export const routes: RouteRecordRaw[] = [
 		"Capabilities",
 		() => import("@/views/CapabilitiesView.vue"),
 	),
-	// Replaces Frappe's /login (website_route_rules in ozone/hooks.py).
-	...inEveryLocale(
+	// Replaces Frappe's /login (website_route_rules in ozone/hooks.py): every Frappe link to the
+	// login page lands here.
+	...authRoutes(
 		authPaths.login,
 		"Login",
 		() => import("@/views/auth/LoginView.vue"),
-		{ layout: "auth", title: "auth.login.pageTitle", guestOnly: true },
+		"auth.login.pageTitle",
 		{
-			beforeEnter: (to) =>
-				forgotHash(to.hash)
+			beforeEnter: (to) => {
+				const page = loginHashPage(to.hash)
+				return page
 					? {
-							name: localizedName(
-								"ForgotPassword",
-								to.meta.locale ?? defaultLocale,
-							),
+							name: localizedName(page, to.meta.locale ?? defaultLocale),
 							query: to.query,
 						}
-					: undefined,
+					: undefined
+			},
 		},
 	),
-	...inEveryLocale(
+	...authRoutes(
+		authPaths.signup,
+		"Signup",
+		() => import("@/views/auth/SignupView.vue"),
+		"auth.signup.pageTitle",
+	),
+	...authRoutes(
 		authPaths.forgotPassword,
 		"ForgotPassword",
 		() => import("@/views/auth/ForgotPasswordView.vue"),
-		{ layout: "auth", title: "auth.forgot.pageTitle", guestOnly: true },
+		"auth.forgot.pageTitle",
+	),
+	...dashboardRoutes(
+		"",
+		"Dashboard",
+		() => import("@/views/dashboard/OverviewView.vue"),
+		"dashboard.titles.overview",
+	),
+	...dashboardRoutes(
+		"/profile",
+		"DashboardProfile",
+		() => import("@/views/dashboard/ProfileView.vue"),
+		"dashboard.titles.profile",
+	),
+	...dashboardRoutes(
+		"/establishment",
+		"DashboardEstablishment",
+		() => import("@/views/dashboard/EstablishmentView.vue"),
+		"dashboard.titles.establishment",
+	),
+	...dashboardRoutes(
+		"/facilities",
+		"DashboardFacilities",
+		() => import("@/views/dashboard/FacilitiesView.vue"),
+		"dashboard.titles.facilities",
+	),
+	...dashboardRoutes(
+		"/requests",
+		"DashboardRequests",
+		() => import("@/views/dashboard/RequestsView.vue"),
+		"dashboard.titles.requests",
+	),
+	...dashboardRoutes(
+		"/quotations",
+		"DashboardQuotations",
+		() => import("@/views/dashboard/QuotationsView.vue"),
+		"dashboard.titles.quotations",
+	),
+	...dashboardRoutes(
+		"/contracts",
+		"DashboardContracts",
+		() => import("@/views/dashboard/ContractsView.vue"),
+		"dashboard.titles.contracts",
+	),
+	// A logged-in account nobody has linked to a producer yet.
+	...dashboardRoutes(
+		"/not-linked",
+		"DashboardNotLinked",
+		() => import("@/views/dashboard/NotLinkedView.vue"),
+		"dashboard.titles.notLinked",
+		false,
 	),
 	...fallbacks,
 ]

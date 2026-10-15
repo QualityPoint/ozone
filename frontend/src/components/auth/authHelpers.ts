@@ -1,7 +1,7 @@
 import { ref } from "vue"
 import type { LocationQuery } from "vue-router"
 
-import { authPaths, basePath } from "@/config/site"
+import { authPaths, basePath, dashboardPath, localePath } from "@/config/site"
 import {
 	AuthRequestError,
 	DESK_PATH,
@@ -10,20 +10,17 @@ import {
 	getLoginOptions,
 	isStaff,
 } from "@/services/auth"
+import type { LocaleCode, Notice } from "@/types"
 import { isEmail } from "@/utils/validation"
 
 /** A result message shown above an auth form. */
-export interface AuthNotice {
-	kind: "success" | "error"
-	text: string
-}
+export type AuthNotice = Notice
 
 type Translate = (key: string) => string
 
 /**
- * Text for a failed auth request, following Frappe's login page: the server's own messages
- * when it sent any (account locked, IP not allowed…), otherwise a translated default for the
- * status.
+ * Text for a failed auth request, following Frappe's login page: the server's own messages when
+ * it sent any (account locked, IP not allowed…), otherwise a translated default for the status.
  */
 export function authErrorMessage(error: unknown, t: Translate): string {
 	const status = error instanceof AuthRequestError ? error.status : 0
@@ -69,21 +66,64 @@ export function redirectToFromQuery(query: LocationQuery): string | null {
 	return safeRedirect(Array.isArray(value) ? value[0] : value)
 }
 
+/** The producer's dashboard in a language: /dashboard, /en/dashboard. */
+export function dashboardHome(locale: LocaleCode): string {
+	return localePath(dashboardPath, locale)
+}
+
+/** The Desk's addresses: staff only (frappe/www/desk.py refuses Website Users). */
+export function isDeskPath(path: string): boolean {
+	return ["/desk", "/app"].some(
+		(prefix) =>
+			path === prefix ||
+			path.startsWith(`${prefix}/`) ||
+			path.startsWith(`${prefix}?`),
+	)
+}
+
 /**
- * Where a successful login goes: `redirect-to`, else the Desk for staff and the website for
- * anyone else (the site has no client area). A URL for a full page load: the Desk is outside
- * this app, and the load picks up the new session's CSRF token.
+ * Where a logged-in user goes (docs/producer_dashboard/routing.md), from the redirects on offer,
+ * first wins:
+ * - Staff: the first redirect, else the Desk.
+ * - Producers: the first redirect outside the Desk, else their dashboard in the page's language.
+ *   A Frappe page that sent them to /login often asks to come back to a Desk page
+ *   (/login?redirect-to=/desk/…), which would only refuse them.
+ */
+export function landingUrl(
+	staff: boolean,
+	redirects: (string | null)[],
+	locale: LocaleCode,
+): string {
+	const offered = redirects.filter((path): path is string => !!path)
+	if (staff) return offered[0] ?? DESK_PATH
+	return offered.find((path) => !isDeskPath(path)) ?? dashboardHome(locale)
+}
+
+/**
+ * Where a successful login goes: `landingUrl`, with producers' page saved at sign-up first. Never
+ * Frappe's `home_page`: for a Website User it is the default app's path. A URL for a full page
+ * load: the Desk is outside this app, and the load picks up the new session's CSRF token.
  */
 export function postLoginUrl(
 	result: LoginResult,
 	redirectTo: string | null,
+	locale: LocaleCode,
 ): string {
-	return redirectTo ?? (isStaff(result) ? DESK_PATH : "/")
+	return isStaff(result)
+		? landingUrl(true, [redirectTo], locale)
+		: landingUrl(false, [safeRedirect(result.redirect_to), redirectTo], locale)
 }
 
-/** Frappe's old login page used a hash for its reset form (/login#forgot); some links still do. */
-export function forgotHash(hash: string): boolean {
-	return hash === "#forgot"
+/**
+ * Frappe's old login page used hashes for its other forms (/login#signup, /login#forgot); some
+ * links still do. The page each one stands for, or null.
+ */
+export function loginHashPage(
+	hash: string,
+): "Signup" | "ForgotPassword" | null {
+	if (hash === "#signup") return "Signup"
+	if (hash === "#forgot") return "ForgotPassword"
+	return null
 }
 
 const options = ref<LoginOptions | null>(null)
@@ -103,6 +143,7 @@ export function useLoginOptions() {
 					login_with_username: false,
 					login_with_mobile: false,
 					email_link: false,
+					signup: false,
 					providers: [],
 				}
 			})

@@ -31,8 +31,27 @@ export const pagePaths: Record<PageKey, string> = meta.paths
  */
 export const authPaths = {
 	login: "/login",
+	signup: "/signup",
 	forgotPassword: "/forgot-password",
 } as const
+
+/**
+ * The producer dashboard (website_route_rules in ozone/hooks.py: /dashboard and below). Private:
+ * not in meta.json, so not indexed. Its pages in the menu's order; `soon` ones show, disabled.
+ */
+export const dashboardPath = "/dashboard"
+export const dashboardPages = [
+	{ id: "overview", path: "" },
+	// The facility first: a producer registers it, then asks for services for it
+	{ id: "facilities", path: "/facilities" },
+	{ id: "requests", path: "/requests" },
+	// A request that turns into a quotation moves here
+	{ id: "quotations", path: "/quotations" },
+	{ id: "profile", path: "/profile" },
+	{ id: "establishment", path: "/establishment" },
+	{ id: "contracts", path: "/contracts" },
+] as const
+export type DashboardPageId = (typeof dashboardPages)[number]["id"]
 
 /**
  * A page's address in a language: the base path in the default language, under

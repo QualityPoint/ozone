@@ -1,9 +1,10 @@
 # Authentication
 
 Ozone's own login page, in Arabic and English and in the website's look. It replaces Frappe's
-`/login`. The website has no client accounts, so it's for the **Ozone team**: after logging in,
-staff go to the Desk. The structure follows blinktech's (`apps/blinktech/docs/frontend/auth.md`),
-without its sign-up page and client dashboard.
+`/login`. It serves **Ozone's team**, who go to the Desk after logging in, and Ozone's **clients**
+(producers), who sign up at `/signup` and go to their dashboard: see
+[../producer_dashboard/](../producer_dashboard/README.md) (ported from hawya's `naqel` branch). The
+structure follows blinktech's (`apps/blinktech/docs/frontend/auth.md`).
 
 ## Pages
 
@@ -11,6 +12,7 @@ without its sign-up page and client dashboard.
 | --- | --- | --- |
 | `/login`, `/en/login` | `LoginView` | Login name and password, a two-factor code step, "Email me a login link", "Continue with ‹provider›" |
 | `/forgot-password`, `/en/forgot-password` | `ForgotPasswordView` | Emails a password reset link (to Frappe's own `/update-password` page) |
+| `/signup`, `/en/signup` | `SignupView` | Name and email: a Lead and its Contact, then Frappe's sign-up (a Website User and the welcome email). See [accounts.md](../producer_dashboard/accounts.md) |
 
 - **Replacing Frappe's page:** the `website_route_rules` in `ozone/hooks.py` take `/login`
   from Frappe. Every Frappe link to the login page lands here: Desk session expiry, the Desk's
@@ -31,7 +33,7 @@ Both use the `auth` layout (`layouts/AuthLayout.vue`), one of the documents' pag
 - **The page:** white with silver shards (`BrandSilverBackground`), between the green and red
   top band and the green bottom band (`BrandStripe`).
 - **The form** (`AuthCard`): one of the documents' white panels, with the red section tag
-  ("فريق أوزون", "Ozone team"), and rounded fields with a green focus ring (`BaseInput`).
+  ("حساب أوزون", "Ozone account"), and rounded fields with a green focus ring (`BaseInput`).
   Results show in a notice: red for errors, green for success (`BaseNotice`).
 - **The panel beside it** (desktop only): the trucks' slogan, the tagline pill, and the
   website's truck (`BrandTruck`, shared with the hero), parked on the bottom band. It's still,
@@ -92,8 +94,8 @@ The page asks `ozone.api.auth.get_login_options` what's enabled, and hides the r
 
 ## Not handled
 
-- **Sign up:** the website has no client accounts. Frappe's sign-up stays off (Website
-  Settings).
+- **Sign up** is the page's, but Frappe decides: with Website Settings → *Disable Signup* on (as on
+  naqel.local), `/signup` says it isn't available and the login page shows no sign-up link.
 - **LDAP login.**
 - **Two-factor setup by QR code:** on the first two-factor login, Frappe emails the
   authenticator QR code, which needs an outgoing Email Account.

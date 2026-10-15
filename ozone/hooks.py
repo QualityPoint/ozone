@@ -9,7 +9,7 @@ app_home = "/desk/ozone"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["naqel"]  # the producer dashboard works on naqel's Facility and Service Request
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
@@ -18,7 +18,9 @@ add_to_apps_screen = [
 		"logo": "/assets/ozone/icons/logo.svg",
 		"title": "Ozone",
 		"route": app_home,
-		# "has_permission": "ozone.api.permission.has_app_permission"
+		# Hidden from Website Users (producers): otherwise Frappe would send them to this Desk app after
+		# logging in instead of their dashboard (docs/producer_dashboard/routing.md)
+		"has_permission": "erpnext.check_app_permission",
 	}
 ]
 
@@ -68,8 +70,18 @@ website_route_rules = [
 	{"from_route": "/en/<path:app_path>", "to_route": "frontend"},
 	{"from_route": "/capabilities", "to_route": "frontend"},
 	{"from_route": "/login", "to_route": "frontend"},
+	{"from_route": "/signup", "to_route": "frontend"},
 	{"from_route": "/forgot-password", "to_route": "frontend"},
+	# The producer dashboard (docs/producer_dashboard/)
+	{"from_route": "/dashboard", "to_route": "frontend"},
+	{"from_route": "/dashboard/<path:app_path>", "to_route": "frontend"},
 ]
+
+# Producers (Website Users) land on their dashboard after any kind of login; staff keep the Desk
+get_website_user_home_page = "ozone.auth.get_website_user_home_page"
+
+# A producer may open its own facilities only (ozone/producer.py)
+has_website_permission = {"Facility": "ozone.producer.facility_website_permission"}
 
 # Frappe's own About Us and Contact Us pages (frappe/www/about.py, contact.py) are public and
 # can't be switched off: send them to the landing page's sections instead.
@@ -96,10 +108,8 @@ website_redirects = [
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "ozone.utils.jinja_methods",
-# 	"filters": "ozone.utils.jinja_filters"
-# }
+# The waste transport contract's print format (Service Quotation) reads its data through this
+jinja = {"methods": ["ozone.contract_print.waste_transport_contract"]}
 
 # Installation
 # ------------
@@ -156,6 +166,11 @@ website_redirects = [
 # Document Events
 # ---------------
 # Hook on document methods and events
+
+doc_events = {
+	# A Customer made from a Lead lists the Lead's website users in its Portal Users
+	"Customer": {"after_insert": "ozone.producer.carry_lead_users"},
+}
 
 # doc_events = {
 # 	"*": {

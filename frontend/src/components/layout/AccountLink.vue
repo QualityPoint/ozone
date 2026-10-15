@@ -4,21 +4,23 @@
     <LucideLayoutDashboard class="size-5" aria-hidden="true" />
     <span v-if="labelled">{{ t("auth.account.desk") }}</span>
   </a>
-  <!-- Anyone else: the login page in the current language. -->
-  <RouterLink v-else :to="{ name: localizedName('Login', current) }" v-bind="labelAttrs(t('auth.account.login'))" :class="classes">
+  <!-- A producer (logged in, not staff): their dashboard; a guest: the login page, in the current
+       language. -->
+  <RouterLink v-else :to="target" v-bind="labelAttrs(label)" :class="classes">
     <LucideUserRound class="size-5" aria-hidden="true" />
-    <span v-if="labelled">{{ t("auth.account.login") }}</span>
+    <span v-if="labelled">{{ label }}</span>
   </RouterLink>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard"
 import LucideUserRound from "~icons/lucide/user-round"
 
+import { dashboardHome } from "@/components/auth/authHelpers"
 import { useLocale } from "@/composables/useLocale"
-import { cookieStaff } from "@/composables/useSession"
+import { cookieLoggedIn, cookieStaff } from "@/composables/useSession"
 import { localizedName } from "@/router/routes"
 import { DESK_PATH } from "@/services/auth"
 
@@ -42,7 +44,17 @@ function labelAttrs(label: string) {
 // Read once mounted; an expired session's cookies only send staff to the Desk, which then
 // asks them to log in again.
 const staff = ref(false)
+const loggedIn = ref(false)
+const label = computed(() =>
+	loggedIn.value ? t("auth.account.dashboard") : t("auth.account.login"),
+)
+const target = computed(() =>
+	loggedIn.value
+		? dashboardHome(current.value)
+		: { name: localizedName("Login", current.value) },
+)
 onMounted(() => {
 	staff.value = cookieStaff()
+	loggedIn.value = cookieLoggedIn()
 })
 </script>

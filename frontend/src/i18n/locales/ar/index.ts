@@ -3,6 +3,7 @@ import auth from "./auth"
 import capabilities from "./capabilities"
 import common from "./common"
 import contact from "./contact"
+import dashboard from "./dashboard"
 import equipment from "./equipment"
 import hero from "./hero"
 import industries from "./industries"
@@ -20,6 +21,7 @@ const ar = {
 	contact,
 	auth,
 	capabilities,
+	dashboard,
 }
 
 /** Arabic, the default language, is the source of truth: every locale must match this shape. */

@@ -88,6 +88,14 @@
         </BaseButton>
       </div>
     </template>
+
+    <!-- Producers without an account register here, when the site allows sign-up. -->
+    <template v-if="options?.signup" #footer>
+      {{ t("auth.login.noAccount") }}
+      <RouterLink :to="{ name: localizedName('Signup', current), query: route.query }" :class="AUTH_LINK">
+        {{ t("auth.login.signupLink") }}
+      </RouterLink>
+    </template>
   </AuthCard>
 </template>
 
@@ -175,7 +183,7 @@ function handleResult(result: LoginResult) {
 		notice.value = { kind: "success", text: t("auth.login.passwordExpired") }
 		return
 	}
-	window.location.assign(postLoginUrl(result, redirectTo.value))
+	window.location.assign(postLoginUrl(result, redirectTo.value, current.value))
 }
 
 async function logIn() {

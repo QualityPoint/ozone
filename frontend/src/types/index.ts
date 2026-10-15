@@ -38,6 +38,12 @@ export interface SiteContact {
 	socials: { platform: SocialPlatform; url: string }[]
 }
 
+/** A result message shown above a form (BaseNotice). */
+export interface Notice {
+	kind: "success" | "error"
+	text: string
+}
+
 /** The services on the landing page; texts are `services.items.<id>`. */
 export type ServiceId = "collection" | "sorting" | "debris"
 

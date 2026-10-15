@@ -1,8 +1,9 @@
 export default {
 	/** The label above each form. */
-	tag: "فريق أوزون",
+	tag: "حساب أوزون",
 	/** The side panel (desktop), under the trucks' slogan (hero.title). */
-	panel: "سجّل الدخول إلى نظام أوزون لإدارة أعمالك اليومية.",
+	panel:
+		"لفريق أوزون، ولعملائها من لوحة حساباتهم: منشآتهم وطلبات خدماتهم في مكان واحد.",
 	backToSite: "العودة إلى الموقع",
 	email: "البريد الإلكتروني",
 	password: "كلمة المرور",
@@ -37,6 +38,22 @@ export default {
 		invalid: "رمز التحقق غير صحيح. حاول مرة أخرى.",
 		notDelivered: "تعذّر إرسال رمز التحقق. تواصل مع مسؤول النظام.",
 		back: "الدخول بحساب آخر",
+		noAccount: "منشأة جديدة؟",
+		signupLink: "أنشئ حسابًا",
+	},
+	signup: {
+		pageTitle: "إنشاء حساب — أوزون للخدمات البيئية",
+		title: "إنشاء حساب",
+		subtitle: "سجّل منشأتك، وسيتواصل معك فريق أوزون لإكمال بياناتك وطلب خدماتك.",
+		fullName: "الاسم الكامل",
+		submit: "إنشاء الحساب",
+		checkEmail: "أرسلنا إلى بريدك رابطًا لتفعيل حسابك وتعيين كلمة المرور.",
+		pending: "استلمنا طلبك، وسيُفعَّل حسابك بعد مراجعته.",
+		alreadyRegistered:
+			"هذا البريد مسجّل من قبل. سجّل الدخول أو استعد كلمة المرور.",
+		unavailable: "إنشاء الحسابات غير متاح حاليًا. تواصل مع أوزون لإنشاء حسابك.",
+		haveAccount: "لديك حساب؟",
+		loginLink: "سجّل الدخول",
 	},
 	forgot: {
 		pageTitle: "استعادة كلمة المرور — أوزون للخدمات البيئية",
@@ -57,6 +74,7 @@ export default {
 	/** The header's account link: to the login page, or to the Desk once logged in. */
 	account: {
 		login: "تسجيل الدخول",
+		dashboard: "لوحة حسابي",
 		desk: "لوحة التحكم",
 	},
 }

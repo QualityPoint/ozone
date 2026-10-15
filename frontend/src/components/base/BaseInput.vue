@@ -1,7 +1,7 @@
 <template>
   <!-- A labelled text field in the documents' look: a rounded white field with a green focus
        ring, red with its error under it. Passwords get a reveal button. Labels come translated. -->
-  <div>
+  <div :class="$attrs.class" :style="$attrs.style as string | undefined">
     <label :for="id" class="mb-1.5 block text-caption font-bold text-site-heading">{{ label }}</label>
     <!-- A forced direction (dir="ltr" for emails and passwords in Arabic) applies to the wrapper
          too, so the reveal button sits at the same end as the input's padding. -->
@@ -9,7 +9,7 @@
       <input
         :id="id"
         v-model="model"
-        v-bind="$attrs"
+        v-bind="controlAttrs"
         :type="type === 'password' && revealed ? 'text' : type"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="error ? `${id}-error` : undefined"
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, useId } from "vue"
+import { computed, ref, useAttrs, useId } from "vue"
 import LucideEye from "~icons/lucide/eye"
 import LucideEyeOff from "~icons/lucide/eye-off"
 
@@ -45,7 +45,7 @@ defineOptions({ inheritAttrs: false })
 
 defineProps<{
 	label: string
-	type?: "text" | "email" | "password"
+	type?: "text" | "email" | "password" | "url" | "date" | "number"
 	error?: string
 	/** Accessible names of the password reveal button. */
 	showPasswordLabel?: string
@@ -55,4 +55,11 @@ defineProps<{
 const model = defineModel<string>({ default: "" })
 const id = useId()
 const revealed = ref(false)
+
+/** Layout classes and styles go on the field's wrapper; everything else on the input. */
+const attrs = useAttrs()
+const controlAttrs = computed(() => {
+	const { class: _class, style: _style, ...rest } = attrs
+	return rest
+})
 </script>

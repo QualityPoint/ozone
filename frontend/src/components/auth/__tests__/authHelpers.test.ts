@@ -4,8 +4,10 @@ import { describe, expect, it } from "vitest"
 import { AuthRequestError, DESK_PATH } from "@/services/auth"
 import {
 	authErrorMessage,
+	dashboardHome,
 	emailError,
-	forgotHash,
+	isDeskPath,
+	loginHashPage,
 	postLoginUrl,
 	redirectToFromQuery,
 	safeRedirect,
@@ -40,6 +42,8 @@ describe("safeRedirect", () => {
 			"/en/login",
 			"/forgot-password",
 			"/en/forgot-password",
+			"/signup",
+			"/en/signup",
 		]) {
 			expect(safeRedirect(page), page).toBeNull()
 		}
@@ -58,20 +62,72 @@ describe("safeRedirect", () => {
 })
 
 describe("postLoginUrl", () => {
-	it("goes to redirect-to, else the Desk for staff and the website for anyone else", () => {
-		expect(postLoginUrl({ message: "Logged In" }, "/desk/todo")).toBe(
+	it("sends staff to redirect-to, else the Desk", () => {
+		expect(postLoginUrl({ message: "Logged In" }, "/desk/todo", "ar")).toBe(
 			"/desk/todo",
 		)
-		expect(postLoginUrl({ message: "Logged In" }, null)).toBe(DESK_PATH)
-		expect(postLoginUrl({ message: "No App" }, null)).toBe("/")
+		expect(postLoginUrl({ message: "Logged In" }, null, "en")).toBe(DESK_PATH)
+	})
+
+	it("sends producers to their sign-up page, else redirect-to, else their dashboard in the page's language", () => {
+		const producer = { message: "No App", home_page: "/desk/spl-settings" }
+		expect(postLoginUrl(producer, null, "ar")).toBe("/dashboard")
+		expect(postLoginUrl(producer, null, "en")).toBe("/en/dashboard")
+		expect(postLoginUrl(producer, "/en/dashboard", "ar")).toBe("/en/dashboard")
+		expect(
+			postLoginUrl({ ...producer, redirect_to: "/en" }, "/dashboard", "ar"),
+		).toBe("/en")
+		// Never Frappe's home_page, and never an unsafe redirect_to.
+		expect(
+			postLoginUrl(
+				{ ...producer, redirect_to: "https://evil.com" },
+				null,
+				"ar",
+			),
+		).toBe("/dashboard")
+	})
+
+	it("never sends producers into the Desk, which refuses them", () => {
+		const producer = { message: "No App" }
+		expect(postLoginUrl(producer, "/desk/accounts/customer", "ar")).toBe(
+			"/dashboard",
+		)
+		expect(postLoginUrl(producer, "/app/todo", "en")).toBe("/en/dashboard")
+		// Staff still go where they asked.
+		expect(
+			postLoginUrl({ message: "Logged In" }, "/desk/accounts/customer", "ar"),
+		).toBe("/desk/accounts/customer")
+		// A page outside the Desk is fine.
+		expect(postLoginUrl(producer, "/en", "ar")).toBe("/en")
+	})
+
+	it("recognises the Desk's addresses only", () => {
+		for (const path of [
+			"/desk",
+			"/desk/hawya",
+			"/app",
+			"/app/todo",
+			"/desk?x=1",
+		]) {
+			expect(isDeskPath(path), path).toBe(true)
+		}
+		for (const path of ["/dashboard", "/desktop", "/apps", "/en/desk"]) {
+			expect(isDeskPath(path), path).toBe(false)
+		}
+	})
+
+	it("builds the dashboard's address per language", () => {
+		expect(dashboardHome("ar")).toBe("/dashboard")
+		expect(dashboardHome("en")).toBe("/en/dashboard")
 	})
 })
 
-describe("forgotHash", () => {
-	it("recognises the reset form's hash of Frappe's old login page", () => {
-		expect(forgotHash("#forgot")).toBe(true)
-		expect(forgotHash("#login")).toBe(false)
-		expect(forgotHash("")).toBe(false)
+describe("loginHashPage", () => {
+	it("maps the hashes of Frappe's old login page to their pages", () => {
+		expect(loginHashPage("#forgot")).toBe("ForgotPassword")
+		expect(loginHashPage("#signup")).toBe("Signup")
+		expect(loginHashPage("#login")).toBeNull()
+		expect(loginHashPage("")).toBeNull()
 	})
 })
 
@@ -99,6 +155,6 @@ describe("emailError", () => {
 	it("asks for a value first, then a plausible address", () => {
 		expect(emailError("  ", t)).toBe("t:auth.errors.required")
 		expect(emailError("not-an-email", t)).toBe("t:auth.errors.invalidEmail")
-		expect(emailError(" someone@ozone-services.net ", t)).toBeUndefined()
+		expect(emailError(" someone@naqel.sa ", t)).toBeUndefined()
 	})
 })

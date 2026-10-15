@@ -1,6 +1,7 @@
 export default {
-	tag: "Ozone team",
-	panel: "Log in to Ozone's system to manage your daily work.",
+	tag: "Ozone account",
+	panel:
+		"For Ozone's team, and for its clients from their dashboard: their facilities and service requests in one place.",
 	backToSite: "Back to website",
 	email: "Email",
 	password: "Password",
@@ -35,6 +36,26 @@ export default {
 		notDelivered:
 			"We couldn't send your verification code. Please contact your administrator.",
 		back: "Use a different account",
+		noAccount: "New facility?",
+		signupLink: "Create an account",
+	},
+	signup: {
+		pageTitle: "Create an account — Ozone Environmental Services",
+		title: "Create an account",
+		subtitle:
+			"Register your facility, and Ozone's team will contact you to complete your details and request services.",
+		fullName: "Full name",
+		submit: "Create account",
+		checkEmail:
+			"We've emailed you a link to activate your account and set your password.",
+		pending:
+			"We've received your request; your account will be activated once it's reviewed.",
+		alreadyRegistered:
+			"This email is already registered. Log in, or reset your password.",
+		unavailable:
+			"Creating accounts isn't available right now. Contact Ozone to have one made.",
+		haveAccount: "Have an account?",
+		loginLink: "Log in",
 	},
 	forgot: {
 		pageTitle: "Reset password — Ozone Environmental Services",
@@ -55,6 +76,7 @@ export default {
 	},
 	account: {
 		login: "Log in",
+		dashboard: "My dashboard",
 		desk: "Desk",
 	},
 }

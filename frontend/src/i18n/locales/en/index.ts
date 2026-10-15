@@ -3,6 +3,7 @@ import auth from "./auth"
 import capabilities from "./capabilities"
 import common from "./common"
 import contact from "./contact"
+import dashboard from "./dashboard"
 import equipment from "./equipment"
 import hero from "./hero"
 import industries from "./industries"
@@ -20,5 +21,6 @@ const en = {
 	contact,
 	auth,
 	capabilities,
+	dashboard,
 }
 export default en
