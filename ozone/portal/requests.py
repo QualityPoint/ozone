@@ -16,16 +16,17 @@ from frappe.query_builder import Criterion
 from frappe.utils import add_days, cint, cstr, flt, getdate
 from naqel.naqel.doctype.waste_type.waste_type import get_wastes
 from naqel.naqel_calculator.doctype.waste_calculator.waste_calculator import (
+	WASTE_SEP,
+	default_wastes_locked,
+	find_service_setup,
 	get_allowed_facility_uoms,
 	get_facility_uom_hierarchy,
+	parse_waste_items,
 )
-from naqel.naqel_contracting.doctype.service_quotation.service_quotation import _resolve_default_sc
 from naqel.naqel_contracting.doctype.service_request.service_request import (
-	WASTE_SEP,
 	facility_document,
 	open_request,
 	registration_documents,
-	split_wastes,
 )
 
 from ozone.portal import comments, own_doc, pick
@@ -154,6 +155,8 @@ def get_request_form(
 		"service_setup": configuration,
 		"uoms": uoms,
 		"waste_types": _waste_types(configuration),
+		# Whether the setup's default wastes stay (the Service's Allow Removing Default Wastes is off)
+		"defaults_locked": default_wastes_locked(service.name),
 		# A composite facility's annexes, all covered unless the producer unticks some
 		"annexes": _annexes(site, producer),
 		"documents": _documents(site.name, service_type),
@@ -227,17 +230,20 @@ def save_service_request(producer: frappe._dict, data: dict) -> dict:
 		set_credential(site, given)
 		site.save(ignore_permissions=True)
 
-	# The wastes of each waste type: the setup's defaults stay (ServiceRequest.set_waste_types), the
-	# producer's additions must be wastes of that type (ServiceRequest.validate_wastes)
-	added = {
+	# Each waste type's wastes as the producer chose them; the Service Request keeps the setup's defaults
+	# unless the service allows removing them, and starts a waste type not sent from its defaults
+	# (ServiceRequest.set_waste_types). Every waste must be of its type, and each type needs one
+	# (check_wastes).
+	chosen_wastes = {
 		cstr(row.get("waste_type")): [cstr(name) for name in row.get("wastes") or []]
 		for row in data.get("waste_types") or []
 	}
 	request.set(
 		"waste_types",
 		[
-			{"waste_type": row["waste_type"], "waste_item": WASTE_SEP.join(added.get(row["waste_type"], []))}
+			{"waste_type": row["waste_type"], "waste_item": WASTE_SEP.join(chosen_wastes[row["waste_type"]])}
 			for row in _waste_types(configuration)
+			if row["waste_type"] in chosen_wastes
 		],
 	)
 
@@ -268,14 +274,6 @@ def get_service_request(producer: frappe._dict, name: str) -> dict:
 	"""One of the producer's requests: what it asks for (to change it while it is a Draft) and its
 	comments with the sales team."""
 	request = own_doc("Service Request", name, producer)
-	defaults = (
-		{
-			row["waste_type"]: {d["value"] for d in row["defaults"]}
-			for row in _waste_types(request.service_setup)
-		}
-		if request.service_setup
-		else {}
-	)
 	return {
 		"name": request.name,
 		"status": request.status,
@@ -290,14 +288,9 @@ def get_service_request(producer: frappe._dict, name: str) -> dict:
 		"values": {
 			**{field: request.get(field) for field in REQUEST_FIELDS},
 			"facility_uoms": [{"uom": row.uom, "uom_value": row.uom_value} for row in request.facility_uoms],
-			# The wastes the producer added (the setup's defaults are kept anyway)
+			# Each waste type's wastes, as chosen (defaults included)
 			"waste_types": [
-				{
-					"waste_type": row.waste_type,
-					"wastes": [
-						w for w in split_wastes(row.waste_item) if w not in defaults.get(row.waste_type, ())
-					],
-				}
+				{"waste_type": row.waste_type, "wastes": parse_waste_items(row.waste_item)}
 				for row in request.waste_types
 			],
 			"annexes": [row.annex for row in request.annexes],
@@ -396,15 +389,16 @@ def _draft(name: str, producer: frappe._dict):
 def _service_setup(service_type: str, site) -> str:
 	"""The Service Setup a request for this service at this facility resolves (the general one, else
 	the nearest up the activity's ISIC tree), or a refusal: the service isn't offered for it yet."""
-	configuration = site.isic_classification and _resolve_default_sc(service_type, site.isic_classification)
+	configuration = site.isic_classification and find_service_setup(site.isic_classification, service_type)[0]
 	if not configuration:
 		frappe.throw(_("This service isn't available for your facility's activity yet."))
 	return configuration
 
 
 def _waste_types(configuration: str) -> list[dict]:
-	"""The setup's waste types: each with its share, its default wastes (kept on every request) and the
-	wastes the producer may add (those of the type and its sub-types)."""
+	"""The setup's waste types: each with its share, its default wastes (they start every request, and stay
+	unless the service allows removing them) and the wastes the producer may pick (those of the type and its
+	sub-types)."""
 	out = []
 	for dist in frappe.get_all(
 		"Waste Distribution",
@@ -418,7 +412,7 @@ def _waste_types(configuration: str) -> list[dict]:
 				"label": _(dist.waste_type),
 				"percentage": flt(dist.distribution_percentage),
 				"defaults": [
-					{"value": name, "label": _(name)} for name in split_wastes(dist.default_waste_item)
+					{"value": name, "label": _(name)} for name in parse_waste_items(dist.default_waste_item)
 				],
 				"wastes": [{"value": name, "label": _(name)} for name in get_wastes(dist.waste_type)],
 			}

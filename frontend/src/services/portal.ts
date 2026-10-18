@@ -265,6 +265,8 @@ export interface RequestWasteType {
 export interface RequestForm {
 	/** The Service Setup the request resolves (the service and the facility's activity). */
 	service_setup: string
+	/** The default wastes stay (the Service doesn't allow removing them); else they can be removed. */
+	defaults_locked: boolean
 	uoms: MeasureUnit[]
 	waste_types: RequestWasteType[]
 	/** A composite facility's annexes, which the request may cover; empty otherwise. */

@@ -140,7 +140,7 @@ def _frequency(count: int, period_count: int, period_uom: str) -> str:
 
 
 def _wastes(doc) -> list[dict]:
-	from naqel.naqel_contracting.doctype.service_request.service_request import split_wastes
+	from naqel.naqel_calculator.doctype.waste_calculator.waste_calculator import parse_waste_items
 
 	out = []
 	for row in doc.get("waste_types") or []:
@@ -150,7 +150,7 @@ def _wastes(doc) -> list[dict]:
 			{
 				"label": frappe._(row.waste_type),
 				"colour": colour,
-				"items": [frappe._(item) for item in split_wastes(row.waste_item)],
+				"items": [frappe._(item) for item in parse_waste_items(row.waste_item)],
 			}
 		)
 	return out

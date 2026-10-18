@@ -3,7 +3,8 @@
        a service at one of its facilities. A request is a Draft the producer can change until it sends
        it; then Ozone's sales team reviews it, and may ask for clarification in its comments
        (CommentThread) before the quotation; a request that has turned into one moves to the Quotations page. The form asks only what the producer knows: the size in the Service Setup's unit, the
-       wastes of each waste type (its defaults stay; others may be added), the annexes a composite
+       wastes of each waste type (its defaults start it, and stay unless the service allows removing them;
+       others may be added), the annexes a composite
        facility's request covers, when it starts and for how long, and the license it holds when
        the service grants one. -->
   <section>
@@ -93,10 +94,13 @@
         </div>
       </fieldset>
 
-      <!-- The wastes of each waste type: the defaults are fixed, the producer adds the others -->
+      <!-- The wastes of each waste type: its defaults to start with (locked when the service keeps them), and
+           the others the producer adds -->
       <fieldset v-if="spec?.waste_types.length" class="mt-8">
         <legend class="text-caption font-bold text-site-heading">{{ t("dashboard.requests.wastes") }}</legend>
-        <p class="mt-1 text-caption text-site-muted">{{ t("dashboard.requests.wastesHint") }}</p>
+        <p class="mt-1 text-caption text-site-muted">
+          {{ spec.defaults_locked ? t("dashboard.requests.wastesHint") : t("dashboard.requests.wastesHintOpen") }}
+        </p>
         <div class="mt-4 grid gap-4 lg:grid-cols-3">
           <div v-for="type in spec.waste_types" :key="type.waste_type" class="rounded-2xl border-2 border-site-line p-4">
             <p class="flex items-baseline justify-between gap-3 font-extrabold text-site-heading">
@@ -104,18 +108,17 @@
               <span class="text-caption font-bold text-site-muted" dir="ltr">{{ type.percentage }}%</span>
             </p>
             <ul class="mt-3 flex flex-wrap gap-2">
+              <template v-for="name in chosen[type.waste_type]" :key="name">
               <li
-                v-for="waste in type.defaults"
-                :key="waste.value"
+                v-if="isLocked(type, name)"
                 class="inline-flex items-center gap-1.5 rounded-full bg-brand-green px-3 py-1 text-label font-bold text-white"
                 :title="t('dashboard.requests.defaultWaste')"
               >
                 <LucideLock class="size-3" aria-hidden="true" />
-                {{ waste.label }}
+                {{ wasteLabel(type, name) }}
               </li>
               <li
-                v-for="name in added[type.waste_type]"
-                :key="name"
+                v-else
                 class="inline-flex items-center gap-1 rounded-full border-2 border-brand-green px-3 py-0.5 text-label font-bold text-site-heading dark:border-brand-leaf"
               >
                 {{ wasteLabel(type, name) }}
@@ -128,7 +131,11 @@
                   <LucideX class="size-3.5" aria-hidden="true" />
                 </button>
               </li>
+              </template>
             </ul>
+            <p v-if="form.errors.value[`wastes:${type.waste_type}`]" class="mt-2 text-caption font-bold text-brand-red dark:text-brand-red-300">
+              {{ form.errors.value[`wastes:${type.waste_type}`] }}
+            </p>
             <BaseSelect
               v-if="addable(type).length"
               :model-value="''"
@@ -401,8 +408,8 @@ const spec = ref<RequestForm | null>(null)
 const formFailed = ref("")
 const draft = reactive(blank())
 const parts = reactive<Record<string, string>>({})
-/** The wastes the producer added to each waste type (its defaults aren't listed: they stay). */
-const added = reactive<Record<string, string[]>>({})
+/** Each waste type's wastes, as chosen: its defaults to start with, then those the producer adds. */
+const chosen = reactive<Record<string, string[]>>({})
 /** The annexes a composite facility's request covers: all of them, unless unticked. */
 const annexes = ref<string[]>([])
 /** The required document, when the facility has none on file: one of the service's, numbered and uploaded. */
@@ -499,7 +506,7 @@ async function applyPrefill(result: RequestForm) {
 		? String(values.facility_measurement)
 		: ""
 	for (const row of values.waste_types) {
-		if (row.waste_type in added) added[row.waste_type] = [...row.wastes]
+		if (row.waste_type in chosen) chosen[row.waste_type] = [...row.wastes]
 	}
 	const annexNames = new Set(result.annexes.map((annex) => annex.value))
 	annexes.value = values.annexes.filter((name) => annexNames.has(name))
@@ -541,8 +548,9 @@ watch(
 				return
 			spec.value = result
 			draft.facility_uom = result.uoms[0]?.value ?? ""
-			for (const key of Object.keys(added)) delete added[key]
-			for (const type of result.waste_types) added[type.waste_type] = []
+			for (const key of Object.keys(chosen)) delete chosen[key]
+			for (const type of result.waste_types)
+				chosen[type.waste_type] = type.defaults.map((waste) => waste.value)
 			annexes.value = result.annexes.map((annex) => annex.value)
 			Object.assign(doc, blankDocument())
 			if (
@@ -560,25 +568,33 @@ watch(unit, () => {
 	for (const key of Object.keys(parts)) delete parts[key]
 })
 
-/** The wastes a type can still take: its own, less the defaults and those already added. */
+/** The wastes a type can still take: its own, less those already chosen. */
 function addable(type: RequestWasteType): Option[] {
-	const taken = new Set([
-		...type.defaults.map((waste) => waste.value),
-		...(added[type.waste_type] ?? []),
-	])
+	const taken = new Set(chosen[type.waste_type] ?? [])
 	return type.wastes.filter((waste) => !taken.has(waste.value))
 }
 
+/** A default waste the service keeps (it can't be removed). */
+function isLocked(type: RequestWasteType, name: string): boolean {
+	return (
+		Boolean(spec.value?.defaults_locked) &&
+		type.defaults.some((waste) => waste.value === name)
+	)
+}
+
 function wasteLabel(type: RequestWasteType, name: string): string {
-	return type.wastes.find((waste) => waste.value === name)?.label ?? name
+	const known = [...type.defaults, ...type.wastes]
+	return known.find((waste) => waste.value === name)?.label ?? name
 }
 
 function addWaste(wasteType: string, name: string) {
-	if (name && !added[wasteType]?.includes(name)) added[wasteType]?.push(name)
+	if (name && !chosen[wasteType]?.includes(name)) chosen[wasteType]?.push(name)
 }
 
 function removeWaste(wasteType: string, name: string) {
-	added[wasteType] = (added[wasteType] ?? []).filter((waste) => waste !== name)
+	chosen[wasteType] = (chosen[wasteType] ?? []).filter(
+		(waste) => waste !== name,
+	)
 }
 
 /** A size: above zero, and whole when the unit counts things. */
@@ -609,6 +625,12 @@ const form = useFormSubmit<string>({
 			if (error) errors[`part:${part.value}`] = error
 		}
 		if (!draft.start_date) errors.start_date = required
+		for (const type of spec.value.waste_types) {
+			if (!(chosen[type.waste_type] ?? []).length)
+				errors[`wastes:${type.waste_type}`] = t(
+					"dashboard.requests.wasteRequired",
+				)
+		}
 		if (documentNeeded.value) {
 			if (!doc.key) errors["document:type"] = required
 			if (!doc.document_number.trim()) errors["document:number"] = required
@@ -653,7 +675,7 @@ const form = useFormSubmit<string>({
 			license_document: renewal ? draft.license_document || null : null,
 			waste_types: (spec.value?.waste_types ?? []).map((type) => ({
 				waste_type: type.waste_type,
-				wastes: added[type.waste_type] ?? [],
+				wastes: chosen[type.waste_type] ?? [],
 			})),
 			annexes: spec.value?.annexes.length ? annexes.value : undefined,
 			document:

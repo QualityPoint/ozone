@@ -12,7 +12,8 @@ import frappe
 from frappe import _
 from frappe.utils import cint, cstr, flt
 from naqel.utils.location.map_location import _point, resolve_map_location
-from naqel.utils.location.regions.lookup import address_of, find_region, region_path, region_titles
+from naqel.utils.location.regions.lookup import address_of, region_path, region_titles
+from naqel.utils.location.regions.policy import pin_region, region_policy
 
 from ozone.portal import own_doc, pick
 from ozone.producer import main_party, owned_names
@@ -72,7 +73,7 @@ def save_facility(producer: frappe._dict, data: dict) -> dict:
 	and `longitude` dropped on the form's map."""
 	values = pick(data, FACILITY_FIELDS + ADDRESS_FIELDS)
 	if "region" in values:
-		divisions = region_divisions()
+		divisions = region_policy().divisions
 		if not divisions:
 			# No region policy: the pin decides it (naqel's Facility.set_region)
 			values.pop("region")
@@ -143,17 +144,12 @@ def get_facility_settings() -> dict:
 	"""What the facility form needs to know: the documents a composite facility may share with its annexes,
 	whether a region or a pin is required, and where the map opens."""
 	address = frappe.get_cached_doc("Address Settings")
+	policy = region_policy()
 	return {
 		"shared_document_types": _document_types(shared_only=True),
-		"requires_region": bool(region_divisions()),
-		# The level the region is picked at (its Region Division's: District, City…), which names the field
-		"region_level": frappe.db.get_value(
-			"Region Division",
-			frappe.db.get_single_value("Naqel Settings", "assigned_region_division"),
-			"level",
-		)
-		if region_divisions()
-		else None,
+		# naqel's region policy: a region is required, picked at the assigned division's level (District, City…)
+		"requires_region": bool(policy.divisions),
+		"region_level": policy.level if policy.divisions else None,
 		"requires_pin": bool(address.requires_pinned_location),
 		"map": {
 			"latitude": address.default_map_latitude or 24.7136,
@@ -207,20 +203,10 @@ def set_credential(facility, values: dict) -> None:
 	facility.append("credentials", values)
 
 
-def region_divisions() -> list[str]:
-	"""The Region Divisions a facility's region is picked from (Naqel Settings): the assigned division and those
-	below it, when a region is required; none otherwise."""
-	settings = frappe.get_cached_doc("Naqel Settings")
-	if not settings.requires_region or not settings.assigned_region_division:
-		return []
-	lft, rgt = frappe.db.get_value("Region Division", settings.assigned_region_division, ["lft", "rgt"])
-	return frappe.get_all("Region Division", filters={"lft": [">=", lft], "rgt": ["<=", rgt]}, pluck="name")
-
-
 def search_regions(txt: str = "") -> list[dict]:
-	"""Regions the facility may be in (region_divisions) matching a name or an alias, each with where it lies
-	and the address it fills."""
-	divisions = region_divisions()
+	"""Regions the facility may be in (naqel's region policy) matching a name or an alias, each with where it
+	lies and the address it fills."""
+	divisions = region_policy().divisions
 	if not divisions:
 		return []
 	txt = cstr(txt).strip()
@@ -237,16 +223,11 @@ def search_regions(txt: str = "") -> list[dict]:
 
 
 def region_at(latitude: float, longitude: float) -> dict | None:
-	"""The region a dropped pin falls in, if the facility may be in it."""
-	region = find_region(flt(latitude), flt(longitude))
-	divisions = region_divisions()
-	if not region or not divisions:
+	"""The region a dropped pin falls in, if naqel's region policy accepts it (pin_region)."""
+	if not region_policy().divisions:
 		return None
-	# The pin finds the lowest region; the facility's is at the assigned division or below it
-	for name in region_path(region):
-		if frappe.db.get_value("Region", name, "division_type") in divisions:
-			return region_option(name)
-	return None
+	found = pin_region(latitude, longitude)
+	return region_option(found["region"]) if found["region"] else None
 
 
 def region_option(name: str) -> dict:

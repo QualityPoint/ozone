@@ -349,6 +349,9 @@ export default {
 		wastes: "Wastes",
 		wastesHint:
 			"Each waste type's default wastes stay on the request; add any others your facility produces.",
+		wastesHintOpen:
+			"Each waste type starts with its default wastes: remove any your facility doesn't produce, and add others.",
+		wasteRequired: "Keep at least one waste.",
 		defaultWaste: "Default",
 		addWaste: "Add a waste",
 		wastePick: "Choose a waste",
