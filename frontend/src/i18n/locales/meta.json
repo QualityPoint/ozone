@@ -1,7 +1,8 @@
 {
 	"paths": {
 		"landing": "/",
-		"capabilities": "/capabilities"
+		"capabilities": "/capabilities",
+		"naqel": "/naqel"
 	},
 	"site": {
 		"ar": "شركة أوزون للخدمات البيئية",
@@ -15,6 +16,10 @@
 		"capabilities": {
 			"title": "قدراتنا التشغيلية — أوزون للخدمات البيئية",
 			"description": "قدرات أوزون للخدمات البيئية كما ترسمها خطة التشغيل: معسكر تشغيل متكامل، وأسطول متابَع لحظيًا، ومسار وشاحنة لكل نوع من النفايات، وفرق عمل مدرّبة، وصيانة وسلامة وإدارة للمخاطر."
+		},
+		"naqel": {
+			"title": "نظام ناقل لإدارة النفايات — أوزون للخدمات البيئية",
+			"description": "نظام ناقل: نظام رقمي ذكي يدير كل عمليات النفايات الفردية والتجارية، ويربط الناقل بمنتجي النفايات في نظام واحد: طلبات الخدمة، والتسعير، وحاسبة النفايات، والعقود، والتتبع والتشغيل."
 		}
 	},
 	"en": {
@@ -25,6 +30,10 @@
 		"capabilities": {
 			"title": "Our Operational Capabilities — Ozone Environmental Services",
 			"description": "Ozone Environmental Services' capabilities, from its operation plan: a complete operations camp, a fleet tracked live, a route and a truck for each type of waste, trained teams, and maintenance, safety and risk management."
+		},
+		"naqel": {
+			"title": "Naqel Waste Management System — Ozone Environmental Services",
+			"description": "Naqel is a smart digital system that manages every household and commercial waste operation, connecting the transporter with its waste producers: service requests, pricing, the waste calculator, contracts, tracking and operations."
 		}
 	}
 }

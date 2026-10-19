@@ -12,6 +12,7 @@
 /* frappe-ui styles; this file contains the @tailwind base/components/utilities directives. */
 @import "frappe-ui/style.css";
 @import "./components.css";
+@import "./naqel.css";
 
 /*
  * Theme tokens (RGB channels) behind the `site-*` Tailwind colours.

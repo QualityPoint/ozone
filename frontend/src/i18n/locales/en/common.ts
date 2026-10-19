@@ -22,6 +22,7 @@ export default {
 	nav: {
 		about: "About",
 		capabilities: "Capabilities",
+		naqel: "Naqel system",
 		services: "Services",
 		industries: "Industries",
 		contact: "Contact",

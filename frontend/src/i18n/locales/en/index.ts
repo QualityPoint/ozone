@@ -7,6 +7,7 @@ import dashboard from "./dashboard"
 import equipment from "./equipment"
 import hero from "./hero"
 import industries from "./industries"
+import naqel from "./naqel"
 import services from "./services"
 import why from "./why"
 
@@ -21,6 +22,7 @@ const en = {
 	contact,
 	auth,
 	capabilities,
+	naqel,
 	dashboard,
 }
 export default en

@@ -19,6 +19,9 @@ The script writes:
   src/assets/images/equipment/<slug>.webp   fleet and container photos (listed in src/config/site.ts)
   src/assets/images/hero-truck.webp   the hero's compactor truck, cut out on transparency
   src/assets/images/<folder>/<slug>.webp  photos embedded in the operation file (EMBEDDED_PHOTOS)
+  src/assets/naqel/quality-point.webp      Naqel's developer's logo, for the Naqel page (QP_LOGO)
+
+The Naqel page's developer logo comes from Quality Point's own media (QP_LOGO, outside the repo).
 
 Usage (from frontend/):  ~/frappe-bench/env/bin/python scripts/build-brand-assets.py [SOURCE_DIR]
 Requires Pillow, OpenCV and NumPy (all in the bench's env), and poppler-utils (pdftoppm and
@@ -88,6 +91,10 @@ EMBEDDED_PHOTOS = {
 	"equipment/route-recyclables": (56, 0, True),
 }
 EMBEDDED_WIDTH = 1100
+
+# Quality Point's logo (blue on white), trimmed to its ink, for the Naqel page's closing panel.
+QP_LOGO = Path.home() / "Documents/Companies-Media/QP/QP_Software/assests/QualityPoint_Logo_Software.png"
+QP_LOGO_WIDTH = 360
 
 # Where the red "O" and its location pin sit in logo.png (measured from its pixels).
 O_BOX = (56, 324, 528, 798)
@@ -269,22 +276,27 @@ def scaled(image: Image.Image, width: int) -> Image.Image:
 	return image.resize((width, round(image.height * width / image.width)), Image.LANCZOS)
 
 
+def trimmed(image: Image.Image, margin: float) -> Image.Image:
+	"""`image` cropped to its subject on a white ground, keeping `margin` of its width around it."""
+	ink = ImageChops.difference(image, Image.new("RGB", image.size, WHITE[:3])).convert("L")
+	box = ink.point(lambda v: 255 if v > 24 else 0).getbbox()
+	pad = round(image.width * margin)
+	return image.crop(
+		(
+			max(box[0] - pad, 0),
+			max(box[1] - pad, 0),
+			min(box[2] + pad, image.width),
+			min(box[3] + pad, image.height),
+		)
+	)
+
+
 def write_embedded_photos() -> None:
 	"""Each EMBEDDED_PHOTOS entry as WebP, trimmed to its subject on the white page when asked."""
 	for path, (page, number, trim) in EMBEDDED_PHOTOS.items():
 		photo = embedded_image(page, number)
 		if trim:
-			ink = ImageChops.difference(photo, Image.new("RGB", photo.size, WHITE[:3])).convert("L")
-			box = ink.point(lambda v: 255 if v > 24 else 0).getbbox()
-			margin = round(photo.width * 0.02)
-			photo = photo.crop(
-				(
-					max(box[0] - margin, 0),
-					max(box[1] - margin, 0),
-					min(box[2] + margin, photo.width),
-					min(box[3] + margin, photo.height),
-				)
-			)
+			photo = trimmed(photo, 0.02)
 		out = IMAGES_OUT / f"{path}.webp"
 		out.parent.mkdir(parents=True, exist_ok=True)
 		scaled(photo, EMBEDDED_WIDTH).save(out, quality=82, method=6)
@@ -298,6 +310,13 @@ def write_hero_truck() -> None:
 	truck = rgba.crop(rgba.getchannel("A").point(lambda a: 255 if a > 10 else 0).getbbox())
 	truck = scaled(truck, HERO_WIDTH)
 	truck.save(IMAGES_OUT / "hero-truck.webp", quality=85, alpha_quality=90, method=6)
+
+
+def write_qp_logo() -> None:
+	"""Quality Point's logo on its white ground (the page shows it on a white plate), trimmed."""
+	logo = trimmed(Image.open(QP_LOGO).convert("RGB"), 0)
+	out = FRONTEND / "src/assets/naqel/quality-point.webp"
+	scaled(logo, QP_LOGO_WIDTH).save(out, lossless=True, method=6)
 
 
 def main() -> None:
@@ -317,6 +336,7 @@ def main() -> None:
 	write_photos()
 	write_hero_truck()
 	write_embedded_photos()
+	write_qp_logo()
 	print(f"wrote brand assets from {SOURCE}")
 
 

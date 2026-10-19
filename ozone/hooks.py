@@ -69,6 +69,7 @@ website_route_rules = [
 	{"from_route": "/en", "to_route": "frontend"},
 	{"from_route": "/en/<path:app_path>", "to_route": "frontend"},
 	{"from_route": "/capabilities", "to_route": "frontend"},
+	{"from_route": "/naqel", "to_route": "frontend"},
 	{"from_route": "/login", "to_route": "frontend"},
 	{"from_route": "/signup", "to_route": "frontend"},
 	{"from_route": "/forgot-password", "to_route": "frontend"},

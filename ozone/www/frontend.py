@@ -1,6 +1,6 @@
 import frappe
 import frappe.sessions
-from frappe.utils import get_url
+from frappe.utils import get_build_version, get_url
 
 from ozone.locales import DEFAULT_LOCALE, SUPPORTED_LOCALES, shared_json
 from ozone.site_contact import site_contact
@@ -75,6 +75,9 @@ def get_context():
 	context.boot = {
 		"csrf_token": csrf_token,
 		"site_name": frappe.local.site,
+		# Busts the browser's cache of naqel's Desk sprite, which the Naqel page inserts into the page
+		# (frontend/src/components/naqel/brand/naqelSprite.ts), as Frappe does with _version_number.
+		"build_version": get_build_version(),
 		# Footer and contact section (Ozone Settings).
 		"site_contact": site_contact(),
 	}

@@ -129,6 +129,7 @@ export const routes: RouteRecordRaw[] = [
 		"Capabilities",
 		() => import("@/views/CapabilitiesView.vue"),
 	),
+	...localizedRoutes("naqel", "Naqel", () => import("@/views/NaqelView.vue")),
 	// Replaces Frappe's /login (website_route_rules in ozone/hooks.py): every Frappe link to the
 	// login page lands here.
 	...authRoutes(

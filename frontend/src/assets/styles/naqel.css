@@ -1,0 +1,36 @@
+/*
+ * The Naqel page (views/NaqelView.vue) in Naqel's own identity (docs/naqel_page/identity.md):
+ * inside `.naqel`, the `site-*` tokens, the fonts and the bands' direction take Naqel's values
+ * (hawya's main.css), so its components keep their classes. Ozone's header and footer sit
+ * outside it and stay Ozone's.
+ */
+.naqel {
+	--site-bg: 255 255 255;
+	--site-tint: 244 248 245;
+	--site-heading: 22 27 21; /* naqel-night */
+	--site-text: 38 44 39;
+	--site-muted: 96 108 99;
+	--site-hover: 232 245 236; /* naqel-green-100 */
+	--site-line: 222 230 224;
+	/* The bands point their gradient toward the start side (tailwind.config.ts: naqel-band). */
+	--band-to: left;
+	@apply bg-site-bg font-naqel text-body text-site-text;
+}
+
+[data-theme="dark"] .naqel {
+	--site-bg: 16 21 17;
+	--site-tint: 22 30 24;
+	--site-heading: 255 255 255;
+	--site-text: 220 230 222;
+	--site-muted: 152 170 157;
+	--site-hover: 30 44 34;
+	--site-line: 40 54 44;
+}
+
+html[dir="rtl"] .naqel {
+	--band-to: right;
+}
+
+html:lang(ar) .naqel {
+	@apply font-naqel-arabic;
+}

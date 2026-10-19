@@ -26,17 +26,19 @@ describe("routes", () => {
 		})
 	})
 
-	it("serves the capabilities page in each language", () => {
-		for (const [path, name, locale] of [
-			["/capabilities", "Capabilities", "ar"],
-			["/en/capabilities", "CapabilitiesEn", "en"],
+	it("serves the pages of their own in each language", () => {
+		for (const [path, name, locale, page] of [
+			["/capabilities", "Capabilities", "ar", "capabilities"],
+			["/en/capabilities", "CapabilitiesEn", "en", "capabilities"],
+			["/naqel", "Naqel", "ar", "naqel"],
+			["/en/naqel", "NaqelEn", "en", "naqel"],
 		]) {
 			const route = router.resolve(path)
 			expect(route.name, path).toBe(name)
 			expect(route.meta, path).toMatchObject({
 				layout: "public",
 				locale,
-				page: "capabilities",
+				page,
 			})
 		}
 	})

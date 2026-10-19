@@ -22,6 +22,7 @@ export default {
 	nav: {
 		about: "من نحن",
 		capabilities: "قدراتنا",
+		naqel: "نظام ناقل",
 		services: "خدماتنا",
 		industries: "القطاعات",
 		contact: "تواصل معنا",

@@ -1,10 +1,28 @@
+import type { LocaleCode } from "@/types"
+
 /**
- * A whole number with thousands separators and Latin digits, in both languages (as blinktech
- * shows figures): 50000 → "50,000".
+ * A number with thousands separators and Latin digits, in both languages (as blinktech shows
+ * figures), with at most `digits` decimals: 50000 → "50,000", 15.291 → "15.29" with 2.
  */
-export function formatNumber(value: number): string {
-	return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(
-		value,
+export function formatNumber(value: number, digits = 0): string {
+	return new Intl.NumberFormat("en-US", {
+		maximumFractionDigits: digits,
+	}).format(value)
+}
+
+/**
+ * Dates in the visitor's language: the Gregorian calendar in Arabic too (ar-SA would default to the
+ * Hijri one), with Latin digits.
+ */
+const DATE_LOCALE: Record<LocaleCode, string> = {
+	ar: "ar-SA-u-nu-latn-ca-gregory",
+	en: "en-GB",
+}
+
+/** A month's short name, January being 0: "Jan", "يناير". */
+export function formatMonth(month: number, code: LocaleCode): string {
+	return new Intl.DateTimeFormat(DATE_LOCALE[code], { month: "short" }).format(
+		new Date(2026, month, 1),
 	)
 }
 

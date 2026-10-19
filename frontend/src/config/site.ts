@@ -91,12 +91,13 @@ export const localeHome = Object.fromEntries(
 	SUPPORTED_LOCALES.map((code) => [code, localePath(pagePaths.landing, code)]),
 ) as Record<LocaleCode, string>
 
-/** The navbar, in order: sections of the landing page. Labels are `nav.<id>` messages. */
+/** The navbar, in order: sections of the landing page and pages. Labels are `nav.<id>` messages. */
 export const navItems: NavItem[] = [
 	{ id: "about", section: "about" },
 	{ id: "services", section: "services" },
 	{ id: "capabilities", page: "capabilities" },
 	{ id: "industries", section: "industries" },
+	{ id: "naqel", page: "naqel" },
 	{ id: "contact", section: "contact" },
 ]
 

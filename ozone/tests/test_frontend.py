@@ -24,6 +24,8 @@ class TestFrontendAddresses(IntegrationTestCase):
 		self.assertEqual(resolve_page("/en"), ("landing", "en", "/"))
 		self.assertEqual(resolve_page("/capabilities"), ("capabilities", "ar", "/capabilities"))
 		self.assertEqual(resolve_page("/en/capabilities"), ("capabilities", "en", "/capabilities"))
+		self.assertEqual(resolve_page("/naqel"), ("naqel", "ar", "/naqel"))
+		self.assertEqual(resolve_page("/en/naqel"), ("naqel", "en", "/naqel"))
 		self.assertEqual(resolve_page("/english"), (None, "ar", "/english"))  # not the /en prefix
 		self.assertEqual(resolve_page("/en/nothing"), (None, "en", "/nothing"))
 
@@ -60,7 +62,7 @@ class TestFrappePagesRedirect(IntegrationTestCase):
 class TestSitemap(IntegrationTestCase):
 	def test_lists_the_spa_in_each_language_without_redirected_pages(self):
 		links = {urlsplit(link["loc"]).path: link for link in sitemap.get_context(frappe._dict())["links"]}
-		for page in ("/", "/en", "/capabilities", "/en/capabilities"):
+		for page in ("/", "/en", "/capabilities", "/en/capabilities", "/naqel", "/en/naqel"):
 			self.assertIn(page, links)
 		self.assertNotIn("/about", links)
 		self.assertNotIn("/contact", links)

@@ -28,6 +28,7 @@ layout.
 | 5. Polish | Done: responsive audit (320–1366 px), font weights, the hero's truck cut-out with no motion, clean-checkout build, CI frontend job |
 | 6. Login | Done: Ozone's own `/login` and `/forgot-password` in both languages, replacing Frappe's ([auth.md](auth.md)) |
 | 7. Capabilities page | Done: `/capabilities`, Ozone's operational capabilities and teams from the operation file, in the header ([how-to.md](how-to.md#the-capabilities-pages-sections)) |
+| 8. Naqel page | Done: `/naqel`, the Naqel system as its own site presents it, in Naqel's identity ([naqel_page/](../naqel_page/README.md)) |
 
 ## Content sources
 
