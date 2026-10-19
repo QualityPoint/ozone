@@ -37,8 +37,21 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v6
+        with:
+          path: ozone
+
+      # ozone's required app. QualityPoint/naqel is private, so this needs a NAQEL_TOKEN secret:
+      # a fine-grained token with read access to that repository's contents.
+      - name: Clone naqel
+        uses: actions/checkout@v6
+        with:
+          repository: QualityPoint/naqel
+          ref: version-16
+          token: ${{ secrets.NAQEL_TOKEN }}
+          path: naqel
 
       - name: Find tests
+        working-directory: ozone
         run: |
           echo "Finding tests"
           grep -rn "def test" > /dev/null
@@ -90,7 +103,11 @@ jobs:
       - name: Install
         working-directory: /home/runner/frappe-bench
         run: |
-          bench get-app ozone $GITHUB_WORKSPACE
+          # The required apps (naqel's own first): install-app ozone installs them, but they must be on the bench
+          bench get-app erpnext --branch version-16
+          bench get-app hrms --branch version-16
+          bench get-app naqel $GITHUB_WORKSPACE/naqel
+          bench get-app ozone $GITHUB_WORKSPACE/ozone
           bench setup requirements --dev
           bench new-site --db-root-password root --admin-password admin test_site
           bench --site test_site install-app ozone

@@ -24,10 +24,10 @@ export const useUserStore = defineStore("user", () => {
 			.then(async (data) => {
 				// A website account nobody has linked yet starts as a producer of its own (its Lead), so it
 				// can register its facility at once; only an email on a Customer's contact stays unlinked.
-				if (data.user_type === "Website User" && !data.producer) {
-					data = await startProducer().catch(() => data)
-				}
-				user.value = data
+				user.value =
+					data.user_type === "Website User" && !data.producer
+						? await startProducer().catch(() => data)
+						: data
 			})
 			.finally(() => {
 				pending = null

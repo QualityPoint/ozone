@@ -9,15 +9,32 @@ from ozone.api.auth import get_login_options, get_session_user, social_login
 class TestAuthEndpoints(IntegrationTestCase):
 	def test_session_user(self):
 		frappe.set_user("Guest")
-		self.assertEqual(get_session_user(), {"name": "Guest", "user_type": None})
+		self.assertEqual(
+			get_session_user(), {"name": "Guest", "full_name": None, "user_type": None, "producer": None}
+		)
 		frappe.set_user("Administrator")
-		self.assertEqual(get_session_user(), {"name": "Administrator", "user_type": "System User"})
+		self.assertEqual(
+			get_session_user(),
+			{
+				"name": "Administrator",
+				"full_name": frappe.db.get_value("User", "Administrator", "full_name"),
+				"user_type": "System User",
+				"producer": None,
+			},
+		)
 
 	def test_login_options(self):
 		options = get_login_options()
 		self.assertEqual(
 			set(options),
-			{"password_login", "login_with_username", "login_with_mobile", "email_link", "providers"},
+			{
+				"password_login",
+				"login_with_username",
+				"login_with_mobile",
+				"email_link",
+				"signup",
+				"providers",
+			},
 		)
 		self.assertIsInstance(options["providers"], list)
 
