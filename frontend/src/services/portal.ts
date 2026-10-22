@@ -170,6 +170,8 @@ export type RequestStatus =
 	| "Require Clarification"
 	| "Clarified"
 	| "Quotation"
+	| "Contract Quotation"
+	| "Contract"
 	| "Cancelled"
 
 /** A quotation Ozone's team has sent: Open (waiting for the producer's answer), Accepted or Rejected. */
@@ -179,6 +181,8 @@ export interface QuotationSummary {
 	name: string
 	status: QuotationStatus
 	status_label: string
+	/** The status's colour in its DocType's states (utils/status: statusBadge). */
+	status_color: string
 	grand_total: number
 	currency: string
 }
@@ -202,6 +206,8 @@ export interface QuotationDetail {
 	name: string
 	status: QuotationStatus
 	status_label: string
+	/** The status's colour in its DocType's states (utils/status: statusBadge). */
+	status_color: string
 	service_request: string
 	service_title: string
 	facility_title: string
@@ -228,10 +234,9 @@ export interface QuotationDetail {
 	/** The waste calculation report (HTML, from naqel's template). */
 	report: string
 	can_decide: boolean
+	/** Always false: the producer reads a quotation's comments, its rejection reason aside. */
 	can_reply: boolean
 	comments: RequestComment[]
-	/** How many more files the record takes (its DocType's Max Attachments); null: no limit. */
-	attachments_left: number | null
 }
 
 export interface ServiceRequest {
@@ -242,6 +247,8 @@ export interface ServiceRequest {
 	facility_title: string
 	status: RequestStatus
 	status_label: string
+	/** The status's colour in its DocType's states (utils/status: statusBadge). */
+	status_color: string
 	start_date: string | null
 	creation: string
 	/** The quotations Ozone's team has sent for it, newest first. */
@@ -335,6 +342,8 @@ export interface RequestDetail {
 	name: string
 	status: RequestStatus
 	status_label: string
+	/** The status's colour in its DocType's states (utils/status: statusBadge). */
+	status_color: string
 	service_title: string
 	facility_title: string
 	can_edit: boolean
@@ -362,6 +371,8 @@ export interface ActivityRecord {
 	name: string
 	status: string
 	status_label: string
+	/** The status's colour in its DocType's states (utils/status: statusBadge). */
+	status_color: string
 }
 
 export interface FacilityActivity {
@@ -490,13 +501,14 @@ export function submitServiceRequest(
 	return postMethod(`${API}.submit_service_request`, { name })
 }
 
-/** `files`: the URLs of files the producer uploaded for this comment (uploadFile). */
-export function addRequestComment(
+/** The producer's answer to the team's clarification, which makes the request Clarified; `files`: the
+ *  URLs of files the producer uploaded for it (uploadFile). The request as it is then. */
+export function clarifyRequest(
 	name: string,
 	text: string,
 	files: string[] = [],
-): Promise<RequestComment[]> {
-	return postMethod(`${API}.add_request_comment`, { name, text, files })
+): Promise<RequestDetail> {
+	return postMethod(`${API}.clarify_request`, { name, text, files })
 }
 
 export function getFacilityActivity(
@@ -520,6 +532,8 @@ export interface ContractEntry {
 		name: string
 		status: string
 		status_label: string
+		/** The status's colour in its DocType's states (utils/status: statusBadge). */
+		status_color: string
 		contract_date: string | null
 	} | null
 }
@@ -548,19 +562,12 @@ export function decideQuotation(
 }
 
 /** A quotation's conversation and status, as its panel refreshes them. */
-export function getQuotationThread(name: string): Promise<{
+export interface QuotationThread {
 	status: QuotationStatus
 	can_reply: boolean
 	comments: RequestComment[]
-	attachments_left: number | null
-}> {
-	return getMethod(`${API}.get_quotation_thread`, { name })
 }
 
-export function addQuotationComment(
-	name: string,
-	text: string,
-	files: string[] = [],
-): Promise<RequestComment[]> {
-	return postMethod(`${API}.add_quotation_comment`, { name, text, files })
+export function getQuotationThread(name: string): Promise<QuotationThread> {
+	return getMethod(`${API}.get_quotation_thread`, { name })
 }

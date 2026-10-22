@@ -69,6 +69,7 @@ Tests live next to the code they cover, in `__tests__/*.test.ts`:
 | `router/__tests__/routes.test.ts` | `/` (Arabic) and `/en` resolve with their locale and page; unknown paths redirect to their language's landing page; every page has a layout |
 | `config/__tests__/site.test.ts` | Arabic has no prefix, English is under `/en` and back (`localePath`, `basePath`), language homes, unique nav ids, a photo for every equipment slug |
 | `utils/__tests__/format.test.ts` | Thousands separators, Latin digits |
+| `utils/__tests__/status.test.ts` | A status badge in its DocType state's colour, gray otherwise |
 | `i18n/__tests__/locales.test.ts` | `en` has exactly the same keys and list lengths as `ar`, no empty messages, no `@ { } \|` |
 | `composables/__tests__/useTheme.test.ts` | Theme toggle, storage key, `theme-color` |
 | `composables/__tests__/useSiteContact.test.ts` | Phone formatting, `wa.me` link, filtering of boot data (unknown platforms, non-https links, empty addresses) |

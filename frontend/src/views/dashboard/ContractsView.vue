@@ -34,7 +34,7 @@
               <span
                 :class="[
                   'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-bold',
-                  entry.contract ? 'bg-brand-green text-white' : 'bg-site-hover text-site-heading',
+                  entry.contract ? statusBadge(entry.contract.status_color) : 'bg-site-hover text-site-heading',
                 ]"
               >
                 <LucideHourglass v-if="!entry.contract" class="size-3.5" aria-hidden="true" />
@@ -79,6 +79,7 @@ import { dashboardPath, localePath } from "@/config/site"
 import { type ContractEntry, getContracts } from "@/services/portal"
 import type { LocaleCode } from "@/types"
 import { formatMoney } from "@/utils/format"
+import { statusBadge } from "@/utils/status"
 
 const { t, locale } = useI18n()
 const entries = ref<ContractEntry[] | null>(null)

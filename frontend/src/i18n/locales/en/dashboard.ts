@@ -188,7 +188,7 @@ export default {
 	},
 	quotations: {
 		intro:
-			"Your requests that Ozone's team has turned into a quotation: what you'd pay, how your waste is collected, and the waste calculation. Accept or reject each one, or write to the team first.",
+			"Your requests that Ozone's team has turned into a quotation: what you'd pay, how your waste is collected, and the waste calculation. Accept or reject each one.",
 		none: "No quotations yet. They appear here once Ozone's team quotes one of your",
 		view: "Quotation",
 		preparing: "Ozone's team is preparing your quotation.",
@@ -280,9 +280,8 @@ export default {
 		containers: "Container at your facility",
 		report: "Waste calculation report",
 		decide: "Your answer",
-		decideHint:
-			"Accept the quotation, or reject it and tell Ozone's team why. You can also write to the team below first.",
-		comment: "Comment (required to reject)",
+		decideHint: "Accept the quotation, or reject it and tell Ozone's team why.",
+		comment: "Reason (required to reject)",
 		accept: "Accept",
 		reject: "Reject",
 		acceptConfirm: "Accept this quotation for",
@@ -294,7 +293,6 @@ export default {
 		rejected:
 			"You rejected this quotation. Ozone's team may send you a revised one.",
 		conversation: "Conversation with Ozone's team",
-		write: "Write to Ozone's team",
 	},
 	requests: {
 		document: "Required document",
@@ -333,7 +331,7 @@ export default {
 			"A draft stays yours to change. Once sent, Ozone's team reviews it and it can't be changed.",
 		submitConfirm: "Once sent, the request can't be changed. Send it?",
 		clarify:
-			"Ozone's team needs a clarification. Answer in the comments below.",
+			"Ozone's team needs a clarification. Answer below: sending your answer marks the request clarified.",
 		comments: "Comments",
 		loading: "Loading…",
 		noComments: "No comments yet.",
@@ -341,6 +339,7 @@ export default {
 		you: "You",
 		answer: "Your answer",
 		send: "Send",
+		sendClarification: "Send clarification",
 		attach: "Attach files",
 		uploading: "Uploading…",
 		removeFile: "Remove",

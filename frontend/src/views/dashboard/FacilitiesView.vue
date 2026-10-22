@@ -193,7 +193,7 @@
                 <dt class="font-bold text-site-heading">{{ t(`dashboard.facilities.activityKinds.${group.kind}`) }}</dt>
                 <dd v-for="row in group.rows" :key="row.name" class="mt-1 flex justify-between gap-3 text-site-muted">
                   <span dir="ltr">{{ row.name }}</span>
-                  <span class="font-bold">{{ row.status_label }}</span>
+                  <span :class="['rounded-full px-2 py-0.5 font-bold', statusBadge(row.status_color)]">{{ row.status_label }}</span>
                 </dd>
               </div>
             </dl>
@@ -243,6 +243,7 @@ import {
 } from "@/services/portal"
 import { useUserStore } from "@/stores/user"
 import type { LocaleCode } from "@/types"
+import { statusBadge } from "@/utils/status"
 
 type Kind = "single" | "main" | "branch"
 

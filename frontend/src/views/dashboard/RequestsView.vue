@@ -194,7 +194,7 @@
                 <p class="mt-1 text-caption text-site-muted">{{ t("dashboard.requests.created") }}: {{ formatDate(request.creation) }}</p>
               </div>
             </div>
-            <span :class="['rounded-full px-3 py-1 text-caption font-bold', statusClass[request.status] ?? statusClass.Draft]">{{ request.status_label }}</span>
+            <span :class="['rounded-full px-3 py-1 text-caption font-bold', statusBadge(request.status_color)]">{{ request.status_label }}</span>
           </div>
 
           <p v-if="request.status === 'Require Clarification'" class="mt-3 text-caption font-bold text-brand-red dark:text-brand-red-300">
@@ -237,7 +237,8 @@
             <CommentThread
               v-if="threadOpen(request)"
               :load="() => getServiceRequest(request.name)"
-              :send="(text, files) => addRequestComment(request.name, text, files)"
+              :send="(text, files) => clarify(request, text, files)"
+              :send-label="t('dashboard.requests.sendClarification')"
             />
           </template>
         </BaseCard>
@@ -274,10 +275,9 @@ import {
 	type RequestDetail,
 	type RequestForm,
 	type RequestOptions,
-	type RequestStatus,
 	type RequestWasteType,
 	type ServiceRequest,
-	addRequestComment,
+	clarifyRequest,
 	getRequestForm,
 	getRequestOptions,
 	getServiceRequest,
@@ -287,6 +287,7 @@ import {
 } from "@/services/portal"
 import type { LocaleCode } from "@/types"
 import { durationBetween } from "@/utils/duration"
+import { statusBadge } from "@/utils/status"
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -339,15 +340,6 @@ watch(filters, async () => {
 	}
 })
 
-const statusClass: Record<RequestStatus, string> = {
-	Draft: "bg-site-hover text-site-heading",
-	"Under Process": "bg-brand-leaf/20 text-brand-green dark:text-brand-leaf",
-	"Require Clarification": "bg-brand-red text-white",
-	Clarified:
-		"border-2 border-brand-green text-brand-green dark:border-brand-leaf dark:text-brand-leaf",
-	Quotation: "bg-brand-green text-white",
-	Cancelled: "bg-site-hover text-site-muted",
-}
 const rowButton =
 	"inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-label font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-leaf disabled:opacity-60"
 
@@ -355,6 +347,17 @@ const rowButton =
 const threads = reactive<Record<string, boolean>>({})
 function threadOpen(request: ServiceRequest): boolean {
 	return threads[request.name] ?? request.status === "Require Clarification"
+}
+
+/** The producer's answer to the team's clarification: the request is Clarified at once (the team asks
+ *  again or quotes it), and its thread stays open on the answer. */
+async function clarify(request: ServiceRequest, text: string, files: string[]) {
+	const detail = await clarifyRequest(request.name, text, files)
+	request.status = detail.status
+	request.status_label = detail.status_label
+	request.status_color = detail.status_color
+	threads[request.name] = true
+	return detail
 }
 
 // Sending a Draft from the list.

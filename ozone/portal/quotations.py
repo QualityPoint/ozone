@@ -5,7 +5,8 @@ A Service Quotation is the team's until they send it (Open); the producer sees o
 Rejected ones (naqel's CLIENT_STATUSES). It shows the amount to pay, each container line's collection
 mechanism and frequency, the service period and the waste calculation report. It names a line's
 container type only when its collection deploys a container at the facility. The producer accepts or rejects an Open quotation
-(a rejection says why), and writes to the team in its comments."""
+and reads its comments with the team, but doesn't write there: the reason it gives for a rejection is the one comment
+it adds (questions go through the request's clarification)."""
 
 import frappe
 from frappe import _
@@ -15,7 +16,7 @@ from naqel.naqel_contracting.doctype.service_quotation.service_quotation import 
 	client_waste_report,
 )
 
-from ozone.portal import comments, own_doc
+from ozone.portal import comments, own_doc, status_color
 from ozone.producer import owned_names
 
 DECISIONS = ("Accepted", "Rejected")
@@ -43,6 +44,7 @@ def request_quotations(producer: frappe._dict, requests: list[str]) -> dict[str,
 				"name": row.name,
 				"status": row.status,
 				"status_label": _(row.status),
+				"status_color": status_color("Service Quotation", row.status),
 				"grand_total": flt(row.rounded_total) or flt(row.grand_total),
 				"currency": row.currency,
 			}
@@ -88,6 +90,7 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		"name": quotation.name,
 		"status": quotation.status,
 		"status_label": _(quotation.status),
+		"status_color": status_color("Service Quotation", quotation.status),
 		"service_request": quotation.service_request,
 		"service_title": _(
 			frappe.db.get_value("Service", quotation.service_type, "service_name") or quotation.service_type
@@ -119,22 +122,21 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		},
 		"report": _report(quotation),
 		"can_decide": quotation.status == "Open" and quotation.docstatus == 0,
-		"can_reply": True,
+		"can_reply": False,
 		"comments": comments.thread(quotation),
-		"attachments_left": comments.attachments_left(quotation),
 	}
 
 
 def decide_quotation(producer: frappe._dict, name: str, decision: str, comment: str | None = None) -> dict:
-	"""Accept or reject an Open quotation. A rejection says why; either way the comment goes to the team in
-	the quotation's comments."""
+	"""Accept or reject an Open quotation. A rejection says why, in the quotation's comments for the team;
+	an acceptance carries no comment."""
 	quotation = _visible(name, producer)
 	if decision not in DECISIONS:
 		frappe.throw(_("Accept or reject the quotation."))
 	if decision == "Rejected" and not (comment or "").strip():
 		frappe.throw(_("Tell Ozone's team why you reject the quotation."))
 	quotation.set_client_decision(decision)
-	if (comment or "").strip():
+	if decision == "Rejected":
 		comments.post(quotation, comment)
 	return get_quotation(producer, name)
 
@@ -145,18 +147,9 @@ def get_quotation_thread(producer: frappe._dict, name: str) -> dict:
 	quotation = _visible(name, producer)
 	return {
 		"status": quotation.status,
-		"can_reply": True,
+		"can_reply": False,
 		"comments": comments.thread(quotation),
-		"attachments_left": comments.attachments_left(quotation),
 	}
-
-
-def add_quotation_comment(
-	producer: frappe._dict, name: str, text: str, files: list[str] | None = None
-) -> list[dict]:
-	quotation = _visible(name, producer)
-	comments.post(quotation, text, files)
-	return comments.thread(quotation)
 
 
 def _collection(row) -> dict:

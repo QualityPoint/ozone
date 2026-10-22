@@ -29,7 +29,7 @@ from naqel.naqel_contracting.doctype.service_request.service_request import (
 	registration_documents,
 )
 
-from ozone.portal import comments, own_doc, pick
+from ozone.portal import comments, own_doc, pick, status_color
 from ozone.portal.facilities import _document_types, document, set_credential
 from ozone.producer import main_party, owned_names
 
@@ -48,18 +48,21 @@ DURATION_UOMS = ("Day", "Month", "Year")
 LICENSE_STATUSES = ("New Issue", "Renewal")
 
 
-# A request that has turned into a quotation moves to the Quotations page (portal/quotations.py: get_quotations)
+# A request that has turned into a quotation moves to the Quotations page (portal/quotations.py: get_quotations),
+# and one its contract follows to the Contracts page (portal/contracts.py)
 QUOTED = "Quotation"
+MOVED_ON = (QUOTED, "Contract Quotation", "Contract")
 
 
 def get_service_requests(
 	producer: frappe._dict, filters: dict | None = None, include_quoted: bool = False
 ) -> list[dict]:
 	"""The producer's requests, newest first, optionally for one facility, service or status. Those that
-	have turned into a quotation are on the Quotations page, unless `include_quoted` (a facility's history)."""
+	have turned into a quotation or a contract are on the Quotations or Contracts page, unless `include_quoted`
+	(a facility's history)."""
 	conditions = {"name": ["in", owned_names("Service Request", producer) or [""]]}
 	if not include_quoted:
-		conditions["status"] = ["!=", QUOTED]
+		conditions["status"] = ["not in", MOVED_ON]
 	for field in ("facility", "service_type", "status"):
 		if (filters or {}).get(field):
 			conditions[field] = filters[field]
@@ -80,6 +83,7 @@ def get_service_requests(
 		request.service_title = _(services.get(request.service_type) or request.service_type or "")
 		request.facility_title = facilities.get(request.facility) or request.facility
 		request.status_label = _(request.status)
+		request.status_color = status_color("Service Request", request.status)
 	return requests
 
 
@@ -103,7 +107,7 @@ def get_request_options(producer: frappe._dict) -> dict:
 			)
 		],
 		"statuses": [
-			{"value": status, "label": _(status)} for status in statuses if status and status != QUOTED
+			{"value": status, "label": _(status)} for status in statuses if status and status not in MOVED_ON
 		],
 	}
 
@@ -121,7 +125,7 @@ def get_request_form(
 	if other := open_request(site.name, service.name, exclude=name):
 		frappe.throw(
 			_(
-				"This facility already has a request for this service ({0}). You can raise another once its quotation is cancelled."
+				"This facility already has a request for this service ({0}). You can raise another once it is cancelled."
 			).format(other)
 		)
 	configuration = _service_setup(service_type, site)
@@ -278,6 +282,7 @@ def get_service_request(producer: frappe._dict, name: str) -> dict:
 		"name": request.name,
 		"status": request.status,
 		"status_label": _(request.status),
+		"status_color": status_color("Service Request", request.status),
 		"service_title": _(
 			frappe.db.get_value("Service", request.service_type, "service_name") or request.service_type
 		),
@@ -309,16 +314,17 @@ def submit_service_request(producer: frappe._dict, name: str) -> dict:
 	return {"name": request.name, "requests": get_service_requests(producer)}
 
 
-def add_request_comment(
-	producer: frappe._dict, name: str, text: str, files: list[str] | None = None
-) -> list[dict]:
-	"""The producer's answer, in the request's comments, while the sales team asks for clarification
-	(the Desk shows it in the request's timeline): its text and the files it uploaded for it."""
+def clarify_request(producer: frappe._dict, name: str, text: str, files: list[str] | None = None) -> dict:
+	"""The producer's answer to the clarification the sales team asked: its text and the files it uploaded
+	for it, in the request's comments (the Desk shows them in its timeline). Sending it makes the request
+	Clarified (naqel's ServiceRequest.clarify), for the team to ask again or quote it. The request as
+	get_service_request reads it."""
 	request = own_doc("Service Request", name, producer)
 	if request.status != "Require Clarification":
 		frappe.throw(_("You can write here while the request requires clarification."))
 	comments.post(request, text, files)
-	return comments.thread(request)
+	request.clarify()
+	return get_service_request(producer, name)
 
 
 def get_facility_activity(producer: frappe._dict, facility: str) -> dict:
@@ -348,19 +354,28 @@ def get_facility_activity(producer: frappe._dict, facility: str) -> dict:
 		.run(as_dict=True)
 	)
 	customers = [party for party_type, party in producer.parties if party_type == "Customer"]
-	contracts = (
-		frappe.get_all(
-			"Service Contract",
-			filters={
-				"service_quotation": ["in", [q.name for q in quotations]],
-				"customer": ["in", customers],
-				"docstatus": ["<", 2],
-			},
-			fields=["name", "status", "contract_date"],
-			order_by="creation desc",
-		)
-		if quotations and customers
-		else []
+	# The contracts that follow the facility's quotations, or its requests straight away
+	contracts = sorted(
+		(
+			contract
+			for document_type, names in (
+				("Service Quotation", [q.name for q in quotations]),
+				("Service Request", [r.name for r in requests]),
+			)
+			if names and customers
+			for contract in frappe.get_all(
+				"Service Contract",
+				filters={
+					"document_type": document_type,
+					"document_name": ["in", names],
+					"customer": ["in", customers],
+					"docstatus": ["<", 2],
+				},
+				fields=["name", "status", "contract_date", "creation"],
+			)
+		),
+		key=lambda contract: contract.creation,
+		reverse=True,
 	)
 	orders = (
 		frappe.get_all(
@@ -372,8 +387,14 @@ def get_facility_activity(producer: frappe._dict, facility: str) -> dict:
 		if customers
 		else []
 	)
-	for row in (*quotations, *contracts, *orders):
-		row.status_label = _(row.status)
+	for doctype, rows in (
+		("Service Quotation", quotations),
+		("Service Contract", contracts),
+		("Operation Order", orders),
+	):
+		for row in rows:
+			row.status_label = _(row.status)
+			row.status_color = status_color(doctype, row.status)
 	return {
 		"requests": requests,
 		"quotations": quotations,

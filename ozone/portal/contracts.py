@@ -1,11 +1,13 @@
 """The producer's contracts (docs/producer_dashboard/api.md): each quotation it accepted that the team has
-submitted, with the Service Contract that follows it ("being prepared" until the team issues one), and any other
-contract of its Customer. Read only. A contract still in Draft, or cancelled, is the team's and isn't shown."""
+submitted, and each request the team contracts straight away (its Service allows it), with the Service Contract that
+follows it ("being prepared" until the team issues one), and any other contract of its Customer. Read only. A
+contract still in Draft, or cancelled, is the team's and isn't shown."""
 
 import frappe
 from frappe import _
 from frappe.utils import cint, flt
 
+from ozone.portal import status_color
 from ozone.producer import owned_names
 
 HIDDEN_STATUSES = ("Draft", "Cancelled")
@@ -18,7 +20,8 @@ CONTRACT_FIELDS = [
 	"is_milestone_based",
 	"net_total",
 	"currency",
-	"service_quotation",
+	"document_type",
+	"document_name",
 ]
 
 
@@ -43,19 +46,7 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 		order_by="modified desc",
 	)
 	names = [q.name for q in quotations] or [""]
-	issued = {
-		row.service_quotation: row
-		for row in frappe.get_all(
-			"Service Contract",
-			filters={
-				"service_quotation": ["in", names],
-				"status": ["not in", HIDDEN_STATUSES],
-				"docstatus": ["<", 2],
-			},
-			fields=CONTRACT_FIELDS,
-			order_by="creation asc",  # the newest wins
-		)
-	}
+	issued = _issued("Service Quotation", names)
 	entries = [
 		_entry(
 			quotation=q.name,
@@ -71,7 +62,41 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 		for q in quotations
 	]
 
-	# The Customer's other contracts, made without one of these quotations
+	# The requests the team contracts straight away: listed from their contract's draft on
+	direct = frappe.get_all(
+		"Service Contract",
+		filters={
+			"document_type": "Service Request",
+			"document_name": ["in", owned_names("Service Request", producer) or [""]],
+			"docstatus": ["<", 2],
+		},
+		pluck="document_name",
+	)
+	requests = frappe.get_all(
+		"Service Request",
+		filters={"name": ["in", direct or [""]]},
+		fields=["name", "service_type", "facility", "start_date", "end_date", "is_milestone_based"],
+		order_by="modified desc",
+	)
+	contracted = _issued("Service Request", [r.name for r in requests] or [""])
+	for request in requests:
+		contract = contracted.get(request.name)
+		entries.append(
+			_entry(
+				quotation=None,
+				service_type=request.service_type,
+				facility=request.facility,
+				amount=flt(contract.net_total) if contract else 0,
+				currency=contract.currency if contract else None,
+				start_date=request.start_date,
+				end_date=request.end_date,
+				milestone_based=request.is_milestone_based,
+				contract=contract,
+			)
+		)
+	listed = {("Service Quotation", name) for name in names} | {("Service Request", r.name) for r in requests}
+
+	# The Customer's other contracts, made without one of these quotations or requests
 	for contract in frappe.get_all(
 		"Service Contract",
 		filters={
@@ -81,8 +106,8 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 		fields=CONTRACT_FIELDS,
 		order_by="creation desc",
 	):
-		if contract.service_quotation in names:
-			continue  # listed with its quotation above
+		if (contract.document_type, contract.document_name) in listed:
+			continue  # listed with its quotation or request above
 		entries.append(
 			_entry(
 				quotation=None,
@@ -97,6 +122,24 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 			)
 		)
 	return entries
+
+
+def _issued(document_type: str, names: list[str]) -> dict:
+	"""The issued contracts (not Draft nor Cancelled) following these documents, by document."""
+	return {
+		row.document_name: row
+		for row in frappe.get_all(
+			"Service Contract",
+			filters={
+				"document_type": document_type,
+				"document_name": ["in", names],
+				"status": ["not in", HIDDEN_STATUSES],
+				"docstatus": ["<", 2],
+			},
+			fields=CONTRACT_FIELDS,
+			order_by="creation asc",  # the newest wins
+		)
+	}
 
 
 def count_contracts(producer: frappe._dict) -> int:
@@ -125,6 +168,7 @@ def _entry(
 			"name": contract.name,
 			"status": contract.status,
 			"status_label": _(contract.status),
+			"status_color": status_color("Service Contract", contract.status),
 			"contract_date": contract.contract_date,
 		},
 	}

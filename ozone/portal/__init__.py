@@ -7,6 +7,15 @@ import frappe
 from frappe import _
 
 
+def status_color(doctype: str, status: str | None) -> str:
+	"""The status's colour in the DocType's states (its States table, or Customize Form's), as the Desk's
+	indicators show it: "pink", "light-blue"…; gray for a status without one."""
+	color = next(
+		(state.color for state in frappe.get_meta(doctype).get("states") or [] if state.title == status), None
+	)
+	return (color or "Gray").lower().replace(" ", "-")
+
+
 def pick(data: dict | None, fields: tuple[str, ...]) -> dict:
 	"""Only the allowlisted fields of what the client sent."""
 	data = data or {}

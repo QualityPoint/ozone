@@ -2,7 +2,8 @@
   <!-- A record's comments with Ozone's team (ozone/portal/comments.py): a request's while it requires
        clarification, a quotation's while the producer answers it. `load` reads them (and whether the
        producer may write now), `send` posts the producer's, with the files it attaches (uploaded as it
-       picks them, private; a comment links them and they are attached to the record). The team's comments sit at the start, the
+       picks them, private; a comment links them and they are attached to the record), and answers the
+       thread as it is then (a request's answer closes the box until the team asks again). The team's comments sit at the start, the
        producer's at the end. It reads them again every 15 seconds while the tab is visible, and as soon
        as the producer comes back to it, so the team's answers show without reloading the page. -->
   <div class="mt-4 border-t-2 border-site-line pt-4">
@@ -42,7 +43,7 @@
         </li>
       </ol>
 
-      <form v-if="canReply" class="mt-4" novalidate @submit.prevent="reply">
+      <form v-if="canReply && send" class="mt-4" novalidate @submit.prevent="reply">
         <label :for="fieldId" class="mb-1.5 block text-caption font-bold text-site-heading">{{ label || t("dashboard.requests.answer") }}</label>
         <textarea
           :id="fieldId"
@@ -76,7 +77,7 @@
         </ul>
         <p v-if="error" class="mt-1.5 text-caption font-bold text-brand-red dark:text-brand-red-300">{{ error }}</p>
         <div class="mt-3 flex flex-wrap items-center gap-3">
-          <BaseButton type="submit" :loading="busy" :disabled="uploading">{{ t("dashboard.requests.send") }}</BaseButton>
+          <BaseButton type="submit" :loading="busy" :disabled="uploading">{{ sendLabel || t("dashboard.requests.send") }}</BaseButton>
           <label
             v-if="room > 0"
             :class="[
@@ -123,15 +124,19 @@ const ACCEPT = [
 interface Thread {
 	comments: RequestComment[]
 	can_reply: boolean
-	attachments_left: number | null
+	/** How many more files the record takes; none or null: no limit. */
+	attachments_left?: number | null
 }
 
 const props = defineProps<{
 	load: () => Promise<Thread>
-	/** Posts the producer's text and the URLs of the files it uploaded for it. */
-	send: (text: string, files: string[]) => Promise<RequestComment[]>
+	/** Posts the producer's text and the URLs of the files it uploaded for it; the thread as it is then.
+	 *  Without it the thread is read only. */
+	send?: (text: string, files: string[]) => Promise<Thread>
 	/** The answer box's label (default: "Your answer"). */
 	label?: string
+	/** The send button's label (default: "Send"). */
+	sendLabel?: string
 }>()
 
 const { t, locale } = useI18n()
@@ -161,7 +166,7 @@ let timer: number | undefined
 function show(detail: Thread) {
 	comments.value = detail.comments
 	canReply.value = detail.can_reply
-	left.value = detail.attachments_left
+	left.value = detail.attachments_left ?? null
 }
 
 onMounted(async () => {
@@ -222,11 +227,13 @@ async function reply() {
 	if (error.value) return
 	busy.value = true
 	try {
-		comments.value = await props.send(
-			text.value.trim(),
-			files.value.map((file) => file.url),
+		if (!props.send) return
+		show(
+			await props.send(
+				text.value.trim(),
+				files.value.map((file) => file.url),
+			),
 		)
-		if (left.value !== null) left.value -= files.value.length
 		text.value = ""
 		files.value = []
 	} catch (err) {

@@ -2,7 +2,8 @@
   <!-- A quotation Ozone's team has sent for a request (ozone/portal/quotations.py): the amount to pay,
        how and how often the waste is collected (the container type only when the collection deploys
        one), the service period, and the waste calculation report. An Open quotation is accepted or
-       rejected here (a rejection says why); its comments are the conversation with the team. -->
+       rejected here (a rejection says why, in its comments); the producer reads its comments with the team
+       but doesn't write there. -->
   <div class="mt-4 border-t-2 border-site-line pt-4">
     <BaseNotice v-if="failed">{{ failed }}</BaseNotice>
     <p v-else-if="!quotation" class="text-caption text-site-muted">{{ t("dashboard.requests.loading") }}</p>
@@ -117,17 +118,12 @@
       <BaseNotice v-else-if="quotation.status === 'Accepted'" kind="success" class="mt-4">{{ t("dashboard.quotations.accepted") }}</BaseNotice>
       <BaseNotice v-else-if="quotation.status === 'Rejected'" class="mt-4">{{ t("dashboard.quotations.rejected") }}</BaseNotice>
 
-      <!-- The conversation with the team -->
+      <!-- The conversation with the team, read only: the producer's one comment is a rejection's reason -->
       <h3 class="mt-6 flex items-center gap-2 text-caption font-bold text-site-heading">
         <LucideMessageSquare class="size-4" aria-hidden="true" />
         {{ t("dashboard.quotations.conversation") }}
       </h3>
-      <CommentThread
-        :key="threadKey"
-        :load="loadThread"
-        :send="(text, files) => addQuotationComment(name, text, files)"
-        :label="t('dashboard.quotations.write')"
-      />
+      <CommentThread :key="threadKey" :load="loadThread" />
     </template>
   </div>
 </template>
@@ -151,7 +147,6 @@ import { refusal } from "@/composables/useFormSubmit"
 import {
 	type QuotationCollection,
 	type QuotationDetail,
-	addQuotationComment,
 	decideQuotation,
 	getQuotation,
 	getQuotationThread,
@@ -160,8 +155,8 @@ import { type PluralForms, counted, formatMoney } from "@/utils/format"
 
 const props = defineProps<{ name: string }>()
 const emit = defineEmits<{
-	/** The producer answered: the request list shows the quotation's new status. */
-	decided: [status: QuotationDetail["status"]]
+	/** The producer answered: the list shows the quotation's new status, in its colour. */
+	decided: [quotation: QuotationDetail]
 }>()
 
 const { t, locale } = useI18n()
@@ -249,7 +244,7 @@ async function loadThread() {
 	const thread = await getQuotationThread(props.name)
 	if (quotation.value && thread.status !== quotation.value.status) {
 		quotation.value = await getQuotation(props.name)
-		emit("decided", quotation.value.status)
+		emit("decided", quotation.value)
 	}
 	return thread
 }
@@ -265,14 +260,15 @@ function ask(decision: "Accepted" | "Rejected") {
 async function decide(decision: "Accepted" | "Rejected") {
 	busy.value = true
 	try {
+		// Only a rejection carries the producer's words (its reason)
 		quotation.value = await decideQuotation(
 			props.name,
 			decision,
-			comment.value.trim(),
+			decision === "Rejected" ? comment.value.trim() : "",
 		)
 		comment.value = ""
 		threadKey.value++
-		emit("decided", quotation.value.status)
+		emit("decided", quotation.value)
 	} catch (error) {
 		decisionError.value = refusal(error, t)
 	} finally {

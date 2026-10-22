@@ -35,12 +35,12 @@
               <span class="font-extrabold text-site-heading">{{ t("dashboard.quotations.view") }}</span>
               <span class="text-caption text-site-muted" dir="ltr">{{ quotation.name }}</span>
               <span class="font-extrabold text-site-heading">{{ formatMoney(quotation.grand_total, quotation.currency, locale) }}</span>
-              <span :class="['ms-auto rounded-full px-3 py-1 text-label font-bold', statusClass[quotation.status]]">
+              <span :class="['ms-auto rounded-full px-3 py-1 text-label font-bold', statusBadge(quotation.status_color)]">
                 {{ t(`dashboard.quotations.status.${quotation.status}`) }}
               </span>
               <LucideChevronDown :class="['size-4 text-site-muted transition', quotationOpen(quotation) ? 'rotate-180' : '']" aria-hidden="true" />
             </button>
-            <QuotationPanel v-if="quotationOpen(quotation)" :name="quotation.name" @decided="(status) => answered(quotation, status)" />
+            <QuotationPanel v-if="quotationOpen(quotation)" :name="quotation.name" @decided="(detail) => answered(quotation, detail)" />
           </div>
           <p v-if="!request.quotations.length" class="mt-4 flex items-center gap-2 text-caption text-site-muted">
             <LucideHourglass class="size-4" aria-hidden="true" />
@@ -65,13 +65,14 @@ import DashboardHeading from "@/components/dashboard/DashboardHeading.vue"
 import QuotationPanel from "@/components/dashboard/QuotationPanel.vue"
 import { dashboardPath, localePath } from "@/config/site"
 import {
-	type QuotationStatus,
+	type QuotationDetail,
 	type QuotationSummary,
 	type ServiceRequest,
 	getQuotations,
 } from "@/services/portal"
 import type { LocaleCode } from "@/types"
 import { formatMoney } from "@/utils/format"
+import { statusBadge } from "@/utils/status"
 
 const { t, locale } = useI18n()
 const requests = ref<ServiceRequest[] | null>(null)
@@ -88,13 +89,6 @@ onMounted(async () => {
 	}
 })
 
-const statusClass: Record<QuotationStatus, string> = {
-	Open: "bg-brand-red text-white",
-	Accepted: "bg-brand-green text-white",
-	Rejected: "bg-site-bg text-site-muted",
-	"Sales Order": "bg-brand-green text-white",
-}
-
 // A quotation's details: open while it waits for the producer's answer, else when opened.
 const panels = reactive<Record<string, boolean>>({})
 function quotationOpen(quotation: QuotationSummary): boolean {
@@ -102,8 +96,9 @@ function quotationOpen(quotation: QuotationSummary): boolean {
 }
 
 /** An answer given (here or elsewhere): the quotation shows its new status, and stays open. */
-function answered(quotation: QuotationSummary, status: QuotationStatus) {
+function answered(quotation: QuotationSummary, detail: QuotationDetail) {
 	panels[quotation.name] = true
-	quotation.status = status
+	quotation.status = detail.status
+	quotation.status_color = detail.status_color
 }
 </script>
