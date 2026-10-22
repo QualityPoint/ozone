@@ -341,6 +341,9 @@ export default {
 		you: "You",
 		answer: "Your answer",
 		send: "Send",
+		attach: "Attach files",
+		uploading: "Uploading…",
+		removeFile: "Remove",
 		created: "Requested on",
 		noFacilities:
 			"Add a facility first: every request is for one of your facilities.",

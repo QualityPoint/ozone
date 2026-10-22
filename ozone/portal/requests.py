@@ -296,6 +296,7 @@ def get_service_request(producer: frappe._dict, name: str) -> dict:
 			"annexes": [row.annex for row in request.annexes],
 		},
 		"comments": comments.thread(request),
+		"attachments_left": comments.attachments_left(request),
 	}
 
 
@@ -308,13 +309,15 @@ def submit_service_request(producer: frappe._dict, name: str) -> dict:
 	return {"name": request.name, "requests": get_service_requests(producer)}
 
 
-def add_request_comment(producer: frappe._dict, name: str, text: str) -> list[dict]:
+def add_request_comment(
+	producer: frappe._dict, name: str, text: str, files: list[str] | None = None
+) -> list[dict]:
 	"""The producer's answer, in the request's comments, while the sales team asks for clarification
-	(the Desk shows it in the request's timeline)."""
+	(the Desk shows it in the request's timeline): its text and the files it uploaded for it."""
 	request = own_doc("Service Request", name, producer)
 	if request.status != "Require Clarification":
 		frappe.throw(_("You can write here while the request requires clarification."))
-	comments.post(request, text)
+	comments.post(request, text, files)
 	return comments.thread(request)
 
 

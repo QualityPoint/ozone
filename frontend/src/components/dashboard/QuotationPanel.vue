@@ -125,7 +125,7 @@
       <CommentThread
         :key="threadKey"
         :load="loadThread"
-        :send="(text) => addQuotationComment(name, text)"
+        :send="(text, files) => addQuotationComment(name, text, files)"
         :label="t('dashboard.quotations.write')"
       />
     </template>

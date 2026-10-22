@@ -230,6 +230,8 @@ export interface QuotationDetail {
 	can_decide: boolean
 	can_reply: boolean
 	comments: RequestComment[]
+	/** How many more files the record takes (its DocType's Max Attachments); null: no limit. */
+	attachments_left: number | null
 }
 
 export interface ServiceRequest {
@@ -325,6 +327,8 @@ export interface RequestComment {
 	/** Written by Ozone's team (else by the producer). */
 	from_team: boolean
 	creation: string
+	/** The files it carries that the producer may open. */
+	attachments: { name: string; url: string }[]
 }
 
 export interface RequestDetail {
@@ -350,6 +354,8 @@ export interface RequestDetail {
 		annexes: string[]
 	}
 	comments: RequestComment[]
+	/** How many more files the record takes (its DocType's Max Attachments); null: no limit. */
+	attachments_left: number | null
 }
 
 export interface ActivityRecord {
@@ -484,11 +490,13 @@ export function submitServiceRequest(
 	return postMethod(`${API}.submit_service_request`, { name })
 }
 
+/** `files`: the URLs of files the producer uploaded for this comment (uploadFile). */
 export function addRequestComment(
 	name: string,
 	text: string,
+	files: string[] = [],
 ): Promise<RequestComment[]> {
-	return postMethod(`${API}.add_request_comment`, { name, text })
+	return postMethod(`${API}.add_request_comment`, { name, text, files })
 }
 
 export function getFacilityActivity(
@@ -544,6 +552,7 @@ export function getQuotationThread(name: string): Promise<{
 	status: QuotationStatus
 	can_reply: boolean
 	comments: RequestComment[]
+	attachments_left: number | null
 }> {
 	return getMethod(`${API}.get_quotation_thread`, { name })
 }
@@ -551,6 +560,7 @@ export function getQuotationThread(name: string): Promise<{
 export function addQuotationComment(
 	name: string,
 	text: string,
+	files: string[] = [],
 ): Promise<RequestComment[]> {
-	return postMethod(`${API}.add_quotation_comment`, { name, text })
+	return postMethod(`${API}.add_quotation_comment`, { name, text, files })
 }

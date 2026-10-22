@@ -121,6 +121,7 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		"can_decide": quotation.status == "Open" and quotation.docstatus == 0,
 		"can_reply": True,
 		"comments": comments.thread(quotation),
+		"attachments_left": comments.attachments_left(quotation),
 	}
 
 
@@ -142,23 +143,22 @@ def get_quotation_thread(producer: frappe._dict, name: str) -> dict:
 	"""What the conversation refreshes: the comments, and the status (an answer given, or the quotation
 	sent again, changes what the panel shows)."""
 	quotation = _visible(name, producer)
-	return {"status": quotation.status, "can_reply": True, "comments": comments.thread(quotation)}
+	return {
+		"status": quotation.status,
+		"can_reply": True,
+		"comments": comments.thread(quotation),
+		"attachments_left": comments.attachments_left(quotation),
+	}
 
 
-def add_quotation_comment(producer: frappe._dict, name: str, text: str) -> list[dict]:
+def add_quotation_comment(
+	producer: frappe._dict, name: str, text: str, files: list[str] | None = None
+) -> list[dict]:
 	quotation = _visible(name, producer)
-	comments.post(quotation, text)
+	comments.post(quotation, text, files)
 	return comments.thread(quotation)
 
 
-def _report(quotation) -> str:
-	"""The waste calculation report, in the producer's language (naqel renders it when read). A calculation
-	that no longer runs (its Service Setup disabled since) leaves the quotation without it, not unreadable."""
-	try:
-		return client_waste_report(quotation)
-	except frappe.ValidationError:
-		frappe.clear_messages()
-		return ""
 def _collection(row) -> dict:
 	"""How one of the quotation's container lines is collected: its waste type, mechanism and frequency, and
 	the container the collection deploys at the facility (its type and count), only when it deploys one."""
@@ -190,6 +190,14 @@ def _collection(row) -> dict:
 	}
 
 
+def _report(quotation) -> str:
+	"""The waste calculation report, in the producer's language (naqel renders it when read). A calculation
+	that no longer runs (its Service Setup disabled since) leaves the quotation without it, not unreadable."""
+	try:
+		return client_waste_report(quotation)
+	except frappe.ValidationError:
+		frappe.clear_messages()
+		return ""
 
 
 def _visible(name: str, producer: frappe._dict):

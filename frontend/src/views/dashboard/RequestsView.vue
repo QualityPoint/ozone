@@ -237,7 +237,7 @@
             <CommentThread
               v-if="threadOpen(request)"
               :load="() => getServiceRequest(request.name)"
-              :send="(text) => addRequestComment(request.name, text)"
+              :send="(text, files) => addRequestComment(request.name, text, files)"
             />
           </template>
         </BaseCard>

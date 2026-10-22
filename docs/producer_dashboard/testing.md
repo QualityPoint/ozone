@@ -32,6 +32,7 @@ producer (`demo.producer@example.com`, a Lead; left on the site with its facilit
 | Clarified, then Create → Service Quotation in the Desk | The request is Quotation; deleting its only quotation brings it back to Under Process |
 | Create → Service Quotation, set the collection mechanism and frequency, Calculate Service Price, save | The Service Setup and wastes come from the request; containers priced per rental period (4 ياردة at 650 SAR/month, twice a day → 1,300 × 3 months = 3,900) |
 | Send to Client, then the request in the dashboard | The quotation opens under the request: amount, period, mechanism and "مرتان كل يوم", the report in Arabic without container types; with Container Deployment, the container type shows |
+| Attach files to a comment (a PDF and a picture), remove one, send; send with files only | The comment shows its files as links that open; the Desk shows them in the record's attachments and linked in the timeline comment. A file-only comment is sent; an empty one is refused. On a request (Max Attachments 5, its documents included), Attach files goes once it is full, and more files are refused |
 | Reject without a comment / with one; Send Again; Accept | Refused / Rejected with the comment in the Desk timeline / Open again / Accepted |
 | A party or status sent by the client | Ignored |
 | Another producer's facility | "Not permitted." |

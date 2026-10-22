@@ -118,8 +118,8 @@ def submit_service_request(name: str) -> dict:
 
 
 @frappe.whitelist(methods=["POST"])
-def add_request_comment(name: str, text: str) -> list[dict]:
-	return requests.add_request_comment(require_producer(), name, text)
+def add_request_comment(name: str, text: str, files: list[str] | None = None) -> list[dict]:
+	return requests.add_request_comment(require_producer(), name, text, files)
 
 
 @frappe.whitelist(methods=["GET"])
@@ -153,5 +153,5 @@ def get_quotation_thread(name: str) -> dict:
 
 
 @frappe.whitelist(methods=["POST"])
-def add_quotation_comment(name: str, text: str) -> list[dict]:
-	return quotations.add_quotation_comment(require_producer(), name, text)
+def add_quotation_comment(name: str, text: str, files: list[str] | None = None) -> list[dict]:
+	return quotations.add_quotation_comment(require_producer(), name, text, files)

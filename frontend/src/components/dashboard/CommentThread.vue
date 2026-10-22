@@ -1,7 +1,8 @@
 <template>
   <!-- A record's comments with Ozone's team (ozone/portal/comments.py): a request's while it requires
        clarification, a quotation's while the producer answers it. `load` reads them (and whether the
-       producer may write now), `send` posts the producer's. The team's comments sit at the start, the
+       producer may write now), `send` posts the producer's, with the files it attaches (uploaded as it
+       picks them, private; a comment links them and they are attached to the record). The team's comments sit at the start, the
        producer's at the end. It reads them again every 15 seconds while the tab is visible, and as soon
        as the producer comes back to it, so the team's answers show without reloading the page. -->
   <div class="mt-4 border-t-2 border-site-line pt-4">
@@ -24,7 +25,20 @@
             </span>
             <time :datetime="comment.creation">{{ formatTime(comment.creation) }}</time>
           </p>
-          <p class="mt-1 whitespace-pre-line text-body text-site-text">{{ comment.text }}</p>
+          <p v-if="comment.text" class="mt-1 whitespace-pre-line text-body text-site-text">{{ comment.text }}</p>
+          <ul v-if="comment.attachments?.length" class="mt-2 flex flex-wrap gap-2">
+            <li v-for="file in comment.attachments" :key="file.url">
+              <a
+                :href="file.url"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-site-hover px-3 py-1 text-caption font-bold text-brand-green underline dark:text-brand-leaf"
+              >
+                <LucidePaperclip class="size-3.5 shrink-0" aria-hidden="true" />
+                <span class="truncate">{{ file.name }}</span>
+              </a>
+            </li>
+          </ul>
         </li>
       </ol>
 
@@ -42,25 +56,80 @@
             error ? 'border-brand-red' : 'border-site-line',
           ]"
         />
+        <ul v-if="files.length" class="mt-2 flex flex-wrap gap-2">
+          <li
+            v-for="(file, index) in files"
+            :key="file.url"
+            class="inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-site-line py-1 pe-1.5 ps-3 text-caption font-bold text-site-heading"
+          >
+            <LucidePaperclip class="size-3.5 shrink-0" aria-hidden="true" />
+            <span class="truncate">{{ file.name }}</span>
+            <button
+              type="button"
+              class="rounded-full p-0.5 text-site-muted transition hover:bg-site-hover hover:text-site-heading"
+              :aria-label="`${t('dashboard.requests.removeFile')} ${file.name}`"
+              @click="files.splice(index, 1)"
+            >
+              <LucideX class="size-3.5" aria-hidden="true" />
+            </button>
+          </li>
+        </ul>
         <p v-if="error" class="mt-1.5 text-caption font-bold text-brand-red dark:text-brand-red-300">{{ error }}</p>
-        <BaseButton type="submit" class="mt-3" :loading="busy">{{ t("dashboard.requests.send") }}</BaseButton>
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+          <BaseButton type="submit" :loading="busy" :disabled="uploading">{{ t("dashboard.requests.send") }}</BaseButton>
+          <label
+            v-if="room > 0"
+            :class="[
+              'inline-flex cursor-pointer items-center gap-2 rounded-xl border-2 border-site-line px-4 py-2.5 text-caption font-bold text-site-heading transition',
+              'hover:border-brand-green focus-within:ring-4 focus-within:ring-brand-leaf/20',
+              uploading || busy ? 'pointer-events-none opacity-60' : '',
+            ]"
+          >
+            <LucidePaperclip class="size-4" aria-hidden="true" />
+            {{ uploading ? t("dashboard.requests.uploading") : t("dashboard.requests.attach") }}
+            <input type="file" class="sr-only" multiple :accept="ACCEPT" @change="attach" />
+          </label>
+        </div>
       </form>
     </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, useId } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, useId } from "vue"
 import { useI18n } from "vue-i18n"
+import LucidePaperclip from "~icons/lucide/paperclip"
+import LucideX from "~icons/lucide/x"
 
 import BaseButton from "@/components/base/BaseButton.vue"
 import BaseNotice from "@/components/base/BaseNotice.vue"
 import { refusal } from "@/composables/useFormSubmit"
+import { uploadFile } from "@/services/http"
 import type { RequestComment } from "@/services/portal"
 
+/** What website users may upload (frappe/handler.py: ALLOWED_MIMETYPES): documents, sheets and pictures. */
+const ACCEPT = [
+	"application/pdf",
+	"image/jpeg",
+	"image/png",
+	".doc",
+	".docx",
+	".xls",
+	".xlsx",
+	".csv",
+	".txt",
+].join(",")
+
+interface Thread {
+	comments: RequestComment[]
+	can_reply: boolean
+	attachments_left: number | null
+}
+
 const props = defineProps<{
-	load: () => Promise<{ comments: RequestComment[]; can_reply: boolean }>
-	send: (text: string) => Promise<RequestComment[]>
+	load: () => Promise<Thread>
+	/** Posts the producer's text and the URLs of the files it uploaded for it. */
+	send: (text: string, files: string[]) => Promise<RequestComment[]>
 	/** The answer box's label (default: "Your answer"). */
 	label?: string
 }>()
@@ -73,16 +142,31 @@ const failed = ref("")
 const text = ref("")
 const error = ref("")
 const busy = ref(false)
+/** The files uploaded for the answer being written (private: only the producer and the team open them). */
+const files = ref<{ name: string; url: string }[]>([])
+const uploading = ref(false)
+/** How many more files the record takes (its DocType's Max Attachments); null: no limit. */
+const left = ref<number | null>(null)
+/** How many more files this answer may carry. */
+const room = computed(() =>
+	left.value === null
+		? Number.POSITIVE_INFINITY
+		: left.value - files.value.length,
+)
 
 /** How often the conversation is read again while it is on screen. */
 const REFRESH_MS = 15_000
 let timer: number | undefined
 
+function show(detail: Thread) {
+	comments.value = detail.comments
+	canReply.value = detail.can_reply
+	left.value = detail.attachments_left
+}
+
 onMounted(async () => {
 	try {
-		const detail = await props.load()
-		comments.value = detail.comments
-		canReply.value = detail.can_reply
+		show(await props.load())
 	} catch (err) {
 		failed.value = refusal(err, t)
 		return
@@ -100,9 +184,7 @@ onBeforeUnmount(() => {
 async function refresh() {
 	if (document.hidden || busy.value) return
 	try {
-		const detail = await props.load()
-		comments.value = detail.comments
-		canReply.value = detail.can_reply
+		show(await props.load())
 	} catch {
 		// Offline for a moment: keep what is shown
 	}
@@ -115,13 +197,38 @@ function formatTime(value: string): string {
 	}).format(new Date(value.replace(" ", "T")))
 }
 
+/** Uploads the chosen files, as many as the record still takes. */
+async function attach(event: Event) {
+	const input = event.target as HTMLInputElement
+	const chosen = Array.from(input.files ?? []).slice(0, room.value)
+	input.value = ""
+	if (!chosen.length) return
+	uploading.value = true
+	error.value = ""
+	try {
+		for (const file of chosen) {
+			files.value.push({ name: file.name, url: await uploadFile(file) })
+		}
+	} catch (err) {
+		error.value = refusal(err, t)
+	} finally {
+		uploading.value = false
+	}
+}
+
 async function reply() {
-	error.value = text.value.trim() ? "" : t("auth.errors.required")
+	error.value =
+		text.value.trim() || files.value.length ? "" : t("auth.errors.required")
 	if (error.value) return
 	busy.value = true
 	try {
-		comments.value = await props.send(text.value.trim())
+		comments.value = await props.send(
+			text.value.trim(),
+			files.value.map((file) => file.url),
+		)
+		if (left.value !== null) left.value -= files.value.length
 		text.value = ""
+		files.value = []
 	} catch (err) {
 		error.value = refusal(err, t)
 	} finally {
