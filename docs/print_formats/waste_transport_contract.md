@@ -6,9 +6,9 @@ The Madinah Regional Municipality's standard contract for transporting non-hazar
 
 | Page | Contents |
 | --- | --- |
-| 1 | Contract data (number, effective and end dates, duration, activity, license, area, municipality), the waste classification (the quotation's waste types and wastes, ticked), the conclusion date in Gregorian and Hijri, the two parties, the container plan (the quotation's container lines with their collection frequency, totals, VAT and the amount in words), the regulation articles, the signatures and the municipality's supervision block |
+| 1 | Contract data (number, effective and end dates, duration, activity, license, area, municipality), the waste classification (the quotation's waste types and wastes, ticked), the conclusion date in Gregorian and Hijri, the two parties, the container plan (the quotation's container lines with their collection frequency, the lines' collection mechanisms (each once), totals, VAT and the amount in words), the regulation articles, the signatures and the municipality's supervision block |
 | 2 | The technical terms, both parties' obligations and the general conditions, as the official form has them; the duration clause states the quotation's own duration |
-| 3 | Only when the collection mechanism is a collection room (its name has غرفة / room): the room annex, with the contract data, photo boxes and the room's conditions |
+| 3 | Only when a line's collection mechanism is a collection room (its name has غرفة / room): the room annex, with the contract data, photo boxes and the room's conditions |
 
 ## Data
 

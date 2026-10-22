@@ -2,9 +2,9 @@
 (docs/producer_dashboard/api.md).
 
 A Service Quotation is the team's until they send it (Open); the producer sees only Open, Accepted and
-Rejected ones (naqel's CLIENT_STATUSES). It shows the amount to pay, the collection mechanism and
-frequency, the service period and the waste calculation report. It names the container type only when
-the collection deploys a container at the facility. The producer accepts or rejects an Open quotation
+Rejected ones (naqel's CLIENT_STATUSES). It shows the amount to pay, each container line's collection
+mechanism and frequency, the service period and the waste calculation report. It names a line's
+container type only when its collection deploys a container at the facility. The producer accepts or rejects an Open quotation
 (a rejection says why), and writes to the team in its comments."""
 
 import frappe
@@ -84,10 +84,6 @@ def count_quotations(producer: frappe._dict) -> int:
 
 def get_quotation(producer: frappe._dict, name: str) -> dict:
 	quotation = _visible(name, producer)
-	# The collection is each container row's (its mechanism and frequency); the panel shows the first row's, and
-	# `collections` every row's
-	collections = [_collection(row) for row in quotation.containers]
-	first = collections[0] if collections else _collection(frappe._dict())
 	return {
 		"name": quotation.name,
 		"status": quotation.status,
@@ -107,19 +103,7 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 			"duration_uom": None if quotation.is_milestone_based else quotation.duration_uom,
 			"milestone_based": cint(quotation.is_milestone_based),
 		},
-		"collection": first,
-		"collections": collections,
-		# The containers only where the collection deploys them at the facility: the type and count the row collects
-		# with
-		"containers": [
-			{
-				"container_type": _(row.collection_container_type or row.container_type),
-				"count": cint(row.collection_container_count or row.container_count),
-				"image": row.image,
-			}
-			for row in quotation.containers
-			if cint(row.requires_container_deployment)
-		],
+		"collections": [_collection(row) for row in quotation.containers],
 		"amounts": {
 			"currency": quotation.currency,
 			"net_total": flt(quotation.net_total),
@@ -137,28 +121,6 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		"can_decide": quotation.status == "Open" and quotation.docstatus == 0,
 		"can_reply": True,
 		"comments": comments.thread(quotation),
-	}
-
-
-def _collection(row) -> dict:
-	"""A container row's collection, as the client sees it: its mechanism and frequency."""
-	mechanism = (
-		frappe.db.get_value(
-			"Collection Mechanism",
-			row.collection_mechanism,
-			["collection_mechanism_name", "description", "requires_container_deployment"],
-			as_dict=True,
-		)
-		if row.collection_mechanism
-		else None
-	) or frappe._dict()
-	return {
-		"mechanism": _(mechanism.collection_mechanism_name or row.collection_mechanism or ""),
-		"description": _(mechanism.description or ""),
-		"count": cint(row.collection_count) or 1,
-		"period_count": cint(row.collection_period_count) or 1,
-		"period_uom": row.collection_period_uom or "Day",
-		"deploys_container": cint(mechanism.requires_container_deployment),
 	}
 
 
@@ -197,6 +159,37 @@ def _report(quotation) -> str:
 	except frappe.ValidationError:
 		frappe.clear_messages()
 		return ""
+def _collection(row) -> dict:
+	"""How one of the quotation's container lines is collected: its waste type, mechanism and frequency, and
+	the container the collection deploys at the facility (its type and count), only when it deploys one."""
+	mechanism = (
+		frappe.get_cached_value(
+			"Collection Mechanism",
+			row.collection_mechanism,
+			["collection_mechanism_name", "description"],
+			as_dict=True,
+		)
+		if row.collection_mechanism
+		else None
+	) or frappe._dict()
+	deploys = cint(row.requires_container_deployment) and row.collection_container_type
+	return {
+		"waste_type": _(row.waste_type or ""),
+		"mechanism": _(mechanism.collection_mechanism_name or row.collection_mechanism or ""),
+		"description": _(mechanism.description or ""),
+		"count": cint(row.collection_count) or 1,
+		"period_count": cint(row.collection_period_count) or 1,
+		"period_uom": row.collection_period_uom or "Day",
+		"container": {
+			"container_type": _(row.collection_container_type),
+			"count": cint(row.collection_container_count),
+			"image": frappe.get_cached_value("Container Type", row.collection_container_type, "image"),
+		}
+		if deploys
+		else None,
+	}
+
+
 
 
 def _visible(name: str, producer: frappe._dict):

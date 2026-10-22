@@ -183,6 +183,21 @@ export interface QuotationSummary {
 	currency: string
 }
 
+export interface QuotationCollection {
+	waste_type: string
+	mechanism: string
+	description: string
+	count: number
+	period_count: number
+	period_uom: "Day" | "Week" | "Month" | "Year"
+	/** Only when the collection deploys a container at the facility. */
+	container: {
+		container_type: string
+		count: number
+		image: string | null
+	} | null
+}
+
 export interface QuotationDetail {
 	name: string
 	status: QuotationStatus
@@ -199,16 +214,8 @@ export interface QuotationDetail {
 		duration_uom: string | null
 		milestone_based: 0 | 1
 	}
-	collection: {
-		mechanism: string
-		description: string
-		count: number
-		period_count: number
-		period_uom: "Day" | "Week" | "Month" | "Year"
-		deploys_container: 0 | 1
-	}
-	/** Only when the collection deploys a container at the facility. */
-	containers: { container_type: string; count: number; image: string | null }[]
+	/** How each container line is collected. */
+	collections: QuotationCollection[]
 	amounts: {
 		currency: string
 		net_total: number

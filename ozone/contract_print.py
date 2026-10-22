@@ -61,16 +61,7 @@ def waste_transport_contract(doc) -> dict:
 def _contract(doc) -> dict:
 	facility = frappe.get_doc("Facility", doc.facility) if doc.facility else frappe._dict()
 	company = frappe.get_cached_doc("Company", doc.company) if doc.company else frappe._dict()
-	# The collection is each container row's: the contract names their mechanisms
-	mechanisms = list(
-		dict.fromkeys(
-			row.collection_mechanism for row in doc.get("containers") or [] if row.collection_mechanism
-		)
-	)
-	names = [
-		frappe._(frappe.db.get_value("Collection Mechanism", name, "collection_mechanism_name") or name)
-		for name in mechanisms
-	]
+	mechanisms = _mechanisms(doc)
 	concluded = getdate(doc.transaction_date)
 	return {
 		"logo": _image_data("madinah_municipality.jpeg"),
@@ -98,15 +89,26 @@ def _contract(doc) -> dict:
 		},
 		"first": _first_party(doc, facility),
 		"second": _second_party(doc, company),
-		"mechanism": "، ".join(names),
+		"mechanism": "، ".join(mechanisms),
 		"rows": _rows(doc, facility),
 		"currency": doc.currency,
 		"net_total": flt(doc.net_total),
 		"taxes": flt(doc.total_taxes_and_charges),
 		"grand_total": flt(doc.rounded_total) or flt(doc.grand_total),
 		"in_words": money_in_words(flt(doc.rounded_total) or flt(doc.grand_total), doc.currency),
-		"collection_room": any(word in name.lower() for name in names for word in COLLECTION_ROOM),
+		"collection_room": any(word in name.lower() for name in mechanisms for word in COLLECTION_ROOM),
 	}
+
+
+def _mechanisms(doc) -> list[str]:
+	"""The container lines' collection mechanisms by name, each once, in the lines' order."""
+	names = dict.fromkeys(
+		row.collection_mechanism for row in doc.get("containers") or [] if row.collection_mechanism
+	)
+	return [
+		frappe._(frappe.get_cached_value("Collection Mechanism", name, "collection_mechanism_name") or name)
+		for name in names
+	]
 
 
 def counted(count: int, forms: dict) -> str:
@@ -193,8 +195,8 @@ def _first_party(doc, facility) -> dict:
 		"commercial_registration": documents.get("commercial_registration", ""),
 		"national_id": documents.get("national_id", ""),
 		"tax_id": party.get("tax_id") or documents.get("tax", ""),
-		"phone": doc.contact_mobile or party.get("mobile_no") or party.get("phone") or "",
-		"email": doc.contact_email or party.get("email_id") or "",
+		"phone": doc.mobile_no or party.get("mobile_no") or party.get("phone") or "",
+		"email": doc.email or party.get("email_id") or "",
 	}
 
 

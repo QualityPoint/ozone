@@ -32,31 +32,35 @@
           </p>
         </div>
 
-        <!-- How the waste is collected -->
+        <!-- How the waste is collected: each container line's collection (its waste type when there are several) -->
         <div class="rounded-2xl border-2 border-site-line p-5">
           <p class="text-caption font-bold text-site-muted">{{ t("dashboard.quotations.collection") }}</p>
-          <p class="mt-1 flex items-center gap-2 text-title font-extrabold text-site-heading">
-            <LucideTruck class="size-5 shrink-0 text-brand-green dark:text-brand-leaf" aria-hidden="true" />
-            {{ quotation.collection.mechanism }}
-          </p>
-          <p v-if="quotation.collection.description" class="mt-1 text-caption text-site-muted">{{ quotation.collection.description }}</p>
-          <p class="mt-3 inline-flex items-center gap-2 rounded-full bg-site-hover px-3 py-1 text-caption font-bold text-site-heading">
-            <LucideRepeat class="size-3.5" aria-hidden="true" />
-            {{ frequencyText }}
-          </p>
-          <template v-if="quotation.containers.length">
-            <p class="mt-4 text-caption font-bold text-site-muted">{{ t("dashboard.quotations.containers") }}</p>
-            <ul class="mt-2 flex flex-wrap gap-2">
-              <li
-                v-for="container in quotation.containers"
-                :key="container.container_type"
+          <div
+            v-for="(collection, index) in quotation.collections"
+            :key="index"
+            :class="index ? 'mt-4 border-t-2 border-site-line pt-4' : 'mt-1'"
+          >
+            <p v-if="quotation.collections.length > 1" class="text-label font-bold text-site-muted">{{ collection.waste_type }}</p>
+            <p class="flex items-center gap-2 text-title font-extrabold text-site-heading">
+              <LucideTruck class="size-5 shrink-0 text-brand-green dark:text-brand-leaf" aria-hidden="true" />
+              {{ collection.mechanism }}
+            </p>
+            <p v-if="collection.description" class="mt-1 text-caption text-site-muted">{{ collection.description }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <p class="inline-flex items-center gap-2 rounded-full bg-site-hover px-3 py-1 text-caption font-bold text-site-heading">
+                <LucideRepeat class="size-3.5" aria-hidden="true" />
+                {{ frequency(collection) }}
+              </p>
+              <p
+                v-if="collection.container"
+                :title="t('dashboard.quotations.containers')"
                 class="inline-flex items-center gap-2 rounded-full border-2 border-brand-green px-3 py-1 text-caption font-bold text-site-heading dark:border-brand-leaf"
               >
                 <LucideContainer class="size-4" aria-hidden="true" />
-                {{ container.container_type }}<span v-if="container.count > 1" dir="ltr"> × {{ container.count }}</span>
-              </li>
-            </ul>
-          </template>
+                {{ collection.container.container_type }}<span v-if="collection.container.count > 1" dir="ltr"> × {{ collection.container.count }}</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -145,6 +149,7 @@ import BaseNotice from "@/components/base/BaseNotice.vue"
 import CommentThread from "@/components/dashboard/CommentThread.vue"
 import { refusal } from "@/composables/useFormSubmit"
 import {
+	type QuotationCollection,
 	type QuotationDetail,
 	addQuotationComment,
 	decideQuotation,
@@ -188,7 +193,6 @@ const EMPTY_AMOUNTS: QuotationDetail["amounts"] = {
 	in_words: null,
 }
 const amounts = computed(() => quotation.value?.amounts ?? EMPTY_AMOUNTS)
-const collection = computed(() => quotation.value?.collection)
 
 function money(value: number): string {
 	return formatMoney(value, amounts.value.currency, locale.value)
@@ -212,15 +216,17 @@ function count(value: number, key: string, lead = ""): string {
 }
 
 /** "twice a day", "3 times every 2 weeks", "مرتان كل يوم"… */
-const frequencyText = computed(() => {
-	if (!collection.value) return ""
-	const { count: times, period_count, period_uom } = collection.value
+function frequency({
+	count: times,
+	period_count,
+	period_uom,
+}: QuotationCollection): string {
 	return `${count(times, "dashboard.quotations.times")} ${count(
 		period_count,
 		`dashboard.quotations.periods.${period_uom}`,
 		t("dashboard.quotations.every"),
 	)}`
-})
+}
 
 /** The service period: its dates and duration, or from its start for a milestone-based service. */
 const periodText = computed(() => {
