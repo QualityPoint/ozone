@@ -61,15 +61,16 @@ def waste_transport_contract(doc) -> dict:
 def _contract(doc) -> dict:
 	facility = frappe.get_doc("Facility", doc.facility) if doc.facility else frappe._dict()
 	company = frappe.get_cached_doc("Company", doc.company) if doc.company else frappe._dict()
-	mechanism = (
-		frappe.db.get_value(
-			"Collection Mechanism",
-			doc.single_collection_mechanism,
-			["collection_mechanism_name", "requires_container_deployment"],
-			as_dict=True,
+	# The collection is each container row's: the contract names their mechanisms
+	mechanisms = list(
+		dict.fromkeys(
+			row.collection_mechanism for row in doc.get("containers") or [] if row.collection_mechanism
 		)
-		or frappe._dict()
 	)
+	names = [
+		frappe._(frappe.db.get_value("Collection Mechanism", name, "collection_mechanism_name") or name)
+		for name in mechanisms
+	]
 	concluded = getdate(doc.transaction_date)
 	return {
 		"logo": _image_data("madinah_municipality.jpeg"),
@@ -97,17 +98,14 @@ def _contract(doc) -> dict:
 		},
 		"first": _first_party(doc, facility),
 		"second": _second_party(doc, company),
-		"mechanism": frappe._(mechanism.collection_mechanism_name or doc.single_collection_mechanism or ""),
+		"mechanism": "، ".join(names),
 		"rows": _rows(doc, facility),
 		"currency": doc.currency,
 		"net_total": flt(doc.net_total),
 		"taxes": flt(doc.total_taxes_and_charges),
 		"grand_total": flt(doc.rounded_total) or flt(doc.grand_total),
 		"in_words": money_in_words(flt(doc.rounded_total) or flt(doc.grand_total), doc.currency),
-		"collection_room": any(
-			word in (mechanism.collection_mechanism_name or doc.single_collection_mechanism or "").lower()
-			for word in COLLECTION_ROOM
-		),
+		"collection_room": any(word in name.lower() for name in names for word in COLLECTION_ROOM),
 	}
 
 

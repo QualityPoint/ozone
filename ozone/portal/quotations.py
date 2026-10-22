@@ -84,16 +84,10 @@ def count_quotations(producer: frappe._dict) -> int:
 
 def get_quotation(producer: frappe._dict, name: str) -> dict:
 	quotation = _visible(name, producer)
-	mechanism = (
-		frappe.db.get_value(
-			"Collection Mechanism",
-			quotation.single_collection_mechanism,
-			["collection_mechanism_name", "description", "requires_container_deployment"],
-			as_dict=True,
-		)
-		or frappe._dict()
-	)
-	deploys = cint(mechanism.requires_container_deployment)
+	# The collection is each container row's (its mechanism and frequency); the panel shows the first row's, and
+	# `collections` every row's
+	collections = [_collection(row) for row in quotation.containers]
+	first = collections[0] if collections else _collection(frappe._dict())
 	return {
 		"name": quotation.name,
 		"status": quotation.status,
@@ -113,23 +107,19 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 			"duration_uom": None if quotation.is_milestone_based else quotation.duration_uom,
 			"milestone_based": cint(quotation.is_milestone_based),
 		},
-		"collection": {
-			"mechanism": _(
-				mechanism.collection_mechanism_name or quotation.single_collection_mechanism or ""
-			),
-			"description": _(mechanism.description or ""),
-			"count": cint(quotation.collection_count) or 1,
-			"period_count": cint(quotation.collection_period_count) or 1,
-			"period_uom": quotation.collection_period_uom or "Day",
-			"deploys_container": deploys,
-		},
-		# The container type only when the collection deploys one at the facility
+		"collection": first,
+		"collections": collections,
+		# The containers only where the collection deploys them at the facility: the type and count the row collects
+		# with
 		"containers": [
-			{"container_type": _(row.container_type), "count": cint(row.container_count), "image": row.image}
+			{
+				"container_type": _(row.collection_container_type or row.container_type),
+				"count": cint(row.collection_container_count or row.container_count),
+				"image": row.image,
+			}
 			for row in quotation.containers
-		]
-		if deploys
-		else [],
+			if cint(row.requires_container_deployment)
+		],
 		"amounts": {
 			"currency": quotation.currency,
 			"net_total": flt(quotation.net_total),
@@ -147,6 +137,28 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		"can_decide": quotation.status == "Open" and quotation.docstatus == 0,
 		"can_reply": True,
 		"comments": comments.thread(quotation),
+	}
+
+
+def _collection(row) -> dict:
+	"""A container row's collection, as the client sees it: its mechanism and frequency."""
+	mechanism = (
+		frappe.db.get_value(
+			"Collection Mechanism",
+			row.collection_mechanism,
+			["collection_mechanism_name", "description", "requires_container_deployment"],
+			as_dict=True,
+		)
+		if row.collection_mechanism
+		else None
+	) or frappe._dict()
+	return {
+		"mechanism": _(mechanism.collection_mechanism_name or row.collection_mechanism or ""),
+		"description": _(mechanism.description or ""),
+		"count": cint(row.collection_count) or 1,
+		"period_count": cint(row.collection_period_count) or 1,
+		"period_uom": row.collection_period_uom or "Day",
+		"deploys_container": cint(mechanism.requires_container_deployment),
 	}
 
 
