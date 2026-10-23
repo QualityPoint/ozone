@@ -46,14 +46,16 @@ today's naqel:
   each waste type (naqel requires them).
 - **Request lifecycle:** a request is a Draft the producer can change until it submits it; then it is Under
   Process. A desk user who may write Service Requests asks for clarification when needed (Require
-  Clarification, with the question added to the comments), the producer answers in the dashboard, the desk
-  marks it Clarified and makes the Service Quotation (the request becomes Quotation). The desk calculates and
+  Clarification, with the question added to the comments), the producer answers in the dashboard (which marks it
+  Clarified: only the client's answer does), and the desk makes the Service Quotation (the request becomes
+  Quotation). The desk calculates and
   prices it, then sends it to the client (Open), who accepts or rejects it (a rejection's reason goes into its comments; the client only reads them otherwise). See naqel's
   `docs/modules/naqel_contracting/service_request.md`.
 - **Documents:** each Service lists the documents it requires (Service → Registration Documents). The
   first request for a facility asks for one of them, with its number and uploaded file, and saves it in the
-  **Facility's** credentials; later requests show it as on file. Naqel Settings no longer has a facility-credential
-  policy.
+  **Facility's** credentials through naqel's rule (`naqel.utils.registration.set_registration_document`, the same
+  as the desk's **Add Registration Document**, where the file is optional); later requests, and the desk's
+  quotations, find it there. Naqel Settings no longer has a facility-credential policy.
 
 ## Docs
 

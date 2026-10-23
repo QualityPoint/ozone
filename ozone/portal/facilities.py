@@ -14,6 +14,13 @@ from frappe.utils import cint, cstr, flt
 from naqel.utils.location.map_location import _point, resolve_map_location
 from naqel.utils.location.regions.lookup import address_of, region_path, region_titles
 from naqel.utils.location.regions.policy import pin_region, region_policy
+from naqel.utils.credentials import (
+	CREDENTIAL_FIELDS,
+	CREDENTIAL_FLAGS,
+	CREDENTIAL_TYPES,
+	credential_flags,
+	set_facility_credential,
+)
 
 from ozone.portal import own_doc, pick
 from ozone.producer import main_party, owned_names
@@ -21,21 +28,11 @@ from ozone.producer import main_party, owned_names
 # Not the rating: it is the desk's own assessment of the facility, never shown to or set by the producer. The
 # region is checked against Naqel Settings (region_divisions) before it is set.
 FACILITY_FIELDS = ("facility_name", "isic_classification", "parent_facility", "is_group", "region")
-# The facility's own address: the dashboard requires a street, city and country; naqel makes the Facility's
-# Address from them (Facility.create_address). The country defaults to the system's.
+# The facility's own address: the dashboard requires a street, city and country; naqel's documents show it from
+# these fields (naqel.utils.location.facility_address). The country defaults to the system's.
 ADDRESS_FIELDS = ("street", "building_no", "secondary_no", "district", "city", "pincode", "country")
-# A facility's credentials (commercial registration, licenses): what a producer may set on each row.
-# The expiry and multi-branch flags follow the document type (Facility.set_credential_flags).
-CREDENTIAL_TYPES = ("Government ID", "Service License")
-CREDENTIAL_FIELDS = (
-	"credential_type",
-	"document_type",
-	"document_number",
-	"credential",
-	"issue_date",
-	"expiry_date",
-)
-FLAG_FIELDS = ("has_expiry_date", "eligible_for_multiple_facility_branches")
+# A facility's credentials (commercial registration, licenses): a producer sets naqel's CREDENTIAL_FIELDS on each
+# row; the expiry and multi-branch flags follow the document type (naqel.utils.credentials.credential_flags).
 
 
 def get_facilities(producer: frappe._dict) -> list[dict]:
@@ -113,7 +110,7 @@ def save_facility(producer: frappe._dict, data: dict) -> dict:
 			values = document(row, kept)
 			if values.get("document_type") not in shared:
 				frappe.throw(_("A composite facility's document must be one its annexes share."))
-			set_credential(facility, values)
+			set_facility_credential(facility, values)
 	elif facility.parent_facility:
 		# An annex carries its composite facility's shared documents (naqel requires the same numbers)
 		for row in frappe.get_all(
@@ -125,7 +122,7 @@ def save_facility(producer: frappe._dict, data: dict) -> dict:
 			},
 			fields=list(CREDENTIAL_FIELDS),
 		):
-			set_credential(facility, dict(row))
+			set_facility_credential(facility, dict(row))
 
 	location = cstr(data.get("google_maps_location")).strip()
 	if location and location != facility.google_maps_location:
@@ -172,35 +169,13 @@ def _document_types(pairs: list[tuple[str, str]] | None = None, shared_only: boo
 		]
 	out = []
 	for credential_type, document_type in pairs:
-		flag_fields = [f for f in FLAG_FIELDS if frappe.get_meta(credential_type).has_field(f)]
-		flags = frappe.db.get_value(credential_type, document_type, flag_fields, as_dict=True)
-		if not flags or (shared_only and not flags.get("eligible_for_multiple_facility_branches")):
+		flags = credential_flags(credential_type, document_type)
+		if not flags or (shared_only and not flags["eligible_for_multiple_facility_branches"]):
 			continue
 		out.append(
-			{
-				"credential_type": credential_type,
-				"document_type": document_type,
-				"label": _(document_type),
-				"has_expiry_date": flags.get("has_expiry_date") or 0,
-				"eligible_for_multiple_facility_branches": flags.get(
-					"eligible_for_multiple_facility_branches"
-				)
-				or 0,
-			}
+			{"credential_type": credential_type, "document_type": document_type, "label": _(document_type), **flags}
 		)
 	return out
-
-
-def set_credential(facility, values: dict) -> None:
-	"""Add a document to the facility's credentials, or update its row of the same document type."""
-	for row in facility.get("credentials"):
-		if (row.credential_type, row.document_type) == (
-			values.get("credential_type"),
-			values.get("document_type"),
-		):
-			row.update(values)
-			return
-	facility.append("credentials", values)
 
 
 def search_regions(txt: str = "") -> list[dict]:
@@ -311,7 +286,7 @@ def _credentials(facilities: list[str]) -> dict[str, list[dict]]:
 	rows = frappe.get_all(
 		"Facility Credential",
 		filters={"parenttype": "Facility", "parent": ["in", facilities or [""]]},
-		fields=["parent", *CREDENTIAL_FIELDS, "has_expiry_date", "eligible_for_multiple_facility_branches"],
+		fields=["parent", *CREDENTIAL_FIELDS, *CREDENTIAL_FLAGS],
 		order_by="idx",
 	)
 	out: dict[str, list[dict]] = {}

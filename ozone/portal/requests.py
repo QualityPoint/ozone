@@ -24,13 +24,19 @@ from naqel.naqel_calculator.doctype.waste_calculator.waste_calculator import (
 	parse_waste_items,
 )
 from naqel.naqel_contracting.doctype.service_request.service_request import (
-	facility_document,
 	open_request,
+)
+from naqel.utils.registration import (
+	facility_document,
 	registration_documents,
+	set_registration_document,
 )
 
 from ozone.portal import comments, own_doc, pick, status_color
-from ozone.portal.facilities import _document_types, document, set_credential
+from ozone.portal.facilities import (
+	_document_types,
+	document,
+)
 from ozone.producer import main_party, owned_names
 
 REQUEST_FIELDS = (
@@ -226,12 +232,7 @@ def save_service_request(producer: frappe._dict, data: dict) -> dict:
 				).format(", ".join(_(row.document_type) for row in required))
 			)
 		kept = {row.credential for row in site.get("credentials") if row.credential}
-		given = document(data["document"], kept)
-		if (given.get("credential_type"), given.get("document_type")) not in {
-			(row.credential_type, row.document_type) for row in required
-		}:
-			frappe.throw(_("Choose one of the documents this service requires."))
-		set_credential(site, given)
+		set_registration_document(site, service.name, document(data["document"], kept))
 		site.save(ignore_permissions=True)
 
 	# Each waste type's wastes as the producer chose them; the Service Request keeps the setup's defaults
