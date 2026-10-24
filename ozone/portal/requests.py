@@ -31,6 +31,10 @@ from naqel.utils.registration import (
 	registration_documents,
 	set_registration_document,
 )
+from naqel.utils.service_term import (
+	DURATION_BASED,
+	has_end_date,
+)
 
 from ozone.portal import comments, own_doc, pick, status_color
 from ozone.portal.facilities import (
@@ -170,7 +174,12 @@ def get_request_form(
 		# A composite facility's annexes, all covered unless the producer unticks some
 		"annexes": _annexes(site, producer),
 		"documents": _documents(site.name, service_type),
-		"milestone_based": service.is_milestone_based or 0,
+		# Whether the service has an end date (naqel.utils.service_term), and a Duration-Based one's minimum
+		# period, which the form's end date defaults to (naqel checks it on save)
+		"has_end_date": cint(has_end_date(service.service_term)),
+		"minimum_period": {"count": cint(service.minimum_duration), "uom": service.minimum_duration_uom}
+		if service.service_term == DURATION_BASED and cint(service.minimum_duration)
+		else None,
 		"duration_uoms": [{"value": uom, "label": _(uom)} for uom in DURATION_UOMS],
 		"grants_license": service.grants_license or 0,
 		"license_statuses": [{"value": status, "label": _(status)} for status in LICENSE_STATUSES],
@@ -198,16 +207,11 @@ def save_service_request(producer: frappe._dict, data: dict) -> dict:
 		(site.party_type, site.party) if site.party else main_party(producer)
 	)
 
-	# The producer gives the dates: the start, and the end unless the service is milestone-based. naqel works
-	# out the duration and its unit from them (ServiceRequest: set_duration_from_dates).
+	# The producer gives the dates: the start, and the end when the service has one. naqel keeps them to the
+	# service's term (an end at its minimum period at the earliest) and works out the duration and its unit
+	# from them (ServiceRequest: set_term_dates, set_duration_from_dates, validate_term_dates).
 	if not request.start_date:
 		frappe.throw(_("Give the date the service starts."))
-	if service.is_milestone_based:
-		request.end_date = request.service_duration = request.duration_uom = None
-	elif not request.end_date:
-		frappe.throw(_("Give the date the service ends."))
-	elif request.end_date < request.start_date:
-		frappe.throw(_("The service can't end before it starts."))
 
 	if not service.grants_license:
 		request.license_status = request.license_no = request.license_document = None
@@ -484,7 +488,7 @@ def _service(service_type: str | None) -> frappe._dict:
 	service = service_type and frappe.db.get_value(
 		"Service",
 		service_type,
-		["name", "grants_license", "is_milestone_based"],
+		["name", "grants_license", "service_term", "minimum_duration", "minimum_duration_uom"],
 		as_dict=True,
 	)
 	if not service:

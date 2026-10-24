@@ -25,6 +25,18 @@ export function addDuration(
 	return new Date(Date.UTC(year, target, Math.min(day, lastDay) - 1))
 }
 
+/** The earliest end date of a service started on `startDate` that lasts at least `period`, as "2026-10-31"
+ *  (naqel/utils/service_term.py: minimum_end_date); "" without either. */
+export function minimumEndDate(
+	startDate: string,
+	period: { count: number; uom: DurationUom } | null,
+): string {
+	if (!startDate || !period) return ""
+	return addDuration(parse(startDate), period.count, period.uom)
+		.toISOString()
+		.slice(0, 10)
+}
+
 /** Jan 1 – Dec 31 → 1 Year; Dec 1 – Feb 28 → 3 Months; Mar 1 – Mar 10 → 10 Days. Null for a missing or reversed range. */
 export function durationBetween(
 	startDate: string,

@@ -15,6 +15,9 @@ from naqel.naqel_contracting.doctype.service_quotation.service_quotation import 
 	CLIENT_STATUSES,
 	client_waste_report,
 )
+from naqel.utils.service_term import (
+	has_end_date,
+)
 
 from ozone.portal import comments, own_doc, status_color
 from ozone.producer import owned_names
@@ -86,6 +89,7 @@ def count_quotations(producer: frappe._dict) -> int:
 
 def get_quotation(producer: frappe._dict, name: str) -> dict:
 	quotation = _visible(name, producer)
+	ends = has_end_date(quotation.service_term)
 	return {
 		"name": quotation.name,
 		"status": quotation.status,
@@ -101,10 +105,9 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		"valid_till": quotation.valid_till,
 		"period": {
 			"start_date": quotation.start_date,
-			"end_date": None if quotation.is_milestone_based else quotation.end_date,
-			"duration": None if quotation.is_milestone_based else flt(quotation.service_duration),
-			"duration_uom": None if quotation.is_milestone_based else quotation.duration_uom,
-			"milestone_based": cint(quotation.is_milestone_based),
+			"end_date": quotation.end_date if ends else None,
+			"duration": flt(quotation.service_duration) if ends else None,
+			"duration_uom": quotation.duration_uom if ends else None,
 		},
 		"collections": [_collection(row) for row in quotation.containers],
 		"amounts": {

@@ -51,11 +51,11 @@
               :error="form.errors.value[`part:${part.value}`]"
             />
           </template>
-          <!-- The dates: the start, and the end unless the service is milestone-based; the duration and its unit
-               follow from them (utils/duration, as naqel sets them) -->
+          <!-- The dates: the start, and the end when the service has one (from its minimum period at the
+               earliest); the duration and its unit follow from them (utils/duration, as naqel sets them) -->
           <BaseInput v-model="draft.start_date" :label="t('dashboard.requests.startDate')" type="date" :error="form.errors.value.start_date" />
-          <template v-if="!spec.milestone_based">
-            <BaseInput v-model="draft.end_date" :label="t('dashboard.requests.endDate')" type="date" :min="draft.start_date || undefined" :error="form.errors.value.end_date" />
+          <template v-if="spec.has_end_date">
+            <BaseInput v-model="draft.end_date" :label="t('dashboard.requests.endDate')" type="date" :min="minimumEnd || draft.start_date || undefined" :error="form.errors.value.end_date" />
             <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 md:col-start-2">
               <BaseInput :model-value="duration ? String(duration.count) : ''" :label="t('dashboard.requests.duration')" dir="ltr" readonly />
               <BaseInput :model-value="durationUnit" :label="t('dashboard.requests.durationUom')" readonly />
@@ -286,7 +286,7 @@ import {
 	submitServiceRequest,
 } from "@/services/portal"
 import type { LocaleCode } from "@/types"
-import { durationBetween } from "@/utils/duration"
+import { durationBetween, minimumEndDate } from "@/utils/duration"
 import { statusBadge } from "@/utils/status"
 
 const { t, locale } = useI18n()
@@ -518,6 +518,15 @@ async function applyPrefill(result: RequestForm) {
 		parts[part.uom] = String(part.uom_value)
 }
 
+/** A Duration-Based service's earliest end date: the end date starts there, or moves up to it. */
+const minimumEnd = computed(() =>
+	minimumEndDate(draft.start_date, spec.value?.minimum_period ?? null),
+)
+watch(minimumEnd, (minimum) => {
+	if (minimum && (!draft.end_date || draft.end_date < minimum))
+		draft.end_date = minimum
+})
+
 /** The service's duration, from its dates (naqel sets the same on save). */
 const duration = computed(() =>
 	durationBetween(draft.start_date, draft.end_date),
@@ -640,10 +649,12 @@ const form = useFormSubmit<string>({
 			if (!doc.credential)
 				errors["document:file"] = t("dashboard.facilities.fileRequired")
 		}
-		if (!spec.value.milestone_based) {
+		if (spec.value.has_end_date) {
 			if (!draft.end_date) errors.end_date = required
 			else if (draft.start_date && draft.end_date < draft.start_date)
 				errors.end_date = t("dashboard.requests.endBeforeStart")
+			else if (minimumEnd.value && draft.end_date < minimumEnd.value)
+				errors.end_date = t("dashboard.requests.endBeforeMinimum")
 		}
 		if (spec.value.grants_license && !draft.license_status)
 			errors.license_status = required
@@ -671,7 +682,7 @@ const form = useFormSubmit<string>({
 					}))
 				: undefined,
 			start_date: draft.start_date,
-			end_date: spec.value?.milestone_based ? null : draft.end_date,
+			end_date: spec.value?.has_end_date ? draft.end_date : null,
 			license_status: draft.license_status || undefined,
 			// A renewal's number and document only: switching back to a new issue drops them.
 			license_no: renewal ? draft.license_no.trim() || undefined : undefined,

@@ -4,6 +4,7 @@
  */
 import type { Producer } from "@/services/auth"
 import { getMethod, postMethod } from "@/services/http"
+import type { DurationUom } from "@/utils/duration"
 
 export interface Overview {
 	producer: Producer
@@ -218,7 +219,6 @@ export interface QuotationDetail {
 		end_date: string | null
 		duration: number | null
 		duration_uom: string | null
-		milestone_based: 0 | 1
 	}
 	/** How each container line is collected. */
 	collections: QuotationCollection[]
@@ -298,7 +298,10 @@ export interface RequestForm {
 			expiry_date: string | null
 		} | null
 	}
-	milestone_based: 0 | 1
+	/** Not for a Milestone-Based service (naqel.utils.service_term). */
+	has_end_date: 0 | 1
+	/** A Duration-Based service's minimum period: the end date defaults to it, and can't come before it. */
+	minimum_period: { count: number; uom: DurationUom } | null
 	duration_uoms: Option[]
 	grants_license: 0 | 1
 	license_statuses: Option[]
@@ -315,7 +318,7 @@ export interface RequestInput {
 	facility_measurement?: number | null
 	facility_uoms?: { uom: string; uom_value: number }[]
 	start_date: string
-	/** Unless the service is milestone-based; naqel works out the duration and its unit from the dates. */
+	/** When the service has one; naqel works out the duration and its unit from the dates. */
 	end_date?: string | null
 	license_status?: string
 	license_no?: string
@@ -526,8 +529,8 @@ export interface ContractEntry {
 	amount: number
 	currency: string
 	start_date: string | null
+	/** None for a service without one. */
 	end_date: string | null
-	milestone_based: 0 | 1
 	contract: {
 		name: string
 		status: string

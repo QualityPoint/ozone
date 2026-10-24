@@ -6,6 +6,9 @@ contract still in Draft, or cancelled, is the team's and isn't shown."""
 import frappe
 from frappe import _
 from frappe.utils import cint, flt
+from naqel.utils.service_term import (
+	has_end_date,
+)
 
 from ozone.portal import status_color
 from ozone.producer import owned_names
@@ -17,7 +20,7 @@ CONTRACT_FIELDS = [
 	"contract_date",
 	"start_date",
 	"end_date",
-	"is_milestone_based",
+	"service_term",
 	"net_total",
 	"currency",
 	"document_type",
@@ -27,7 +30,7 @@ CONTRACT_FIELDS = [
 
 def get_contracts(producer: frappe._dict) -> list[dict]:
 	"""Newest first: `{quotation, service_title, facility_title, amount, currency, start_date, end_date,
-	milestone_based, contract}`. `quotation` is None for a contract that follows none of the producer's
+	contract}`, with no end date for a service without one. `quotation` is None for a contract that follows none of the producer's
 	quotations, and `contract` None while the team prepares it."""
 	quotations = frappe.get_all(
 		"Service Quotation",
@@ -41,7 +44,7 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 			"currency",
 			"start_date",
 			"end_date",
-			"is_milestone_based",
+			"service_term",
 		],
 		order_by="modified desc",
 	)
@@ -56,7 +59,7 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 			currency=q.currency,
 			start_date=q.start_date,
 			end_date=q.end_date,
-			milestone_based=q.is_milestone_based,
+			service_term=q.service_term,
 			contract=issued.get(q.name),
 		)
 		for q in quotations
@@ -75,7 +78,7 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 	requests = frappe.get_all(
 		"Service Request",
 		filters={"name": ["in", direct or [""]]},
-		fields=["name", "service_type", "facility", "start_date", "end_date", "is_milestone_based"],
+		fields=["name", "service_type", "facility", "start_date", "end_date", "service_term"],
 		order_by="modified desc",
 	)
 	contracted = _issued("Service Request", [r.name for r in requests] or [""])
@@ -90,7 +93,7 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 				currency=contract.currency if contract else None,
 				start_date=request.start_date,
 				end_date=request.end_date,
-				milestone_based=request.is_milestone_based,
+				service_term=request.service_term,
 				contract=contract,
 			)
 		)
@@ -117,7 +120,7 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 				currency=contract.currency,
 				start_date=contract.start_date,
 				end_date=contract.end_date,
-				milestone_based=contract.is_milestone_based,
+				service_term=contract.service_term,
 				contract=contract,
 			)
 		)
@@ -148,7 +151,7 @@ def count_contracts(producer: frappe._dict) -> int:
 
 
 def _entry(
-	*, quotation, service_type, facility, amount, currency, start_date, end_date, milestone_based, contract
+	*, quotation, service_type, facility, amount, currency, start_date, end_date, service_term, contract
 ):
 	return {
 		"quotation": quotation,
@@ -161,8 +164,7 @@ def _entry(
 		"amount": amount,
 		"currency": currency,
 		"start_date": start_date,
-		"end_date": None if cint(milestone_based) else end_date,
-		"milestone_based": cint(milestone_based),
+		"end_date": end_date if has_end_date(service_term) else None,
 		"contract": contract
 		and {
 			"name": contract.name,

@@ -316,6 +316,8 @@ export default {
 		startDate: "Start date",
 		endDate: "End date",
 		endBeforeStart: "The end date comes before the start date.",
+		endBeforeMinimum:
+			"The end date comes before the service's minimum period ends.",
 		duration: "Duration",
 		durationUom: "Unit",
 		license: "License",

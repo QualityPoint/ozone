@@ -223,13 +223,12 @@ function frequency({
 	)}`
 }
 
-/** The service period: its dates and duration, or from its start for a milestone-based service. */
+/** The service period: its dates and duration, or from its start for a service without an end date. */
 const periodText = computed(() => {
 	const period = quotation.value?.period
 	if (!period?.start_date) return ""
-	const { start_date, end_date, duration, duration_uom, milestone_based } =
-		period
-	if (milestone_based || !end_date || !duration_uom)
+	const { start_date, end_date, duration, duration_uom } = period
+	if (!end_date || !duration_uom)
 		return `${t("dashboard.quotations.from")} ${formatDate(start_date)}`
 	const length = count(
 		Number(duration),

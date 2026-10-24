@@ -312,6 +312,7 @@ export default {
 		startDate: "تاريخ البدء",
 		endDate: "تاريخ الانتهاء",
 		endBeforeStart: "تاريخ الانتهاء قبل تاريخ البدء.",
+		endBeforeMinimum: "تاريخ الانتهاء قبل انقضاء الحد الأدنى لمدة الخدمة.",
 		duration: "المدة",
 		durationUom: "الوحدة",
 		license: "الترخيص",

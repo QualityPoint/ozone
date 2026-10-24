@@ -12,7 +12,12 @@ from pathlib import Path
 
 import frappe
 from frappe.utils import cint, flt, getdate, money_in_words, strip_html
-from naqel.utils.location.regions.lookup import region_at_level
+from naqel.utils.location.regions.lookup import (
+	region_at_level,
+)
+from naqel.utils.service_term import (
+	has_end_date,
+)
 
 WEEKDAYS = ("الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد")
 # Arabic counted words by plural form (Intl/CLDR): "one" and "two" are whole phrases, the others follow the number
@@ -63,16 +68,17 @@ def _contract(doc) -> dict:
 	company = frappe.get_cached_doc("Company", doc.company) if doc.company else frappe._dict()
 	mechanisms = _mechanisms(doc)
 	concluded = getdate(doc.transaction_date)
+	ends = has_end_date(doc.service_term)
 	return {
 		"logo": _image_data("madinah_municipality.jpeg"),
 		"company_logo": company.get("company_logo"),
 		"number": doc.name,
 		"follows": doc.amended_from or "",
 		"start_date": _date(doc.start_date),
-		"end_date": "" if doc.is_milestone_based else _date(doc.end_date),
-		"duration": ""
-		if doc.is_milestone_based or not doc.service_duration
-		else counted(cint(doc.service_duration), COUNTED.get(doc.duration_uom, COUNTED["Day"])),
+		"end_date": _date(doc.end_date) if ends else "",
+		"duration": counted(cint(doc.service_duration), COUNTED.get(doc.duration_uom, COUNTED["Day"]))
+		if ends and doc.service_duration
+		else "",
 		"activity": frappe.db.get_value("ISIC Classification", doc.isic_classification, "category_name")
 		or doc.isic_classification
 		or "",
