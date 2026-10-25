@@ -118,7 +118,8 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 				for row in quotation.taxes
 				if flt(row.tax_amount)
 			],
-			"discount": flt(quotation.discount_amount) if quotation.apply_discount_on else 0,
+			# naqel doesn't apply a quotation's discount fields: nothing comes off its total, so none is shown
+			"discount": 0,
 			"grand_total": flt(quotation.grand_total),
 			"rounded_total": flt(quotation.rounded_total) or flt(quotation.grand_total),
 			"in_words": quotation.in_words,
