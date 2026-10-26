@@ -2,9 +2,9 @@
 (docs/producer_dashboard/api.md).
 
 A Service Quotation is the team's until they send it (Open); the producer sees only Open, Accepted and
-Rejected ones (naqel's CLIENT_STATUSES). It shows the amount to pay, each container line's collection
-mechanism and frequency, the service period and the waste calculation report. It names a line's
-container type only when its collection deploys a container at the facility. The producer accepts or rejects an Open quotation
+Rejected ones (naqel's CLIENT_STATUSES). It shows the amount to pay, how each set of its containers (a waste
+type's, or the whole facility's) is collected, the service period and the waste calculation report. It names
+the container type only when the collection deploys one at the facility. The producer accepts or rejects an Open quotation
 and reads its comments with the team, but doesn't write there: the reason it gives for a rejection is the one comment
 it adds (questions go through the request's clarification)."""
 
@@ -109,7 +109,7 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 			"duration": flt(quotation.service_duration) if ends else None,
 			"duration_uom": quotation.duration_uom if ends else None,
 		},
-		"collections": [_collection(row) for row in quotation.containers],
+		"collections": [_collection(row) for row in quotation.collections],
 		"amounts": {
 			"currency": quotation.currency,
 			"net_total": flt(quotation.net_total),
@@ -157,8 +157,9 @@ def get_quotation_thread(producer: frappe._dict, name: str) -> dict:
 
 
 def _collection(row) -> dict:
-	"""How one of the quotation's container lines is collected: its waste type, mechanism and frequency, and
-	the container the collection deploys at the facility (its type and count), only when it deploys one."""
+	"""How one of the quotation's sets is collected (naqel's Service Quotation Collection: a waste type's
+	containers, or the whole facility's): its waste type, mechanism and frequency, and the container the
+	collection deploys at the facility (its type and count), only when it deploys one."""
 	mechanism = (
 		frappe.get_cached_value(
 			"Collection Mechanism",

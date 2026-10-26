@@ -107,9 +107,9 @@ def _contract(doc) -> dict:
 
 
 def _mechanisms(doc) -> list[str]:
-	"""The container lines' collection mechanisms by name, each once, in the lines' order."""
+	"""The sets' collection mechanisms by name, each once, in the sets' order."""
 	names = dict.fromkeys(
-		row.collection_mechanism for row in doc.get("containers") or [] if row.collection_mechanism
+		row.collection_mechanism for row in doc.get("collections") or [] if row.collection_mechanism
 	)
 	return [
 		frappe._(frappe.get_cached_value("Collection Mechanism", name, "collection_mechanism_name") or name)
@@ -169,19 +169,26 @@ def _rows(doc, facility) -> list[dict]:
 		else ""
 	)
 	area = _area(doc)
-	return [
-		{
-			"container": frappe._(row.container_type),
-			"count": cint(row.container_count),
-			"coordinates": coordinates,
-			"frequency": _frequency(
-				cint(row.collection_count), cint(row.collection_period_count), row.collection_period_uom
-			),
-			"amount": flt(row.amount),
-			"area": area,
-		}
-		for row in doc.get("containers") or []
-	]
+	# A container line is collected at its set's frequency (the collection of its waste type)
+	collection_of = {row.waste_type or "": row for row in doc.get("collections") or []}
+	rows = []
+	for row in doc.get("containers") or []:
+		collection = collection_of.get(row.waste_type or "") or frappe._dict()
+		rows.append(
+			{
+				"container": frappe._(row.container_type),
+				"count": cint(row.container_count),
+				"coordinates": coordinates,
+				"frequency": _frequency(
+					cint(collection.collection_count),
+					cint(collection.collection_period_count),
+					collection.collection_period_uom,
+				),
+				"amount": flt(row.amount),
+				"area": area,
+			}
+		)
+	return rows
 
 
 def _first_party(doc, facility) -> dict:
