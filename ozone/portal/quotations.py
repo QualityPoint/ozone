@@ -11,9 +11,11 @@ it adds (questions go through the request's clarification)."""
 import frappe
 from frappe import _
 from frappe.utils import cint, flt
+from naqel.naqel_calculator.doctype.waste_calculator.waste_calculator import (
+	client_waste_report,
+)
 from naqel.naqel_contracting.doctype.service_quotation.service_quotation import (
 	CLIENT_STATUSES,
-	client_waste_report,
 )
 from naqel.utils.service_term import (
 	has_end_date,
