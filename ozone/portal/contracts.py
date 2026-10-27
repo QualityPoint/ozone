@@ -21,6 +21,12 @@ from naqel.utils.contract.sales_order import (
 	received_payment,
 	required_payment,
 )
+from naqel.utils.contract.signature import (
+	can_sign,
+)
+from naqel.utils.contract.signature import (
+	sign_contract as sign_service_contract,
+)
 from naqel.utils.service_term import (
 	has_end_date,
 )
@@ -49,6 +55,10 @@ CONTRACT_FIELDS = [
 	"currency",
 	"document_type",
 	"document_name",
+	"is_signed",
+	"signee",
+	"signed_on",
+	"letter_head",
 ]
 
 
@@ -194,7 +204,8 @@ def _entry(
 
 
 def _contract(contract) -> dict:
-	"""A contract as the producer sees it; a draft taking its payment says how much, and whether it pays online."""
+	"""A contract as the producer sees it; a draft taking its payment says how much, and whether it pays online. An
+	issued one waiting for the producer's signature can be signed (can_sign); a signed one says by whom and when."""
 	pays_first = _pays_first(contract)
 	return {
 		"name": contract.name,
@@ -202,6 +213,8 @@ def _contract(contract) -> dict:
 		"status_label": _(contract.status),
 		"status_color": status_color("Service Contract", contract.status),
 		"contract_date": contract.contract_date,
+		"can_sign": can_sign(contract),
+		"signed": bool(contract.is_signed) and {"signee": contract.signee, "signed_on": contract.signed_on},
 		"payment": pays_first
 		and {
 			"requirement": contract.payment_requirement,
@@ -222,3 +235,43 @@ def pay_contract(producer: frappe._dict, name: str) -> dict:
 	if not can_pay_online(contract):
 		frappe.throw(_("This contract can't be paid online."), title=_("No Online Payment"))
 	return {"url": contract_payment_url(contract.name)}
+
+
+def _own_contract(producer: frappe._dict, name: str):
+	"""One of the producer's contracts that it sees (_shown): issued, or a draft taking its payment."""
+	contract = own_doc("Service Contract", name, producer)
+	if not _shown(contract):
+		frappe.throw(_("Not permitted."), frappe.PermissionError)
+	return contract
+
+
+def get_contract_print(producer: frappe._dict, name: str) -> dict:
+	"""The contract as it prints (`{html}`): its default print format under its letter head, marked DRAFT while the
+	team hasn't issued it, so the producer reads what it pays for and what it signs."""
+	return {"html": _print(_own_contract(producer, name))}
+
+
+def _print(contract) -> str:
+	"""The contract printed with the DocType's default print format under its own letter head, as the system: a
+	producer has no permission to print it."""
+	print_format = frappe.get_meta("Service Contract").default_print_format or "Standard"
+	user = frappe.session.user
+	frappe.set_user("Administrator")
+	try:
+		return frappe.get_print(
+			"Service Contract",
+			contract.name,
+			print_format,
+			doc=contract,
+			letterhead=contract.letter_head,
+		)
+	finally:
+		frappe.set_user(user)
+
+
+def sign_contract(producer: frappe._dict, name: str, signee: str, signature: str) -> list[dict]:
+	"""The producer signs its issued contract (naqel's utils.contract.signature): `get_contracts` again."""
+	contract = _own_contract(producer, name)
+	sign_service_contract(contract.name, signee, signature)
+	return get_contracts(producer)
+

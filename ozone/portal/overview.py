@@ -78,7 +78,8 @@ def get_overview(producer: frappe._dict) -> dict:
 
 
 def _next_steps(facilities, requests, quotations, contracts) -> list[dict]:
-	"""What waits for the producer, the most pressing first: `{kind, section, name, title, facility}`, a payment's
+	"""What waits for the producer, the most pressing first (a contract to pay, a contract to sign, a quotation to
+	answer, a clarification, a draft): `{kind, section, name, title, facility}`, a payment's
 	`payment` (as get_contracts gives it) and a quotation's `amount` and `currency`. A new producer is pointed to its
 	first facility, then to its first request."""
 	steps = [
@@ -92,6 +93,17 @@ def _next_steps(facilities, requests, quotations, contracts) -> list[dict]:
 		}
 		for entry in contracts
 		if entry["contract"] and entry["contract"]["status"] == AWAITING_PAYMENT
+	]
+	steps += [
+		{
+			"kind": "sign",
+			"section": "contracts",
+			"name": entry["contract"]["name"],
+			"title": entry["service_title"],
+			"facility": entry["facility_title"],
+		}
+		for entry in contracts
+		if entry["contract"] and entry["contract"]["can_sign"]
 	]
 	steps += [
 		{

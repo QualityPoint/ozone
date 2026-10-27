@@ -70,6 +70,7 @@ export default {
 			more: "Also waiting for you",
 			open: "Open",
 			payment: "Pay to have your contract issued",
+			sign: "Sign your contract",
 			quotation: "Answer your quotation",
 			clarification: "Ozone's team asked you a question",
 			draft: "Submit your service request",
@@ -239,6 +240,36 @@ export default {
 			offline: "Ozone's team will tell you how to pay this amount.",
 			issuing:
 				"Your payment is received: Ozone's team is issuing your contract.",
+		},
+		/** The contract as it prints, and the producer's signature on it (ozone/portal/contracts.py). */
+		document: {
+			view: "View contract",
+			title: "Contract",
+			close: "Close",
+			print: "Print",
+			printHint:
+				"Print the contract, or save it as a PDF from the print dialog.",
+			loading: "Loading the contract…",
+			failed: "The contract couldn't be loaded. Try again.",
+			draftNote:
+				"This is the contract being prepared: you sign it once Ozone's team issues it.",
+		},
+		sign: {
+			action: "Review and sign",
+			title: "Sign your contract",
+			intro:
+				"Read the contract above. Signing it accepts its terms, and the contract takes effect as Ozone issued it.",
+			consent: "I have read the contract and agree to its terms.",
+			name: "Your full name",
+			pad: "Your signature",
+			padHint: "Sign inside the box with your finger or the mouse.",
+			clear: "Clear",
+			submit: "Sign the contract",
+			signing: "Signing…",
+			failed: "The contract couldn't be signed. Try again.",
+			done: "Your contract is signed.",
+			signedBy: "Signed by",
+			waiting: "Waiting for your signature",
 		},
 	},
 	quotations: {

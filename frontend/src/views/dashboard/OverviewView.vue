@@ -70,7 +70,7 @@
 
           <div v-else class="mt-4 flex flex-wrap items-center justify-between gap-3">
             <p v-if="next.amount && next.currency" class="text-title font-extrabold text-site-heading" dir="ltr">{{ money(next.amount, next.currency) }}</p>
-            <BaseButton :to="pageLink(next.section)" class="ms-auto">
+            <BaseButton :to="next.kind === 'sign' ? { path: pageLink(next.section), query: { sign: next.name } } : pageLink(next.section)" class="ms-auto">
               {{ t("dashboard.overview.next.open") }}
               <LucideArrowRight class="size-4 rtl:-scale-x-100" aria-hidden="true" />
             </BaseButton>

@@ -27,6 +27,7 @@ export interface Overview {
 
 export type NextStepKind =
 	| "payment"
+	| "sign"
 	| "quotation"
 	| "clarification"
 	| "draft"
@@ -581,6 +582,10 @@ export interface ContractEntry {
 		contract_date: string | null
 		/** A draft awaiting the producer's payment (its Service requires one before the contract is issued). */
 		payment: ContractPayment | false
+		/** Issued and waiting for the producer's signature (Unsigned). */
+		can_sign: boolean
+		/** Who signed it and when, once signed. */
+		signed: { signee: string | null; signed_on: string | null } | false
 	} | null
 }
 
@@ -635,6 +640,20 @@ export function markNotificationsRead(
 /** The checkout to pay what a contract requires before it is issued (its Payment Request's). */
 export function payContract(name: string): Promise<{ url: string }> {
 	return postMethod(`${API}.pay_contract`, { name })
+}
+
+/** The contract as it prints (its letter head, terms and collection plan), DRAFT while it is being prepared. */
+export function getContractPrint(name: string): Promise<{ html: string }> {
+	return getMethod(`${API}.get_contract_print`, { name })
+}
+
+/** Sign an issued contract: the signee's name and the drawn signature (a PNG data URL). The contracts again. */
+export function signContract(
+	name: string,
+	signee: string,
+	signature: string,
+): Promise<ContractEntry[]> {
+	return postMethod(`${API}.sign_contract`, { name, signee, signature })
 }
 
 /** The requests that have turned into a quotation, each with the quotations sent for it. */

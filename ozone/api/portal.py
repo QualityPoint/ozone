@@ -141,6 +141,18 @@ def pay_contract(name: str) -> dict:
 
 
 @frappe.whitelist(methods=["GET"])
+def get_contract_print(name: str) -> dict:
+	"""The contract as it prints: `{html}`."""
+	return contracts.get_contract_print(require_producer(), name)
+
+
+@frappe.whitelist(methods=["POST"])
+def sign_contract(name: str, signee: str, signature: str) -> list[dict]:
+	"""Sign an issued contract: its drawn signature (a PNG data URL) and the signee's name; the contracts again."""
+	return contracts.sign_contract(require_producer(), name, signee, signature)
+
+
+@frappe.whitelist(methods=["GET"])
 def get_quotations() -> list[dict]:
 	return quotations.get_quotations(require_producer())
 
