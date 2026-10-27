@@ -47,7 +47,7 @@
           <!-- What it requires paid before it is issued (a draft awaiting the producer's payment) -->
           <div
             v-if="entry.contract?.payment"
-            class="mt-4 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950/30"
+            class="mt-4 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/30"
           >
             <p class="text-caption font-bold text-site-heading">
               {{ t("dashboard.contracts.payment.title") }} · {{ entry.contract.payment.requirement_label }}
