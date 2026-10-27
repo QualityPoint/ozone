@@ -196,7 +196,7 @@ export default {
 			Open: "Awaiting your answer",
 			Accepted: "Accepted",
 			Rejected: "Rejected",
-			"Sales Order": "Sales order",
+			Contract: "Contracted",
 		},
 		amount: "Amount to pay",
 		net: "Service",

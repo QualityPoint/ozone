@@ -194,7 +194,7 @@ export default {
 			Open: "بانتظار ردك",
 			Accepted: "مقبول",
 			Rejected: "مرفوض",
-			"Sales Order": "أمر بيع",
+			Contract: "متعاقد عليه",
 		},
 		amount: "المبلغ المستحق",
 		net: "الخدمة",

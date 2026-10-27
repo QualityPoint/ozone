@@ -175,8 +175,9 @@ export type RequestStatus =
 	| "Contract"
 	| "Cancelled"
 
-/** A quotation Ozone's team has sent: Open (waiting for the producer's answer), Accepted or Rejected. */
-export type QuotationStatus = "Open" | "Accepted" | "Rejected" | "Sales Order"
+/** A quotation Ozone's team has sent: Open (waiting for the producer's answer), Accepted or Rejected; Contract once its
+ *  contract is submitted. */
+export type QuotationStatus = "Open" | "Accepted" | "Rejected" | "Contract"
 
 export interface QuotationSummary {
 	name: string
