@@ -114,14 +114,15 @@ def get_quotation(producer: frappe._dict, name: str) -> dict:
 		"collections": [_collection(row) for row in quotation.collections],
 		"amounts": {
 			"currency": quotation.currency,
-			"net_total": flt(quotation.net_total),
+			# The total before the Additional Discount; the discount is the part taken off it (on the Grand Total, the
+			# net total's share: the taxes follow), so total − discount + taxes = the grand total
+			"net_total": flt(quotation.total),
 			"taxes": [
 				{"description": _(row.description or row.account_head or ""), "amount": flt(row.tax_amount)}
 				for row in quotation.taxes
 				if flt(row.tax_amount)
 			],
-			# naqel doesn't apply a quotation's discount fields: nothing comes off its total, so none is shown
-			"discount": 0,
+			"discount": flt(quotation.total) - flt(quotation.net_total),
 			"grand_total": flt(quotation.grand_total),
 			"rounded_total": flt(quotation.rounded_total) or flt(quotation.grand_total),
 			"in_words": quotation.in_words,
