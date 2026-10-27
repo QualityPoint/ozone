@@ -6,7 +6,7 @@
     <button
       type="button"
       class="relative grid size-10 place-items-center rounded-full text-site-heading transition hover:bg-site-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-leaf"
-      :aria-label="unread ? t('dashboard.notifications.unread', { count: unread }) : t('dashboard.notifications.title')"
+      :aria-label="unread ? `${t('dashboard.notifications.unread')}: ${unread}` : t('dashboard.notifications.title')"
       :title="t('dashboard.notifications.title')"
       :aria-expanded="open"
       aria-haspopup="true"
@@ -57,7 +57,7 @@
               <span :class="['block text-caption', item.read ? 'text-site-muted' : 'font-bold text-site-heading']">
                 {{ item.subject }}
               </span>
-              <span class="mt-0.5 block text-label text-site-muted">{{ when(item.creation) }}</span>
+              <span class="mt-0.5 block text-label text-site-muted">{{ formatDateTime(item.creation, locale as LocaleCode) }}</span>
             </span>
           </button>
         </li>
@@ -81,6 +81,7 @@ import {
 	markNotificationsRead,
 } from "@/services/portal"
 import type { LocaleCode } from "@/types"
+import { formatDateTime } from "@/utils/format"
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -124,12 +125,5 @@ async function openItem(item: Notification) {
 	router.push(
 		localePath(`${dashboardPath}/${item.section}`, locale.value as LocaleCode),
 	)
-}
-
-function when(value: string): string {
-	return new Intl.DateTimeFormat(locale.value, {
-		dateStyle: "medium",
-		timeStyle: "short",
-	}).format(new Date(value.replace(" ", "T")))
 }
 </script>

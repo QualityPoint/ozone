@@ -3,7 +3,7 @@
        submitted, with the Service Contract that follows it ("being prepared" until the team issues it),
        and any other contract of the producer's Customer. Read only; a quotation's details open below it. -->
   <section>
-    <DashboardHeading :title="t('dashboard.nav.contracts')" :intro="t('dashboard.contracts.intro')" />
+    <DashboardHeading :eyebrow="t('dashboard.nav.groups.operations')" :title="t('dashboard.nav.contracts')" :intro="t('dashboard.contracts.intro')" />
     <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
     <p v-else-if="!entries" class="mt-8 text-site-muted">{{ t("dashboard.requests.loading") }}</p>
     <p v-else-if="!entries.length" class="mt-8 text-site-muted">
@@ -12,7 +12,7 @@
     </p>
 
     <ul v-else class="mt-8 space-y-3">
-      <li v-for="entry in entries" :key="entry.quotation ?? entry.contract?.name">
+      <li v-for="entry in entries" :key="entry.quotation ?? entry.contract?.name" class="dash-rise">
         <BaseCard class="p-5">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="flex min-w-0 gap-4">
@@ -26,7 +26,7 @@
                   <span dir="ltr">{{ entry.contract?.name ?? entry.quotation }}</span>
                 </p>
                 <p v-if="entry.start_date" class="mt-1 text-caption text-site-muted">
-                  {{ formatDate(entry.start_date) }}<template v-if="entry.end_date"> – {{ formatDate(entry.end_date) }}</template>
+                  {{ formatDate(entry.start_date, locale as LocaleCode) }}<template v-if="entry.end_date"> – {{ formatDate(entry.end_date, locale as LocaleCode) }}</template>
                 </p>
               </div>
             </div>
@@ -117,14 +117,11 @@ import BaseCard from "@/components/base/BaseCard.vue"
 import BaseNotice from "@/components/base/BaseNotice.vue"
 import DashboardHeading from "@/components/dashboard/DashboardHeading.vue"
 import QuotationPanel from "@/components/dashboard/QuotationPanel.vue"
+import { usePayContract } from "@/composables/usePayContract"
 import { dashboardPath, localePath } from "@/config/site"
-import {
-	type ContractEntry,
-	getContracts,
-	payContract,
-} from "@/services/portal"
+import { type ContractEntry, getContracts } from "@/services/portal"
 import type { LocaleCode } from "@/types"
-import { formatMoney } from "@/utils/format"
+import { formatDate, formatMoney } from "@/utils/format"
 import { statusBadge } from "@/utils/status"
 
 const { t, locale } = useI18n()
@@ -132,8 +129,7 @@ const entries = ref<ContractEntry[] | null>(null)
 const failed = ref(false)
 const open = reactive<Record<string, boolean>>({})
 // The contract whose payment is being opened, and the one whose payment couldn't be
-const paying = ref<string | null>(null)
-const payFailed = ref<string | null>(null)
+const { paying, failed: payFailed, pay } = usePayContract()
 const quotationsLink = computed(() =>
 	localePath(`${dashboardPath}/quotations`, locale.value as LocaleCode),
 )
@@ -146,26 +142,7 @@ onMounted(async () => {
 	}
 })
 
-/** Open the contract's checkout (its Payment Request's: Moyasar), which brings the producer back when it is paid. */
-async function pay(name: string) {
-	paying.value = name
-	payFailed.value = null
-	try {
-		const { url } = await payContract(name)
-		window.location.assign(url)
-	} catch {
-		payFailed.value = name
-		paying.value = null
-	}
-}
-
 function money(amount: number, currency: string): string {
 	return formatMoney(amount, currency, locale.value)
-}
-
-function formatDate(value: string): string {
-	return new Intl.DateTimeFormat(locale.value, { dateStyle: "medium" }).format(
-		new Date(`${value}T00:00:00`),
-	)
 }
 </script>

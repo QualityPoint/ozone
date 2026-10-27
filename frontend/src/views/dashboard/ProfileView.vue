@@ -2,7 +2,7 @@
   <!-- My details: the user's own contact details, the party they belong to (kept by the
        transporter), and the party's addresses (ozone/portal/profile.py). -->
   <section>
-    <DashboardHeading :title="t('dashboard.nav.profile')" :intro="t('dashboard.profile.intro')" />
+    <DashboardHeading :eyebrow="t('dashboard.nav.groups.account')" :title="t('dashboard.nav.profile')" :intro="t('dashboard.profile.intro')" />
     <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
 
     <div v-if="profile" class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

@@ -1,6 +1,5 @@
 export default {
 	logout: "تسجيل الخروج",
-	soon: "قريبًا",
 	save: "حفظ",
 	saved: "حُفظت التغييرات.",
 	cancel: "إلغاء",
@@ -33,6 +32,11 @@ export default {
 		requests: "طلبات الخدمة",
 		quotations: "عروض الأسعار",
 		contracts: "العقود",
+		/** The menu's groups after the overview. */
+		groups: {
+			operations: "العمليات",
+			account: "الحساب",
+		},
 	},
 	/** The account's stage: the party it belongs to (ozone/producer.py). */
 	stage: {
@@ -51,6 +55,36 @@ export default {
 			quotations: "عروض الأسعار",
 			contracts: "العقود",
 		},
+		newRequest: "اطلب خدمة",
+		addFacility: "أضف منشأة",
+		/** The stages of the journey with nothing in them yet. */
+		empty: {
+			facilities: "أضف منشأتك الأولى",
+			requests: "لا طلبات بعد",
+			quotations: "لا عرض سعر ينتظر ردك",
+			contracts: "لا عقود بعد",
+		},
+		/** What waits for the producer (ozone/portal/overview.py: next_steps), by kind. */
+		next: {
+			label: "خطوتك التالية",
+			more: "ينتظرك أيضًا",
+			open: "افتح",
+			payment: "ادفع لإصدار عقدك",
+			quotation: "ردّ على عرض السعر",
+			clarification: "فريق أوزون أرسل لك استفسارًا",
+			draft: "أرسل طلب الخدمة",
+			facility: "أضف منشأتك الأولى",
+			facilityHint: "سجّل منشأتك، ثم اطلب لها الخدمات.",
+			request: "اطلب خدمتك الأولى",
+			requestHint: "اطلب خدمة لمنشأتك، ويراجعها فريق أوزون ويُعدّ عرض السعر.",
+			upToDate: "لا شيء ينتظرك",
+			upToDateHint: "كل شيء على ما يرام الآن. اطلب خدمة متى احتجت إليها.",
+		},
+		contracts: "عقودك",
+		allContracts: "كل العقود",
+		activity: "آخر النشاط",
+		noActivity:
+			"لا شيء بعد. يظهر هنا ما يقوم به فريق أوزون على طلباتك وعروض أسعارك وعقودك.",
 	},
 	notLinked: {
 		title: "حسابك قيد الربط",
@@ -179,7 +213,7 @@ export default {
 	},
 	notifications: {
 		title: "الإشعارات",
-		unread: "الإشعارات: {count} غير مقروء",
+		unread: "إشعارات غير مقروءة",
 		none: "لا جديد. ستُبلَّغ هنا حين يتخذ فريق أوزون إجراءً على طلباتك وعروض أسعارك وعقودك.",
 		markAll: "تعليم الكل كمقروء",
 	},

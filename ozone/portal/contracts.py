@@ -8,9 +8,12 @@ Request. A cancelled one isn't shown."""
 import frappe
 from frappe import _
 from frappe.utils import cint, flt
+from naqel.utils.contract.contract_status import (
+	AWAITING_PAYMENT,
+	PAYMENT_STATUSES,
+)
 from naqel.utils.contract.payment_request import (
 	amount_to_pay,
-	awaits_payment,
 	can_pay_online,
 	contract_payment_url,
 )
@@ -25,11 +28,9 @@ from naqel.utils.service_term import (
 from ozone.portal import own_doc, status_color
 from ozone.producer import owned_names
 
+# A draft awaiting the producer's payment, or with it received while the team issues it, has a status of its own
+# (naqel's contract_status.PAYMENT_STATUSES) and shows
 HIDDEN_STATUSES = ("Draft", "Cancelled")
-# What a draft contract whose Service requires a payment shows, once its Sales Order is submitted: awaiting the
-# producer's payment, then the payment received while the team issues it
-AWAITING_PAYMENT = "Awaiting Payment"
-PAYMENT_RECEIVED = "Payment Received"
 CONTRACT_FIELDS = [
 	"name",
 	"docstatus",
@@ -148,19 +149,15 @@ def get_contracts(producer: frappe._dict) -> list[dict]:
 
 
 def _shown(contract) -> bool:
-	"""Issued (neither Draft nor Cancelled), or a draft taking the producer's payment (_pays_first)."""
-	return contract.status not in HIDDEN_STATUSES or _pays_first(contract)
+	"""Issued, or a draft taking the producer's payment (Awaiting Payment, Payment Received): not a plain Draft, nor
+	Cancelled."""
+	return contract.status not in HIDDEN_STATUSES
 
 
 def _pays_first(contract) -> bool:
 	"""A draft whose Service requires a payment before it is issued, with its Sales Order submitted: the producer pays
 	it here, and sees it received while the team issues the contract."""
-	return bool(
-		contract.docstatus == 0
-		and contract.payment_requirement
-		and contract.sales_order
-		and frappe.db.get_value("Sales Order", contract.sales_order, "docstatus") == 1
-	)
+	return contract.docstatus == 0 and contract.status in PAYMENT_STATUSES
 
 
 def _issued(document_type: str, names: list[str]) -> dict:
@@ -175,11 +172,6 @@ def _issued(document_type: str, names: list[str]) -> dict:
 		)
 		if _shown(row)
 	}
-
-
-def count_contracts(producer: frappe._dict) -> int:
-	"""The overview's count: what the Contracts page lists."""
-	return len(get_contracts(producer))
 
 
 def _entry(
@@ -204,13 +196,11 @@ def _entry(
 def _contract(contract) -> dict:
 	"""A contract as the producer sees it; a draft taking its payment says how much, and whether it pays online."""
 	pays_first = _pays_first(contract)
-	awaiting = pays_first and awaits_payment(contract)
-	status = (AWAITING_PAYMENT if awaiting else PAYMENT_RECEIVED) if pays_first else contract.status
 	return {
 		"name": contract.name,
-		"status": status,
-		"status_label": _(status),
-		"status_color": ("orange" if awaiting else "green") if pays_first else status_color("Service Contract", status),
+		"status": contract.status,
+		"status_label": _(contract.status),
+		"status_color": status_color("Service Contract", contract.status),
 		"contract_date": contract.contract_date,
 		"payment": pays_first
 		and {
@@ -220,7 +210,7 @@ def _contract(contract) -> dict:
 			"received": received_payment(contract),
 			"to_pay": amount_to_pay(contract),
 			"currency": contract.currency,
-			"can_pay_online": awaiting and can_pay_online(contract),
+			"can_pay_online": contract.status == AWAITING_PAYMENT and can_pay_online(contract),
 		},
 	}
 

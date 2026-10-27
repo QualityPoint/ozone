@@ -4,7 +4,7 @@
        prepares it. A quotation opens (QuotationPanel) on the amount, the collection, the waste report,
        the answer and the conversation; one waiting for the producer's answer is open from the start. -->
   <section>
-    <DashboardHeading :title="t('dashboard.nav.quotations')" :intro="t('dashboard.quotations.intro')" />
+    <DashboardHeading :eyebrow="t('dashboard.nav.groups.operations')" :title="t('dashboard.nav.quotations')" :intro="t('dashboard.quotations.intro')" />
     <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
     <p v-else-if="!requests" class="mt-8 text-site-muted">{{ t("dashboard.requests.loading") }}</p>
     <p v-else-if="!requests.length" class="mt-8 text-site-muted">
@@ -13,7 +13,7 @@
     </p>
 
     <ul v-else class="mt-8 space-y-3">
-      <li v-for="request in requests" :key="request.name">
+      <li v-for="request in requests" :key="request.name" class="dash-rise">
         <BaseCard :class="['p-5', request.quotations.some((q) => q.status === 'Open') ? 'ring-2 ring-brand-red/60' : '']">
           <div class="flex min-w-0 gap-4">
             <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-site-hover text-brand-green dark:text-brand-leaf">

@@ -26,6 +26,21 @@ export function formatMonth(month: number, code: LocaleCode): string {
 	)
 }
 
+/** A date in the visitor's language, from the server's "2026-11-01": "1 Nov 2026". */
+export function formatDate(value: string, code: LocaleCode): string {
+	return new Intl.DateTimeFormat(DATE_LOCALE[code], {
+		dateStyle: "medium",
+	}).format(new Date(`${value}T00:00:00`))
+}
+
+/** A date and time in the visitor's language, from the server's "2026-10-27 10:42:00": "27 Oct 2026, 10:42". */
+export function formatDateTime(value: string, code: LocaleCode): string {
+	return new Intl.DateTimeFormat(DATE_LOCALE[code], {
+		dateStyle: "medium",
+		timeStyle: "short",
+	}).format(new Date(value.replace(" ", "T")))
+}
+
 /** An amount in its currency, with Latin digits in both languages: "3,900.00 SAR" / "3,900.00 ر.س.". */
 export function formatMoney(
 	value: number,

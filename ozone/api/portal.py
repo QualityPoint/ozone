@@ -4,23 +4,25 @@ the rules are in ozone/portal/ (docs/producer_dashboard/access.md, api.md)."""
 
 import frappe
 
-from ozone.portal import contracts, establishment, facilities, notifications, profile, quotations, requests
-from ozone.producer import owned_names, require_producer
+from ozone.portal import (
+	contracts,
+	establishment,
+	facilities,
+	notifications,
+	overview,
+	profile,
+	quotations,
+	requests,
+)
+from ozone.producer import (
+	owned_names,
+	require_producer,
+)
 
 
 @frappe.whitelist(methods=["GET"])
 def get_overview() -> dict:
-	"""The producer and how many of its records there are, for the dashboard's first page."""
-	producer = require_producer()
-	return {
-		"producer": {"doctype": producer.doctype, "name": producer.name, "title": producer.title},
-		"counts": {
-			"facilities": len(owned_names("Facility", producer)),
-			"service_requests": len(owned_names("Service Request", producer)),
-			"quotations": quotations.count_quotations(producer),
-			"contracts": contracts.count_contracts(producer),
-		},
-	}
+	return overview.get_overview(require_producer())
 
 
 @frappe.whitelist(methods=["GET"])

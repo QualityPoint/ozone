@@ -8,7 +8,7 @@
        facility's request covers, when it starts and for how long, and the license it holds when
        the service grants one. -->
   <section>
-    <DashboardHeading :title="t('dashboard.nav.requests')" :intro="t('dashboard.requests.intro')">
+    <DashboardHeading :eyebrow="t('dashboard.nav.groups.operations')" :title="t('dashboard.nav.requests')" :intro="t('dashboard.requests.intro')">
       <BaseButton v-if="!editing && options?.facilities.length" @click="open()">
         <LucidePlus class="size-4" aria-hidden="true" />
         {{ t("dashboard.requests.add") }}
@@ -181,7 +181,7 @@
     </div>
     <p v-if="requests && !requests.length && !editing" class="mt-8 text-site-muted">{{ t("dashboard.requests.none") }}</p>
     <ul class="mt-6 space-y-3">
-      <li v-for="request in requests" :key="request.name">
+      <li v-for="request in requests" :key="request.name" class="dash-rise">
         <BaseCard :class="['p-5', request.status === 'Require Clarification' ? 'ring-2 ring-brand-red/60' : '']">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="flex min-w-0 gap-4">

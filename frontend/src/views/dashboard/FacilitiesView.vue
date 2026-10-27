@@ -4,7 +4,7 @@
        documents come with the services it requests (the request form); a composite facility gives
        here the one its annexes share, which they carry too. -->
   <section>
-    <DashboardHeading :title="t('dashboard.nav.facilities')" :intro="t('dashboard.facilities.intro')">
+    <DashboardHeading :eyebrow="t('dashboard.nav.groups.operations')" :title="t('dashboard.nav.facilities')" :intro="t('dashboard.facilities.intro')">
       <BaseButton v-if="!editing && settings" @click="edit(null)">
         <LucidePlus class="size-4" aria-hidden="true" />
         {{ t("dashboard.facilities.add") }}
@@ -132,7 +132,7 @@
 
     <p v-if="facilities && !facilities.length && !editing" class="mt-8 text-site-muted">{{ t("dashboard.facilities.none") }}</p>
     <ul class="mt-8 space-y-3">
-      <li v-for="facility in facilities" :key="facility.name" :class="{ 'ms-6 border-s-2 border-site-line ps-4 sm:ms-10': facility.parent_facility }">
+      <li v-for="facility in facilities" :key="facility.name" class="dash-rise" :class="{ 'ms-6 border-s-2 border-site-line ps-4 sm:ms-10': facility.parent_facility }">
         <BaseCard class="p-5">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="flex min-w-0 gap-4">

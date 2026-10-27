@@ -1,7 +1,8 @@
 <template>
   <!-- The producer's dashboard (docs/producer_dashboard/frontend.md): a top bar with the logo, the
        producer's name and the controls; the pages menu at the side on desktop and as a scrolling
-       row under the top bar on phones; the page on the site's tint. -->
+       row under the top bar on phones; the page on the site's tint. The overview (stores/dashboard)
+       is loaded again on each page, for the menu's counts. -->
   <div class="flex min-h-screen flex-col bg-site-tint">
     <a
       href="#main"
@@ -44,7 +45,7 @@
         <DashboardNav class="sticky top-[4.5rem] p-4" />
       </aside>
       <main id="main" class="min-w-0 flex-1 px-4 py-8 sm:px-8">
-        <div class="mx-auto max-w-5xl">
+        <div class="mx-auto max-w-6xl">
           <slot />
         </div>
       </main>
@@ -54,7 +55,10 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
+import { watch } from "vue"
 import { useI18n } from "vue-i18n"
+import { useRoute } from "vue-router"
 import LucideLogOut from "~icons/lucide/log-out"
 
 import BrandLogo from "@/components/brand/BrandLogo.vue"
@@ -64,14 +68,25 @@ import NotificationBell from "@/components/dashboard/NotificationBell.vue"
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher.vue"
 import ThemeToggle from "@/components/layout/ThemeToggle.vue"
 import { useLocale } from "@/composables/useLocale"
+import { useDashboardStore } from "@/stores/dashboard"
 import { useSessionStore } from "@/stores/session"
 import { useUserStore } from "@/stores/user"
-import { storeToRefs } from "pinia"
 
 const { t } = useI18n()
 const { home } = useLocale()
 const session = useSessionStore()
 const { producer } = storeToRefs(useUserStore())
+const dashboard = useDashboardStore()
+const route = useRoute()
+
+// The overview again on every page: the menu's counts and dots follow what the producer just did
+watch(
+	[() => route.path, producer],
+	() => {
+		if (producer.value) dashboard.load()
+	},
+	{ immediate: true },
+)
 
 async function logOut() {
 	await session.logout().catch(() => {})

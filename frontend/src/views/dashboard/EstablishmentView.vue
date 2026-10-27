@@ -3,7 +3,7 @@
        transporter keeps its name, type, group and territory; the producer keeps its industry,
        market segment and website up to date. -->
   <section>
-    <DashboardHeading :title="t('dashboard.nav.establishment')" :intro="t('dashboard.establishment.intro')" />
+    <DashboardHeading :eyebrow="t('dashboard.nav.groups.account')" :title="t('dashboard.nav.establishment')" :intro="t('dashboard.establishment.intro')" />
     <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
 
     <div v-if="establishment" class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

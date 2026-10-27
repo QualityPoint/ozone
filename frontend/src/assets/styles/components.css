@@ -5,3 +5,17 @@
 		@apply relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
 	}
 }
+
+/* The dashboard's panels and cards rise into place as a page opens; `--rise-delay` staggers siblings.
+   Nothing waits for it: each starts visible and only moves, and not at all with reduced motion. */
+@keyframes dash-rise {
+	from {
+		transform: translateY(12px);
+	}
+}
+@media (prefers-reduced-motion: no-preference) {
+	.dash-rise {
+		animation: dash-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+		animation-delay: var(--rise-delay, 0ms);
+	}
+}

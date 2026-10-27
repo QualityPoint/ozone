@@ -1,6 +1,5 @@
 export default {
 	logout: "Log out",
-	soon: "Soon",
 	save: "Save",
 	saved: "Your changes are saved.",
 	cancel: "Cancel",
@@ -33,6 +32,11 @@ export default {
 		requests: "Service requests",
 		quotations: "Quotations",
 		contracts: "Contracts",
+		/** The menu's groups after the overview. */
+		groups: {
+			operations: "Operations",
+			account: "Account",
+		},
 	},
 	/** The account's stage: the party it belongs to (ozone/producer.py). */
 	stage: {
@@ -51,6 +55,38 @@ export default {
 			quotations: "Quotations",
 			contracts: "Contracts",
 		},
+		newRequest: "Request a service",
+		addFacility: "Add a facility",
+		/** The stages of the journey with nothing in them yet. */
+		empty: {
+			facilities: "Add your first facility",
+			requests: "No requests yet",
+			quotations: "No quotation awaits your answer",
+			contracts: "No contracts yet",
+		},
+		/** What waits for the producer (ozone/portal/overview.py: next_steps), by kind. */
+		next: {
+			label: "Your next step",
+			more: "Also waiting for you",
+			open: "Open",
+			payment: "Pay to have your contract issued",
+			quotation: "Answer your quotation",
+			clarification: "Ozone's team asked you a question",
+			draft: "Submit your service request",
+			facility: "Add your first facility",
+			facilityHint: "Register your facility, then request services for it.",
+			request: "Request your first service",
+			requestHint:
+				"Ask for a service at your facility. Ozone's team reviews it and prepares the quotation.",
+			upToDate: "You're up to date",
+			upToDateHint:
+				"Nothing waits for you right now. Request a service whenever you need one.",
+		},
+		contracts: "Your contracts",
+		allContracts: "All contracts",
+		activity: "Recent activity",
+		noActivity:
+			"Nothing yet. What Ozone's team does on your requests, quotations and contracts shows here.",
 	},
 	notLinked: {
 		title: "Your account is being linked",
@@ -181,7 +217,7 @@ export default {
 	},
 	notifications: {
 		title: "Notifications",
-		unread: "Notifications: {count} unread",
+		unread: "Unread notifications",
 		none: "Nothing new. You'll be told here when Ozone's team acts on your requests, quotations and contracts.",
 		markAll: "Mark all read",
 	},

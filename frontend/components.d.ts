@@ -41,6 +41,7 @@ declare module 'vue' {
     FileField: typeof import('./src/components/dashboard/FileField.vue')['default']
     IconSocial: typeof import('./src/components/icons/IconSocial.vue')['default']
     IsicPicker: typeof import('./src/components/dashboard/IsicPicker.vue')['default']
+    JourneyStage: typeof import('./src/components/dashboard/JourneyStage.vue')['default']
     LandingAbout: typeof import('./src/components/landing/LandingAbout.vue')['default']
     LandingContact: typeof import('./src/components/landing/LandingContact.vue')['default']
     LandingEquipment: typeof import('./src/components/landing/LandingEquipment.vue')['default']

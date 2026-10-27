@@ -77,18 +77,6 @@ def get_quotations(producer: frappe._dict) -> list[dict]:
 	]
 
 
-def count_quotations(producer: frappe._dict) -> int:
-	"""How many quotations the team has sent the producer and not yet submitted (the overview's count)."""
-	return frappe.db.count(
-		"Service Quotation",
-		{
-			"name": ["in", owned_names("Service Quotation", producer) or [""]],
-			"status": ["in", CLIENT_STATUSES],
-			"docstatus": 0,
-		},
-	)
-
-
 def get_quotation(producer: frappe._dict, name: str) -> dict:
 	quotation = _visible(name, producer)
 	ends = has_end_date(quotation.service_term)

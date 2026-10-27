@@ -37,19 +37,19 @@ export const authPaths = {
 
 /**
  * The producer dashboard (website_route_rules in ozone/hooks.py: /dashboard and below). Private:
- * not in meta.json, so not indexed. Its pages in the menu's order; `soon` ones show, disabled.
+ * not in meta.json, so not indexed. Its pages in the menu's order, the overview then two groups.
  */
 export const dashboardPath = "/dashboard"
 export const dashboardPages = [
 	{ id: "overview", path: "" },
-	// The facility first: a producer registers it, then asks for services for it
-	{ id: "facilities", path: "/facilities" },
-	{ id: "requests", path: "/requests" },
-	// A request that turns into a quotation moves here
-	{ id: "quotations", path: "/quotations" },
-	{ id: "profile", path: "/profile" },
-	{ id: "establishment", path: "/establishment" },
-	{ id: "contracts", path: "/contracts" },
+	// The journey, in its order: a producer registers its facility, asks for services for it, answers
+	// the quotation a request turns into, and pays and follows the contract that follows
+	{ id: "facilities", path: "/facilities", group: "operations" },
+	{ id: "requests", path: "/requests", group: "operations" },
+	{ id: "quotations", path: "/quotations", group: "operations" },
+	{ id: "contracts", path: "/contracts", group: "operations" },
+	{ id: "profile", path: "/profile", group: "account" },
+	{ id: "establishment", path: "/establishment", group: "account" },
 ] as const
 export type DashboardPageId = (typeof dashboardPages)[number]["id"]
 

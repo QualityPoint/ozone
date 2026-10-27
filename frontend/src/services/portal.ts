@@ -14,6 +14,46 @@ export interface Overview {
 		quotations: number
 		contracts: number
 	}
+	/** What waits for the producer, the most pressing first (ozone/portal/overview.py). */
+	next_steps: NextStep[]
+	/** The latest record of each stage of the journey; null before the first. */
+	stages: Record<
+		"facilities" | "requests" | "quotations" | "contracts",
+		Stage | null
+	>
+	/** The latest contracts, as get_contracts lists them. */
+	contracts: ContractEntry[]
+}
+
+export type NextStepKind =
+	| "payment"
+	| "quotation"
+	| "clarification"
+	| "draft"
+	| "facility"
+	| "request"
+
+export interface NextStep {
+	kind: NextStepKind
+	/** The dashboard page it is done on. */
+	section: "contracts" | "quotations" | "requests" | "facilities"
+	/** The record, with its service and facility; none for a first facility or request. */
+	name?: string
+	title?: string
+	facility?: string
+	/** A contract to pay. */
+	payment?: ContractPayment
+	/** A quotation to answer. */
+	amount?: number
+	currency?: string
+}
+
+export interface Stage {
+	title: string
+	detail: string | null
+	/** None for a facility, and for a contract the team still prepares. */
+	status_label?: string | null
+	status_color?: string | null
 }
 
 export interface Address {

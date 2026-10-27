@@ -15,8 +15,27 @@ Each route exists in both languages: `/dashboard` and `/en/dashboard`.
 | `/dashboard/contracts` | `DashboardContracts` | `requiresAuth`, `producerOnly` |
 | `/dashboard/not-linked` | `DashboardNotLinked` | `requiresAuth` |
 
-The pages are listed in `dashboardPages` (`config/site.ts`). Pages still to come show in the menu
-with a "soon" tag.
+The pages are listed in `dashboardPages` (`config/site.ts`): the overview, then two groups, Operations (the
+journey's pages: Facilities, Service requests, Quotations, Contracts) and Account (My details, Establishment).
+
+## The look
+
+The dashboard wears the website's identity (docs/frontend/branding.md): every page opens with
+`DashboardHeading`, a white panel with the site's diagonal silver shards and dots, the red section tag (the page's
+menu group; the producer's stage on the overview), the title and intro. Panels and list cards rise into place as a
+page opens (`.dash-rise` in `assets/styles/components.css`: movement only, never hidden, none with reduced motion).
+
+The overview (`get_overview`, kept in `stores/dashboard.ts`) is organised around what the producer does next:
+
+- **the next step**, beside the title: the most pressing of `next_steps` (a contract to pay, with its progress and
+  Pay now; a quotation to answer; a clarification to give; a draft to send; a first facility or request), or "up to
+  date";
+- **the journey**: Facility → Request → Quotation → Contract, each card counting up to its page's count, with its
+  latest record and status, and opening its page (`JourneyStage.vue`);
+- what **also waits**, the **latest contracts**, and **recent activity** (the latest notifications).
+
+The layout loads the overview again on every dashboard page, so the menu shows each journey page's count and a red
+dot where something waits for the producer, and they follow what the producer just did.
 
 ## Guard (`router/guards.ts: installAuthGuard`)
 
@@ -34,8 +53,11 @@ It only picks the page. Data access is the server's job.
 | File | Role |
 | --- | --- |
 | `layouts/DashboardLayout.vue` | Top bar (logo, producer, theme, language, logout), and the menu: at the side from `lg`, a scrolling row on phones |
-| `components/dashboard/DashboardNav.vue` | The menu, from `dashboardPages` |
-| `views/dashboard/OverviewView.vue` | The producer's stage (Lead or Customer), name and counts |
+| `components/dashboard/DashboardNav.vue` | The menu, from `dashboardPages`, in its groups, with the journey pages' counts and a red dot where something waits |
+| `views/dashboard/OverviewView.vue` | The producer's stage (Lead or Customer) and name, its next step, the journey, what also waits, the latest contracts and recent activity (see The look) |
+| `components/dashboard/JourneyStage.vue` | One stage of the journey on the overview: its place, its count (counting up), its latest record |
+| `stores/dashboard.ts` | The overview (`get_overview`), loaded by the layout on every page; `waiting`: the pages where something waits |
+| `composables/usePayContract.ts` | Opens a contract's checkout (`pay_contract`), for the overview and the Contracts page |
 | `views/dashboard/ProfileView.vue` | My account (name, mobile), the party (read-only), addresses (add, edit) |
 | `views/dashboard/EstablishmentView.vue` | The establishment: read-only details, and industry, market segment, website |
 | `views/dashboard/FacilitiesView.vue` | The facility tree (annexes under their composite facility) with each one's activity and a link to request a service, and the form: details, address, location (pasted or on the map), credentials |
@@ -47,7 +69,7 @@ It only picks the page. Data access is the server's job.
 | `components/dashboard/FacilityMap.vue` | Leaflet map: click to drop the pin, drag to move it |
 | `components/dashboard/FileField.vue` | Uploads a document (`services/http.ts: uploadFile`) and holds its URL |
 | `utils/status.ts` | `statusBadge`: a status badge (requests, quotations, contracts, a facility's activity) in its DocType state's colour, as the server sends it (`status_color`), styled like the Desk's indicator pills |
-| `components/dashboard/DashboardHeading.vue` | A page's corner-marked title, intro and main action |
+| `components/dashboard/DashboardHeading.vue` | A page's title panel (silver shards and dots, the red section tag), intro, `actions` under it and the main action (or the overview's next step) at its end |
 | `components/dashboard/IsicPicker.vue` | Search and pick an ISIC activity |
 | `components/base/BaseSelect.vue` | A select in BaseInput's look |
 | `composables/useFormSubmit.ts` | How a form sends: errors after the first try, the server's own refusal text |
@@ -68,4 +90,5 @@ for one. `get_session_user` returns the producer's `facilities` count, and while
 - once the first facility is saved, it offers the next step, a service request for it
   (`/dashboard/requests?facility=…`), and reloads the session so the overview opens again.
 
-The menu follows the same order: Overview, Facilities, Service requests, then My details and Establishment.
+The menu follows the same order: Overview, then Facilities, Service requests, Quotations and Contracts, then My
+details and Establishment.
