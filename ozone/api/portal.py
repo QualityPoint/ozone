@@ -4,7 +4,7 @@ the rules are in ozone/portal/ (docs/producer_dashboard/access.md, api.md)."""
 
 import frappe
 
-from ozone.portal import contracts, establishment, facilities, profile, quotations, requests
+from ozone.portal import contracts, establishment, facilities, notifications, profile, quotations, requests
 from ozone.producer import owned_names, require_producer
 
 
@@ -132,6 +132,12 @@ def get_contracts() -> list[dict]:
 	return contracts.get_contracts(require_producer())
 
 
+@frappe.whitelist(methods=["POST"])
+def pay_contract(name: str) -> dict:
+	"""The checkout to pay what the contract requires before it is issued: `{url}`."""
+	return contracts.pay_contract(require_producer(), name)
+
+
 @frappe.whitelist(methods=["GET"])
 def get_quotations() -> list[dict]:
 	return quotations.get_quotations(require_producer())
@@ -150,3 +156,15 @@ def decide_quotation(name: str, decision: str, comment: str | None = None) -> di
 @frappe.whitelist(methods=["GET"])
 def get_quotation_thread(name: str) -> dict:
 	return quotations.get_quotation_thread(require_producer(), name)
+
+
+@frappe.whitelist(methods=["GET"])
+def get_notifications() -> dict:
+	"""The producer's latest notifications and how many are unread."""
+	return notifications.get_notifications(require_producer())
+
+
+@frappe.whitelist(methods=["POST"])
+def mark_notifications_read(names: list[str] | str | None = None) -> dict:
+	"""Mark the given notifications read (all of them without names)."""
+	return notifications.mark_read(require_producer(), frappe.parse_json(names) if isinstance(names, str) else names)

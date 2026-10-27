@@ -21,6 +21,7 @@
           </p>
         </div>
         <div class="flex items-center gap-1">
+          <NotificationBell v-if="producer" />
           <ThemeToggle />
           <LanguageSwitcher />
           <button
@@ -59,6 +60,7 @@ import LucideLogOut from "~icons/lucide/log-out"
 import BrandLogo from "@/components/brand/BrandLogo.vue"
 import BrandStripe from "@/components/brand/BrandStripe.vue"
 import DashboardNav from "@/components/dashboard/DashboardNav.vue"
+import NotificationBell from "@/components/dashboard/NotificationBell.vue"
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher.vue"
 import ThemeToggle from "@/components/layout/ThemeToggle.vue"
 import { useLocale } from "@/composables/useLocale"

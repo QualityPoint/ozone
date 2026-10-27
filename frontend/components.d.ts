@@ -74,6 +74,7 @@ declare module 'vue' {
     NaqelPlatformArt: typeof import('./src/components/naqel/brand/NaqelPlatformArt.vue')['default']
     NaqelSectionHeading: typeof import('./src/components/naqel/base/NaqelSectionHeading.vue')['default']
     NavLink: typeof import('./src/components/layout/NavLink.vue')['default']
+    NotificationBell: typeof import('./src/components/dashboard/NotificationBell.vue')['default']
     QuotationPanel: typeof import('./src/components/dashboard/QuotationPanel.vue')['default']
     RegionPicker: typeof import('./src/components/dashboard/RegionPicker.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

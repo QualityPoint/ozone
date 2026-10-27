@@ -179,12 +179,31 @@ export default {
 		website: "Website",
 		pick: "Choose…",
 	},
+	notifications: {
+		title: "Notifications",
+		unread: "Notifications: {count} unread",
+		none: "Nothing new. You'll be told here when Ozone's team acts on your requests, quotations and contracts.",
+		markAll: "Mark all read",
+	},
 	contracts: {
 		intro:
 			"Your contracts with Ozone: each follows a quotation you accepted, with its service, facility, period and amount.",
 		none: "No contracts yet. A contract follows a quotation you accept: see",
 		preparing: "Contract being prepared",
 		details: "Quotation details",
+		payment: {
+			title: "Before your contract is issued",
+			required: "Required",
+			received: "Received",
+			toPay: "To pay",
+			pay: "Pay now",
+			paying: "Opening the payment…",
+			failed:
+				"The payment couldn't be opened. Try again, or contact Ozone's team.",
+			offline: "Ozone's team will tell you how to pay this amount.",
+			issuing:
+				"Your payment is received: Ozone's team is issuing your contract.",
+		},
 	},
 	quotations: {
 		intro:

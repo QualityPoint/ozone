@@ -44,6 +44,47 @@
             </div>
           </div>
 
+          <!-- What it requires paid before it is issued (a draft awaiting the producer's payment) -->
+          <div
+            v-if="entry.contract?.payment"
+            class="mt-4 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950/30"
+          >
+            <p class="text-caption font-bold text-site-heading">
+              {{ t("dashboard.contracts.payment.title") }} · {{ entry.contract.payment.requirement_label }}
+            </p>
+            <dl class="mt-2 grid grid-cols-3 gap-3 text-caption">
+              <div>
+                <dt class="text-site-muted">{{ t("dashboard.contracts.payment.required") }}</dt>
+                <dd class="font-bold text-site-heading">{{ money(entry.contract.payment.required, entry.contract.payment.currency) }}</dd>
+              </div>
+              <div>
+                <dt class="text-site-muted">{{ t("dashboard.contracts.payment.received") }}</dt>
+                <dd class="font-bold text-site-heading">{{ money(entry.contract.payment.received, entry.contract.payment.currency) }}</dd>
+              </div>
+              <div>
+                <dt class="text-site-muted">{{ t("dashboard.contracts.payment.toPay") }}</dt>
+                <dd class="font-extrabold text-site-heading">{{ money(entry.contract.payment.to_pay, entry.contract.payment.currency) }}</dd>
+              </div>
+            </dl>
+            <button
+              v-if="entry.contract.payment.can_pay_online"
+              type="button"
+              class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-green px-5 py-2 text-label font-bold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-leaf disabled:opacity-60"
+              :disabled="paying === entry.contract.name"
+              @click="pay(entry.contract.name)"
+            >
+              <LucideCreditCard class="size-4" aria-hidden="true" />
+              {{ paying === entry.contract.name ? t("dashboard.contracts.payment.paying") : t("dashboard.contracts.payment.pay") }}
+            </button>
+            <p v-else-if="entry.contract.payment.to_pay > 0" class="mt-3 text-caption text-site-muted">
+              {{ t("dashboard.contracts.payment.offline") }}
+            </p>
+            <p v-else class="mt-3 text-caption font-bold text-brand-green dark:text-brand-leaf">
+              {{ t("dashboard.contracts.payment.issuing") }}
+            </p>
+            <BaseNotice v-if="payFailed === entry.contract.name" class="mt-3">{{ t("dashboard.contracts.payment.failed") }}</BaseNotice>
+          </div>
+
           <!-- The accepted quotation it follows -->
           <template v-if="entry.quotation">
             <button
@@ -67,6 +108,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from "vue"
 import { useI18n } from "vue-i18n"
+import LucideCreditCard from "~icons/lucide/credit-card"
 import LucideHandshake from "~icons/lucide/handshake"
 import LucideHourglass from "~icons/lucide/hourglass"
 import LucideReceipt from "~icons/lucide/receipt"
@@ -76,7 +118,11 @@ import BaseNotice from "@/components/base/BaseNotice.vue"
 import DashboardHeading from "@/components/dashboard/DashboardHeading.vue"
 import QuotationPanel from "@/components/dashboard/QuotationPanel.vue"
 import { dashboardPath, localePath } from "@/config/site"
-import { type ContractEntry, getContracts } from "@/services/portal"
+import {
+	type ContractEntry,
+	getContracts,
+	payContract,
+} from "@/services/portal"
 import type { LocaleCode } from "@/types"
 import { formatMoney } from "@/utils/format"
 import { statusBadge } from "@/utils/status"
@@ -85,6 +131,9 @@ const { t, locale } = useI18n()
 const entries = ref<ContractEntry[] | null>(null)
 const failed = ref(false)
 const open = reactive<Record<string, boolean>>({})
+// The contract whose payment is being opened, and the one whose payment couldn't be
+const paying = ref<string | null>(null)
+const payFailed = ref<string | null>(null)
 const quotationsLink = computed(() =>
 	localePath(`${dashboardPath}/quotations`, locale.value as LocaleCode),
 )
@@ -96,6 +145,23 @@ onMounted(async () => {
 		failed.value = true
 	}
 })
+
+/** Open the contract's checkout (its Payment Request's: Moyasar), which brings the producer back when it is paid. */
+async function pay(name: string) {
+	paying.value = name
+	payFailed.value = null
+	try {
+		const { url } = await payContract(name)
+		window.location.assign(url)
+	} catch {
+		payFailed.value = name
+		paying.value = null
+	}
+}
+
+function money(amount: number, currency: string): string {
+	return formatMoney(amount, currency, locale.value)
+}
 
 function formatDate(value: string): string {
 	return new Intl.DateTimeFormat(locale.value, { dateStyle: "medium" }).format(

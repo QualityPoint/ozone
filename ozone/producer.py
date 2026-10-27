@@ -129,6 +129,24 @@ def carry_lead_users(customer, method=None):
 			listed.add(user)
 
 
+def party_users(party_type: str | None, party: str | None) -> list[str]:
+	"""The website users a party's records belong to, the reverse of get_producer: a Customer's Portal Users, and the
+	users of its Lead's Contacts while the Lead is open; a Lead's, through its Contacts."""
+	if not party or party_type not in ("Customer", "Lead"):
+		return []
+	users = []
+	if party_type == "Customer":
+		users = frappe.get_all(
+			"Portal User", filters={"parenttype": "Customer", "parentfield": "portal_users", "parent": party}, pluck="user"
+		)
+	else:
+		contacts = frappe.get_all(
+			"Dynamic Link", filters={"parenttype": "Contact", "link_doctype": "Lead", "link_name": party}, pluck="parent"
+		)
+		users = frappe.get_all("Contact", filters={"name": ["in", contacts or [""]], "user": ["is", "set"]}, pluck="user")
+	return [user for user in dict.fromkeys(users) if is_website_user(user)]
+
+
 def _customer_of(user: str) -> str | None:
 	"""The first enabled Customer listing the user in its Portal Users (ERPNext's get_parents_for_user,
 	for any user rather than only the session's)."""

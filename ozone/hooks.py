@@ -171,6 +171,15 @@ jinja = {"methods": ["ozone.contract_print.waste_transport_contract"]}
 doc_events = {
 	# A Customer made from a Lead lists the Lead's website users in its Portal Users
 	"Customer": {"after_insert": "ozone.producer.carry_lead_users"},
+	# The producer's notifications in its dashboard, when Ozone's team acts on its records (ozone/notifications.py)
+	"Service Quotation": {"on_update": "ozone.notifications.quotation_sent"},
+	"Service Request": {"on_update_after_submit": "ozone.notifications.clarification_asked"},
+	"Sales Order": {"on_submit": "ozone.notifications.contract_awaits_payment"},
+	"Payment Entry": {"on_submit": "ozone.notifications.payment_received"},
+	"Service Contract": {
+		"on_submit": "ozone.notifications.contract_issued",
+		"on_update_after_submit": "ozone.notifications.contract_renewed",
+	},
 }
 
 # doc_events = {

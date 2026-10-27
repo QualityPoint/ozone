@@ -25,6 +25,8 @@ today's naqel:
 | — | A composite facility's request lists the **annexes** it covers |
 | `Facility.has_website_permission` | A `has_website_permission` hook in ozone |
 
+See also [notifications.md](notifications.md): what tells the producer in its dashboard.
+
 ## Status
 
 | Part | Covers | State |

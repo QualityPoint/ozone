@@ -539,12 +539,62 @@ export interface ContractEntry {
 		/** The status's colour in its DocType's states (utils/status: statusBadge). */
 		status_color: string
 		contract_date: string | null
+		/** A draft awaiting the producer's payment (its Service requires one before the contract is issued). */
+		payment: ContractPayment | false
 	} | null
 }
 
-/** The submitted quotations and the contracts that follow them (not Draft or Cancelled ones). */
+/** What a contract requires paid before it is issued, against its Sales Order. */
+export interface ContractPayment {
+	requirement: "Advance Payment" | "Full Payment"
+	requirement_label: string
+	required: number
+	received: number
+	to_pay: number
+	currency: string
+	/** Its company takes payments online (a Payment Gateway Account). */
+	can_pay_online: boolean
+}
+
+/** The submitted quotations and the contracts that follow them (not Draft or Cancelled ones, unless a draft awaits
+ *  the producer's payment). */
 export function getContracts(): Promise<ContractEntry[]> {
 	return getMethod(`${API}.get_contracts`)
+}
+
+/** One of the producer's notifications: what Ozone's team did on one of its records, and the page it opens in. */
+export interface Notification {
+	name: string
+	subject: string
+	doctype: string
+	docname: string
+	section: "quotations" | "requests" | "contracts"
+	read: boolean
+	creation: string
+}
+
+export interface Notifications {
+	unread: number
+	items: Notification[]
+}
+
+export function getNotifications(): Promise<Notifications> {
+	return getMethod(`${API}.get_notifications`)
+}
+
+/** Mark the given notifications read, or all of them. */
+export function markNotificationsRead(
+	names?: string[],
+): Promise<Notifications> {
+	return postMethod(
+		`${API}.mark_notifications_read`,
+		names ? { names: JSON.stringify(names) } : {},
+	)
+}
+
+/** The checkout to pay what a contract requires before it is issued (its Payment Request's). */
+export function payContract(name: string): Promise<{ url: string }> {
+	return postMethod(`${API}.pay_contract`, { name })
 }
 
 /** The requests that have turned into a quotation, each with the quotations sent for it. */
