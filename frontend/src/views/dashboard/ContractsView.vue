@@ -7,7 +7,6 @@
        next step). -->
   <section>
     <DashboardHeading :eyebrow="t('dashboard.nav.groups.operations')" :title="t('dashboard.nav.contracts')" :intro="t('dashboard.contracts.intro')" />
-    <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
     <p
       v-if="justSigned"
       class="mt-8 flex items-center gap-2 rounded-2xl bg-brand-green/10 px-4 py-3 font-bold text-brand-green dark:text-brand-leaf"
@@ -16,6 +15,7 @@
       <LucideBadgeCheck class="size-5" aria-hidden="true" />
       {{ t("dashboard.contracts.sign.done") }}
     </p>
+    <BaseNotice v-if="failed" class="mt-8">{{ t("dashboard.loadFailed") }}</BaseNotice>
     <p v-else-if="!entries" class="mt-8 text-site-muted">{{ t("dashboard.requests.loading") }}</p>
     <p v-else-if="!entries.length" class="mt-8 text-site-muted">
       {{ t("dashboard.contracts.none") }}
@@ -171,7 +171,6 @@ import QuotationPanel from "@/components/dashboard/QuotationPanel.vue"
 import { usePayContract } from "@/composables/usePayContract"
 import { dashboardPath, localePath } from "@/config/site"
 import { type ContractEntry, getContracts } from "@/services/portal"
-import { useDashboardStore } from "@/stores/dashboard"
 import type { LocaleCode } from "@/types"
 import { formatDate, formatDateTime, formatMoney } from "@/utils/format"
 import { statusBadge } from "@/utils/status"
@@ -187,7 +186,6 @@ type Contract = NonNullable<ContractEntry["contract"]>
 const reading = ref<Contract | null>(null)
 const justSigned = ref(false)
 const route = useRoute()
-const dashboard = useDashboardStore()
 const quotationsLink = computed(() =>
 	localePath(`${dashboardPath}/quotations`, locale.value as LocaleCode),
 )
@@ -207,11 +205,10 @@ onMounted(async () => {
 		)?.contract ?? null
 })
 
-/** Signed: the contracts as they now are, and the menu's and overview's next steps with them. */
+/** Signed: the contracts as they now are (the menu's counts follow: services/http's CHANGED event). */
 function signed(contracts: ContractEntry[]) {
 	entries.value = contracts
 	justSigned.value = true
-	dashboard.load()
 }
 
 function money(amount: number, currency: string): string {

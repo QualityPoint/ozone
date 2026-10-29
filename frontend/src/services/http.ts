@@ -98,6 +98,13 @@ export async function getMethod<T>(
 	return result<T>(response)
 }
 
+/**
+ * Raised on `window` after every POST that succeeded: something changed on the server (a facility saved, a request
+ * sent, a quotation answered, a contract signed…), so whatever shows a summary of it reloads (the dashboard's menu
+ * counts: DashboardLayout).
+ */
+export const CHANGED = "ozone:changed"
+
 /** POST JSON to a method (with the CSRF header); resolves to its `message`. */
 export async function postMethod<T>(
 	method: string,
@@ -112,7 +119,9 @@ export async function postMethod<T>(
 		},
 		body: JSON.stringify(withLang(args)),
 	})
-	return result<T>(response)
+	const message = await result<T>(response)
+	if (typeof window !== "undefined") window.dispatchEvent(new Event(CHANGED))
+	return message
 }
 
 /**

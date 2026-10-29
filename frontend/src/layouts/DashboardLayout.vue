@@ -2,7 +2,7 @@
   <!-- The producer's dashboard (docs/producer_dashboard/frontend.md): a top bar with the logo, the
        producer's name and the controls; the pages menu at the side on desktop and as a scrolling
        row under the top bar on phones; the page on the site's tint. The overview (stores/dashboard)
-       is loaded again on each page, for the menu's counts. -->
+       is loaded again on each page and after each change (services/http: CHANGED), for the menu's counts. -->
   <div class="flex min-h-screen flex-col bg-site-tint">
     <a
       href="#main"
@@ -55,6 +55,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useDebounceFn, useEventListener } from "@vueuse/core"
 import { storeToRefs } from "pinia"
 import { watch } from "vue"
 import { useI18n } from "vue-i18n"
@@ -68,6 +69,7 @@ import NotificationBell from "@/components/dashboard/NotificationBell.vue"
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher.vue"
 import ThemeToggle from "@/components/layout/ThemeToggle.vue"
 import { useLocale } from "@/composables/useLocale"
+import { CHANGED } from "@/services/http"
 import { useDashboardStore } from "@/stores/dashboard"
 import { useSessionStore } from "@/stores/session"
 import { useUserStore } from "@/stores/user"
@@ -79,14 +81,13 @@ const { producer } = storeToRefs(useUserStore())
 const dashboard = useDashboardStore()
 const route = useRoute()
 
-// The overview again on every page: the menu's counts and dots follow what the producer just did
-watch(
-	[() => route.path, producer],
-	() => {
-		if (producer.value) dashboard.load()
-	},
-	{ immediate: true },
-)
+// The overview again on every page, and after every change the producer makes on one: the menu's counts and dots
+// follow what the producer just did
+const reload = () => {
+	if (producer.value) dashboard.load()
+}
+watch([() => route.path, producer], reload, { immediate: true })
+useEventListener(window, CHANGED, useDebounceFn(reload, 300))
 
 async function logOut() {
 	await session.logout().catch(() => {})
